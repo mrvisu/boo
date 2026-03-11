@@ -70,7 +70,8 @@
             AlertTriangle: (props) => <Icon path="<path d='m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z'/><path d='M12 9v4'/><path d='M12 17h.01'/>" {...props}/>,
             LogOut: (props) => <Icon path="<path d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'/><polyline points='16 17 21 12 16 7'/><line x1='21' x2='9' y1='12' y2='12'/>" {...props}/>,
             CalendarPlus: (props) => <Icon path="<path d='M21 13V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8'/><line x1='16' x2='16' y1='2' y2='6'/><line x1='8' x2='8' y1='2' y2='6'/><line x1='3' x2='21' y1='10' y2='10'/><line x1='19' x2='19' y1='16' y2='22'/><line x1='16' x2='22' y1='19' y2='19'/>" {...props}/>,
-            Info: (props) => <Icon path="<circle cx='12' cy='12' r='10'/><line x1='12' x2='12' y1='16' y2='12'/><line x1='12' x2='12.01' y1='8' y2='8'/>" {...props}/>
+            Info: (props) => <Icon path="<circle cx='12' cy='12' r='10'/><line x1='12' x2='12' y1='16' y2='12'/><line x1='12' x2='12.01' y1='8' y2='8'/>" {...props}/>,
+            TrendingUp: (props) => <Icon path="<polyline points='23 6 13.5 15.5 8.5 10.5 1 18'/><polyline points='17 6 23 6 23 12'/>" {...props}/>
         };
 
         // --- Firebase Configuration ---
@@ -86,7 +87,6 @@
 
         let isFirebaseActive = false;
 
-        // --- Default Settings ---
         const DEFAULT_SETTINGS = {
           packages: [
             { id: 'p1', name: 'Wedding Basic', price: 5000 },
@@ -119,44 +119,60 @@
 
         const LOGO_URL = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh1m611kUbdULF_cv77ptyLsq5ssUUC1GGxZB65Ark2rIeXdbQr__HuuMbl6XbxKt-JNY3ZcGtgC-WjuJaIJTq1Be_DScv2TVEizbU4E1NYzDNj0iiNOIUESe2XyVs5CMgtzc-xsqLsMpYxun6IqzzQ6d8staQJWyUQM_CrGGt6zkLz0gsxONtu8Yd2Jfo/w640-h640/Gemini_Generated_Image_larjc1larjc1larj.png";
 
-        // Helper to generate Google Calendar Link with Full Details
+        // Helper to generate Google Calendar Link
         const generateGoogleCalendarLink = (booking) => {
             const dateObj = new Date(booking.date);
             if (isNaN(dateObj)) return "";
-
             const startStr = dateObj.toISOString().split('T')[0].replace(/-/g, '');
-            dateObj.setDate(dateObj.getDate() + 1); // Set end date as next day for all-day event
+            dateObj.setDate(dateObj.getDate() + 1);
             const endStr = dateObj.toISOString().split('T')[0].replace(/-/g, '');
-
             const session = booking.sessionType === 'آخر' ? booking.otherSessionType : booking.sessionType;
             const loc = booking.location === 'آخر' ? booking.otherLocation : booking.location;
             const casualLoc = booking.casualLocation === 'آخر' ? booking.otherCasualLocation : (booking.casualLocation || 'لا يوجد');
-            
             const title = encodeURIComponent(`📸 تصوير ${session} - ${booking.groomName} & ${booking.brideName}`);
-            
-            let description = `📞 الهاتف: ${booking.phone}\n`;
-            description += `🏠 العنوان: ${booking.address || 'غير مسجل'}\n`;
-            description += `💄 ميك أب: ${booking.makeupArtist || 'غير محدد'} (خروج: ${booking.makeupLeaveTime || '--:--'})\n`;
-            description += `📍 اللوكيشن: ${loc || 'غير محدد'}\n`;
-            description += `📸 كاجوال: ${casualLoc}\n\n`;
-            
-            description += `💰 مالي:\n`;
-            description += `- الباكيدج: ${booking.snapshotPackage?.name || 'غير محدد'}\n`;
-            description += `- الإجمالي: ${booking.totalPrice} ج.م\n`;
-            description += `- المتبقي: ${booking.remaining} ج.م\n\n`;
-
-            if (booking.snapshotVideoService) {
-                description += `🎥 فيديو:\n`;
-                description += `- الخدمة: ${booking.snapshotVideoService.name}\n`;
-                if (booking.videoStartTime) description += `- وقت البدء: ${booking.videoStartTime}\n`;
-                if (booking.videoAddons?.length > 0) description += `- إضافات: ${booking.videoAddons.map(a => a.name).join('، ')}\n`;
-            }
-
-            description += `\n⚠️ تنبيه: تصوير Full HD - تسليم فلاشة. النسخة الاحتياطية ضرورية.`;
-
-            return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startStr}/${endStr}&details=${encodeURIComponent(description)}&location=${encodeURIComponent(loc || '')}`;
+            let desc = `📞 الهاتف: ${booking.phone}\n🏠 العنوان: ${booking.address || 'غير مسجل'}\n💄 ميك أب: ${booking.makeupArtist || 'غير محدد'} (خروج: ${booking.makeupLeaveTime || '--:--'})\n📍 اللوكيشن: ${loc || 'غير محدد'}\n📸 كاجوال: ${casualLoc}\n\n💰 مالي:\n- الإجمالي: ${booking.totalPrice} ج.م\n- المتبقي: ${booking.remaining} ج.م\n\n⚠️ تنبيه: تصوير Full HD.`;
+            return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startStr}/${endStr}&details=${encodeURIComponent(desc)}&location=${encodeURIComponent(loc || '')}`;
         };
 
+        // --- Shared Helper Components ---
+        function InputField({ label, type = "text", value, onChange, placeholder, required }) {
+          return (
+            <div className="flex flex-col w-full">
+              <label className="text-xs text-gray-500 mb-1">{label} {required && <span className="text-red-500">*</span>}</label>
+              <input 
+                type={type} 
+                min={type === 'number' ? "0" : undefined} 
+                value={value} 
+                onChange={onChange} 
+                placeholder={placeholder} 
+                required={required} 
+                className="bg-black border border-[#333] text-white rounded-xl p-3 focus:outline-none focus:border-[#D4AF37] transition-all" 
+              />
+            </div>
+          );
+        }
+
+        function SelectField({ label, value, onChange, options = [] }) {
+          return (
+            <div className="flex flex-col w-full">
+              <label className="text-xs text-gray-500 mb-1">{label}</label>
+              <select value={value} onChange={onChange} className="bg-black border border-[#333] text-white rounded-xl p-3 outline-none focus:border-[#D4AF37]">
+                {options?.map((opt, i) => <option key={i} value={opt}>{opt}</option>)}
+              </select>
+            </div>
+          );
+        }
+
+        function DetailRow({ label, value, isMono }) {
+          return (
+            <div className="flex flex-col border-b border-[#222] pb-2">
+              <span className="text-xs text-gray-500">{label}</span>
+              <span className={`text-sm font-bold text-white ${isMono ? 'font-mono' : ''}`}>{value || '---'}</span>
+            </div>
+          );
+        }
+
+        // --- Main App Component ---
         function App() {
           const [user, setUser] = useState(null);
           const [isCheckingAuth, setIsCheckingAuth] = useState(true);
@@ -178,9 +194,7 @@
           useEffect(() => {
               if (firebaseConfig.apiKey && window.firebase) {
                   try {
-                      if (!firebase.apps.length) {
-                          firebase.initializeApp(firebaseConfig);
-                      }
+                      if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
                       isFirebaseActive = true;
                       setIsFirebaseActiveState(true);
                       firebase.auth().onAuthStateChanged((usr) => {
@@ -221,7 +235,7 @@
           };
 
           const handleLogout = () => {
-              if (isFirebaseActive && window.firebase) { firebase.auth().signOut(); } 
+              if (isFirebaseActive && window.firebase) firebase.auth().signOut();
               else { localStorage.removeItem('mrakby_local_user'); setUser(null); }
               setCurrentView('dashboard');
           };
@@ -232,17 +246,9 @@
             setIsMobileMenuOpen(false);
           };
 
-          if (isCheckingAuth) {
-              return <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center"><p className="text-[#D4AF37] font-bold text-xl">جاري التحميل...</p></div>;
-          }
-
-          if (!user) {
-              return <LoginScreen onLogin={setUser} isFirebaseActive={isFirebaseActiveState} showToast={showToast} />;
-          }
-
-          if (contractToPrint) {
-            return <ContractPrintView booking={contractToPrint} settings={settings} onClose={() => setContractToPrint(null)} />;
-          }
+          if (isCheckingAuth) return <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center"><p className="text-[#D4AF37] font-bold text-xl">جاري التحميل...</p></div>;
+          if (!user) return <LoginScreen onLogin={setUser} isFirebaseActive={isFirebaseActiveState} showToast={showToast} />;
+          if (contractToPrint) return <ContractPrintView booking={contractToPrint} settings={settings} onClose={() => setContractToPrint(null)} />;
 
           return (
             <div className="min-h-screen bg-[#0a0a0a] text-gray-200 font-sans" dir="rtl">
@@ -265,15 +271,9 @@
               <div className="flex flex-col md:flex-row min-h-screen">
                 <aside className={`${isMobileMenuOpen ? 'block' : 'hidden'} md:block w-full md:w-64 bg-[#111] border-l border-[#222] p-6 flex-shrink-0 transition-all flex flex-col`}>
                   <div className="hidden md:flex items-center gap-3 mb-10">
-                    <div className="p-1 rounded-full border-2 border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.2)]">
-                      <img src={LOGO_URL} alt="Mrakby Logo" className="w-12 h-12 rounded-full" />
-                    </div>
-                    <div>
-                      <h1 className="text-[#D4AF37] font-bold text-xl leading-tight">Mrakby</h1>
-                      <p className="text-xs text-gray-400 tracking-widest">PHOTOGRAPHY</p>
-                    </div>
+                    <div className="p-1 rounded-full border-2 border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.2)]"><img src={LOGO_URL} className="w-12 h-12 rounded-full" /></div>
+                    <div><h1 className="text-[#D4AF37] font-bold text-xl leading-tight">Mrakby</h1><p className="text-xs text-gray-400 tracking-widest uppercase">Photography</p></div>
                   </div>
-
                   <nav className="space-y-2 flex-1">
                     <NavItem icon={<Icons.LayoutDashboard />} label="الرئيسية" active={currentView === 'dashboard'} onClick={() => {setCurrentView('dashboard'); setIsMobileMenuOpen(false);}} />
                     <NavItem icon={<Icons.PlusCircle />} label="حجز جديد" active={currentView === 'new'} onClick={() => navigateToNewBooking('')} />
@@ -281,181 +281,26 @@
                     <NavItem icon={<Icons.CalendarIcon />} label="التقويم" active={currentView === 'calendar'} onClick={() => {setCurrentView('calendar'); setIsMobileMenuOpen(false);}} />
                     <NavItem icon={<Icons.Settings />} label="الإعدادات" active={currentView === 'settings'} onClick={() => {setCurrentView('settings'); setIsMobileMenuOpen(false);}} />
                   </nav>
-
                   <div className="mt-auto pt-10 space-y-4">
-                    <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 bg-red-900/20 text-red-500 py-2 rounded-xl border border-red-900/50 hover:bg-red-900/40 transition-colors">
-                        <Icons.LogOut size={18} /> تسجيل الخروج
-                    </button>
-                    <div className="p-4 bg-black/50 rounded-xl border border-[#D4AF37]/20 text-center">
-                      <p className="text-xs text-gray-500 mb-1">Studio ID</p>
-                      <p className="font-mono text-[#D4AF37] font-bold">#MRKBY_2026</p>
-                    </div>
+                    <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 bg-red-900/20 text-red-500 py-2 rounded-xl border border-red-900/50 hover:bg-red-900/40 transition-colors"><Icons.LogOut size={18} /> تسجيل الخروج</button>
+                    <div className="p-4 bg-black/50 rounded-xl border border-[#D4AF37]/20 text-center"><p className="text-xs text-gray-500 mb-1">Studio ID</p><p className="font-mono text-[#D4AF37] font-bold">#MRKBY_2026</p></div>
                   </div>
                 </aside>
 
                 <main className="flex-1 p-4 md:p-8 overflow-y-auto">
                   {currentView === 'dashboard' && <Dashboard bookings={bookings} />}
-                  {currentView === 'new' && <NewBooking settings={settings} initialDate={initialBookingDate} 
-                      user={user} isFirebaseActive={isFirebaseActiveState}
-                      onSuccess={(newB) => {
-                          if(!isFirebaseActiveState) setBookings([newB, ...bookings].sort((a, b) => new Date(b.date) - new Date(a.date))); 
-                          setCurrentView('clients');
-                      }} 
-                      showToast={showToast} />}
-                  {currentView === 'clients' && <ClientsList bookings={bookings} settings={settings} onPrint={setContractToPrint} showToast={showToast} 
-                      user={user} isFirebaseActive={isFirebaseActiveState}
-                      onLocalDelete={(id) => setBookings(bookings.filter(b => b.id !== id))} />}
+                  {currentView === 'new' && <NewBooking settings={settings} initialDate={initialBookingDate} user={user} isFirebaseActive={isFirebaseActiveState} onSuccess={(newB) => { if(!isFirebaseActiveState) setBookings([newB, ...bookings].sort((a, b) => new Date(b.date) - new Date(a.date))); setCurrentView('clients'); }} showToast={showToast} />}
+                  {currentView === 'clients' && <ClientsList bookings={bookings} settings={settings} onPrint={setContractToPrint} showToast={showToast} user={user} isFirebaseActive={isFirebaseActiveState} onLocalDelete={(id) => setBookings(bookings.filter(b => b.id !== id))} />}
                   {currentView === 'calendar' && <CalendarView bookings={bookings} onDayClick={navigateToNewBooking} settings={settings} showToast={showToast} />}
-                  {currentView === 'settings' && <SettingsView settings={settings} user={user} isFirebaseActive={isFirebaseActiveState} 
-                      onLocalSave={(s) => setSettings(s)} showToast={showToast} />}
+                  {currentView === 'settings' && <SettingsView settings={settings} user={user} isFirebaseActive={isFirebaseActiveState} onLocalSave={(s) => setSettings(s)} showToast={showToast} />}
                 </main>
               </div>
             </div>
           );
         }
 
-        // --- Screens & Components (Same logic, mostly UI updates in Calendar) ---
-        function DetailRow({ label, value, isMono }) {
-          return (
-            <div className="flex flex-col border-b border-[#222] pb-2">
-              <span className="text-xs text-gray-500">{label}</span>
-              <span className={`text-sm font-bold text-white ${isMono ? 'font-mono' : ''}`}>{value || '---'}</span>
-            </div>
-          );
-        }
+        // --- Screens ---
 
-        function CalendarView({ bookings, onDayClick, settings, showToast }) {
-          const [selectedBooking, setSelectedBooking] = useState(null);
-          const today = new Date();
-          const year = today.getFullYear();
-          const month = today.getMonth(); 
-          const daysInMonth = new Date(year, month + 1, 0).getDate();
-          const firstDayIndex = new Date(year, month, 1).getDay();
-          const days = [];
-          for(let i=0; i<firstDayIndex; i++) days.push(null);
-          for(let i=1; i<=daysInMonth; i++) days.push(i);
-          const monthNames = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
-
-          return (
-            <div className="animate-fadeIn max-w-5xl mx-auto pb-10 relative">
-              {/* Detail Modal */}
-              {selectedBooking && (
-                <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[60] p-4 animate-fadeIn">
-                  <div className="bg-[#111] border border-[#D4AF37]/30 p-6 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl">
-                    <div className="flex justify-between items-center mb-6 border-b border-[#222] pb-4">
-                      <h3 className="text-2xl font-bold text-[#D4AF37]">بيانات الحجز التفصيلية</h3>
-                      <button onClick={() => setSelectedBooking(null)} className="text-gray-400 hover:text-white"><Icons.X size={30} /></button>
-                    </div>
-
-                    <div className="space-y-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <DetailRow label="العريس" value={selectedBooking.groomName} />
-                        <DetailRow label="العروسة" value={selectedBooking.brideName} />
-                        <DetailRow label="الهاتف" value={selectedBooking.phone} isMono />
-                        <DetailRow label="التاريخ" value={selectedBooking.date} />
-                        <DetailRow label="نوع السيشن" value={selectedBooking.sessionType === 'آخر' ? selectedBooking.otherSessionType : selectedBooking.sessionType} />
-                        <DetailRow label="اللوكيشن" value={selectedBooking.location === 'آخر' ? selectedBooking.otherLocation : selectedBooking.location} />
-                        <DetailRow label="كاجوال" value={selectedBooking.casualLocation === 'آخر' ? selectedBooking.otherCasualLocation : selectedBooking.casualLocation || 'غير محدد'} />
-                        <DetailRow label="الميك أب" value={selectedBooking.makeupArtist || 'غير محدد'} />
-                        <DetailRow label="خروج ميك أب" value={selectedBooking.makeupLeaveTime || '--:--'} />
-                        <DetailRow label="العنوان" value={selectedBooking.address || 'غير محدد'} />
-                      </div>
-
-                      <div className="bg-black/40 p-4 rounded-2xl border border-[#222]">
-                        <h4 className="text-[#D4AF37] font-bold mb-2 flex items-center gap-2"><Icons.Camera size={18} /> الباكيج والإضافات</h4>
-                        <p className="text-sm">الباكيدج الأساسي: {selectedBooking.snapshotPackage?.name || 'غير محدد'} ({selectedBooking.snapshotPackage?.price || 0} ج.م)</p>
-                        {selectedBooking.snapshotAddons?.length > 0 && (
-                          <div className="mt-2 text-xs text-gray-400">إضافات الفوتوغرافيا: {selectedBooking.snapshotAddons.map(a => `${a.name} (${a.price})`).join(' ، ')}</div>
-                        )}
-                      </div>
-
-                      {selectedBooking.snapshotVideoService && (
-                        <div className="bg-black/40 p-4 rounded-2xl border border-[#222]">
-                          <h4 className="text-[#D4AF37] font-bold mb-2 flex items-center gap-2"><Icons.Video size={18} /> تفاصيل تصوير الفيديو</h4>
-                          <p className="text-sm">الخدمة: {selectedBooking.snapshotVideoService.name} ({selectedBooking.snapshotVideoService.price} ج.م)</p>
-                          {selectedBooking.videoStartTime && <p className="text-xs text-gray-400 mt-1">وقت بدء العمل: {selectedBooking.videoStartTime}</p>}
-                          {selectedBooking.videoAddons?.length > 0 && (
-                            <div className="mt-2 text-xs text-gray-400">إضافات فيديو: {selectedBooking.videoAddons.map(a => `${a.name} (${a.price})`).join(' ، ')}</div>
-                          )}
-                        </div>
-                      )}
-
-                      <div className="bg-[#D4AF37]/10 p-4 rounded-2xl border border-[#D4AF37]/30 flex justify-between items-center shadow-lg">
-                        <div>
-                           <p className="text-xs text-gray-400 uppercase">إجمالي الحساب</p>
-                           <p className="text-2xl font-bold text-white">{selectedBooking.totalPrice} ج.م</p>
-                        </div>
-                        <div className="text-left border-r border-[#D4AF37]/20 pr-4">
-                           <p className="text-xs text-gray-400 uppercase">المبلغ المتبقي</p>
-                           <p className="text-2xl font-bold text-red-500">{selectedBooking.remaining} ج.م</p>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <a 
-                      href={generateGoogleCalendarLink(selectedBooking)}
-                      target="_blank"
-                      className="w-full mt-6 bg-[#4285F4] text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-blue-600 transition-colors shadow-md"
-                    >
-                        <Icons.CalendarPlus size={20} /> مزامنة هذه البيانات مع تقويم جوجل
-                    </a>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                <h2 className="text-3xl font-bold text-[#D4AF37]">تقويم الحجوزات</h2>
-                <div className="text-xl bg-[#111] px-6 py-2 rounded-xl border border-[#333] shadow-lg">{monthNames[month]} {year}</div>
-              </div>
-
-              <div className="bg-[#111] rounded-3xl border border-[#333] p-6 shadow-2xl">
-                <p className="text-gray-400 mb-6 text-sm flex items-center gap-2 bg-black/40 p-3 rounded-xl border border-[#222]">
-                  <Icons.Info size={16} className="text-[#D4AF37]"/> 
-                  <span>اضغط على أي يوم لبدء حجز جديد، أو اضغط على اسم الحجز لعرض جميع التفاصيل المسجلة.</span>
-                </p>
-                
-                <div className="grid grid-cols-7 gap-1 md:gap-2 mb-4 text-center font-bold text-gray-500 text-sm md:text-base uppercase tracking-wider">
-                  <div>الأحد</div><div>الإثنين</div><div>الثلاثاء</div><div>الأربعاء</div><div>الخميس</div><div>الجمعة</div><div>السبت</div>
-                </div>
-                
-                <div className="grid grid-cols-7 gap-1 md:gap-3">
-                  {days.map((day, idx) => {
-                    if (!day) return <div key={`empty-${idx}`} className="h-24 md:h-36 bg-black/20 rounded-2xl border border-transparent"></div>;
-                    
-                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                    const dayBookings = bookings.filter(b => b.date === dateStr);
-                    
-                    return (
-                      <div 
-                        key={idx} 
-                        onClick={() => onDayClick(dateStr)}
-                        className={`h-24 md:h-36 p-1 md:p-3 rounded-2xl border cursor-pointer hover:border-[#D4AF37] transition-all relative group ${dayBookings.length > 0 ? 'border-[#D4AF37]/40 bg-[#D4AF37]/5' : 'border-[#222] bg-black/40 hover:bg-[#1a1a1a]'}`}
-                      >
-                        <span className={`text-xs md:text-sm font-bold ${dayBookings.length > 0 ? 'text-[#D4AF37]' : 'text-gray-500'}`}>{day}</span>
-                        
-                        <div className="mt-2 space-y-1.5 overflow-y-auto max-h-[70%] no-scrollbar">
-                          {dayBookings.map((b, i) => (
-                            <div 
-                              key={i} 
-                              onClick={(e) => { e.stopPropagation(); setSelectedBooking(b); }}
-                              className="text-[9px] md:text-[11px] bg-gradient-to-l from-[#D4AF37] to-[#B8860B] text-black px-2 py-1 rounded-lg font-bold truncate shadow-sm hover:scale-105 transition-transform flex items-center gap-1"
-                            >
-                              <Icons.Camera size={10} /> {b.groomName}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          );
-        }
-
-        // --- Other components remain the same (Dashboard, StatCard, NewBooking, ClientsList, SettingsView, LoginScreen, etc.) ---
-        // (Full logic re-pasted to ensure the HTML file remains complete and functional)
-        
         function LoginScreen({ onLogin, isFirebaseActive, showToast }) {
             const [email, setEmail] = useState('');
             const [password, setPassword] = useState('');
@@ -467,19 +312,15 @@
                     try {
                         let userCredential = isRegistering ? await firebase.auth().createUserWithEmailAndPassword(email, password) : await firebase.auth().signInWithEmailAndPassword(email, password);
                         onLogin(userCredential.user);
-                    } catch (error) {
-                        let msg = error.code === 'auth/email-already-in-use' ? "هذا الإيميل مسجل مسبقاً!" : "بيانات الدخول غير صحيحة!";
-                        showToast(msg, "error");
-                    }
+                    } catch (error) { showToast("خطأ في البيانات!", "error"); }
                 } else {
-                    if(email && password) {
-                        const usr = { uid: 'local_admin', email }; localStorage.setItem('mrakby_local_user', JSON.stringify(usr)); onLogin(usr);
-                    } else showToast("أدخل البيانات", "error");
+                    if(email && password) { const usr = { uid: 'local_admin', email }; localStorage.setItem('mrakby_local_user', JSON.stringify(usr)); onLogin(usr); } 
+                    else showToast("أدخل البيانات", "error");
                 }
                 setIsLoading(false);
             };
             return (
-                <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4" dir="rtl">
+                <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
                     <div className="bg-[#111] p-8 rounded-3xl border border-[#D4AF37]/30 w-full max-w-md shadow-2xl">
                         <div className="text-center mb-8"><img src={LOGO_URL} className="w-20 h-20 rounded-full mx-auto mb-4 border border-[#D4AF37]"/><h1 className="text-2xl font-bold text-[#D4AF37]">MRAKBY STUDIO</h1></div>
                         <form onSubmit={handleAuth} className="space-y-4">
@@ -496,22 +337,46 @@
         function Dashboard({ bookings }) {
           const stats = useMemo(() => {
             let rev = 0, paid = 0, counts = { 'زفاف': 0, 'خطوبة': 0, 'كاجول': 0, 'حنة': 0, 'كتب كتاب': 0, 'فوتوغرافي': 0 };
+            const monthly = {};
+            const monthNames = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
             bookings.forEach(b => {
-              rev += Number(b.totalPrice) || 0; paid += Number(b.paid) || 0;
+              const bRev = Number(b.totalPrice) || 0; const bPaid = Number(b.paid) || 0; rev += bRev; paid += bPaid;
               const type = b.sessionType === 'آخر' ? b.otherSessionType : b.sessionType;
               if (counts[type] !== undefined) counts[type]++; else counts[type] = 1;
+              const d = new Date(b.date);
+              if (!isNaN(d)) {
+                  const mKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                  if (!monthly[mKey]) monthly[mKey] = { label: `${monthNames[d.getMonth()]} ${d.getFullYear()}`, rev: 0, count: 0 };
+                  monthly[mKey].rev += bRev; monthly[mKey].count += 1;
+              }
             });
-            return { total: bookings.length, rev, paid, outstanding: rev - paid, counts };
+            const sortedMonths = Object.keys(monthly).sort().reverse().map(key => monthly[key]);
+            const maxMonthlyRev = Math.max(...sortedMonths.map(m => m.rev), 1);
+            return { total: bookings.length, rev, paid, outstanding: rev - paid, counts, sortedMonths, maxMonthlyRev };
           }, [bookings]);
           return (
             <div className="space-y-8 animate-fadeIn">
-              <header><h2 className="text-3xl font-bold">لوحة التحكم 📸</h2><p className="text-gray-500">مرحباً بك، محمود المراكبي.</p></header>
+              <header><h2 className="text-3xl font-bold">لوحة التحكم 📸</h2></header>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <StatCard title="إجمالي الحجوزات" value={stats.total} subtitle="حجز" />
                 <StatCard title="إجمالي الإيرادات" value={`${stats.rev.toLocaleString()} ج.م`} highlight />
                 <StatCard title="المبالغ المتبقية" value={`${stats.outstanding.toLocaleString()} ج.م`} alert={stats.outstanding > 0} />
               </div>
-              <div className="bg-[#111] p-6 rounded-3xl border border-[#222]"><h3 className="text-[#D4AF37] font-bold mb-4">أنواع الحجوزات</h3>{Object.entries(stats.counts).filter(([_, c]) => c > 0).map(([t, c]) => (<div key={t} className="flex justify-between py-2 border-b border-white/5"><span>{t}</span><span className="font-bold text-[#D4AF37]">{c}</span></div>))}</div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-[#111] p-6 rounded-3xl border border-[#222] shadow-xl">
+                  <div className="flex items-center gap-2 mb-6"><Icons.TrendingUp className="text-[#D4AF37]" size={20} /><h3 className="text-[#D4AF37] font-bold text-xl">إحصائيات الشهور</h3></div>
+                  <div className="space-y-6">{stats.sortedMonths.map((m, i) => (
+                    <div key={i} className="space-y-2">
+                      <div className="flex justify-between items-end"><div><p className="text-white font-bold">{m.label}</p><p className="text-xs text-gray-500">{m.count} حجز</p></div><p className="text-[#D4AF37] font-bold">{m.rev.toLocaleString()} ج.م</p></div>
+                      <div className="h-2 bg-black rounded-full overflow-hidden"><div className="h-full bg-gradient-to-l from-[#D4AF37] to-[#B8860B] transition-all duration-1000" style={{ width: `${(m.rev / stats.maxMonthlyRev) * 100}%` }}></div></div>
+                    </div>
+                  ))}</div>
+                </div>
+                <div className="bg-[#111] p-6 rounded-3xl border border-[#222] shadow-xl">
+                  <div className="flex items-center gap-2 mb-6"><Icons.Camera className="text-[#D4AF37]" size={20} /><h3 className="text-[#D4AF37] font-bold text-xl">أنواع الحجوزات</h3></div>
+                  <div className="grid grid-cols-1 gap-2">{Object.entries(stats.counts).filter(([_, c]) => c > 0).map(([t, c]) => (<div key={t} className="flex justify-between py-3 px-4 rounded-xl bg-black/40 border border-white/5 hover:border-[#D4AF37]/30 transition-colors"><span className="text-gray-300">{t}</span><span className="font-bold text-[#D4AF37]">{c}</span></div>))}</div>
+                </div>
+              </div>
             </div>
           );
         }
@@ -616,6 +481,78 @@
             );
         }
 
+        function CalendarView({ bookings, onDayClick, settings, showToast }) {
+          const [selectedBooking, setSelectedBooking] = useState(null);
+          const today = new Date();
+          const year = today.getFullYear();
+          const month = today.getMonth(); 
+          const daysInMonth = new Date(year, month + 1, 0).getDate();
+          const firstDayIndex = new Date(year, month, 1).getDay();
+          const days = [];
+          for(let i=0; i<firstDayIndex; i++) days.push(null);
+          for(let i=1; i<=daysInMonth; i++) days.push(i);
+          const monthNames = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+
+          return (
+            <div className="animate-fadeIn max-w-5xl mx-auto pb-10 relative">
+              {selectedBooking && (
+                <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[60] p-4 animate-fadeIn">
+                  <div className="bg-[#111] border border-[#D4AF37]/30 p-6 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl">
+                    <div className="flex justify-between items-center mb-6 border-b border-[#222] pb-4">
+                      <h3 className="text-2xl font-bold text-[#D4AF37]">بيانات الحجز التفصيلية</h3>
+                      <button onClick={() => setSelectedBooking(null)} className="text-gray-400 hover:text-white"><Icons.X size={30} /></button>
+                    </div>
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <DetailRow label="العريس" value={selectedBooking.groomName} />
+                        <DetailRow label="العروسة" value={selectedBooking.brideName} />
+                        <DetailRow label="الهاتف" value={selectedBooking.phone} isMono />
+                        <DetailRow label="التاريخ" value={selectedBooking.date} />
+                        <DetailRow label="نوع السيشن" value={selectedBooking.sessionType === 'آخر' ? selectedBooking.otherSessionType : selectedBooking.sessionType} />
+                        <DetailRow label="اللوكيشن" value={selectedBooking.location === 'آخر' ? selectedBooking.otherLocation : selectedBooking.location} />
+                        <DetailRow label="الميك أب" value={selectedBooking.makeupArtist || 'غير محدد'} />
+                        <DetailRow label="خروج ميك أب" value={selectedBooking.makeupLeaveTime || '--:--'} />
+                        <DetailRow label="العنوان" value={selectedBooking.address || 'غير محدد'} />
+                      </div>
+                      <div className="bg-black/40 p-4 rounded-2xl border border-[#222]">
+                        <h4 className="text-[#D4AF37] font-bold mb-2 flex items-center gap-2"><Icons.Camera size={18} /> الباكيج والإضافات</h4>
+                        <p className="text-sm">الباكيدج: {selectedBooking.snapshotPackage?.name} ({selectedBooking.snapshotPackage?.price} ج.م)</p>
+                      </div>
+                      <div className="bg-[#D4AF37]/10 p-4 rounded-2xl border border-[#D4AF37]/30 flex justify-between items-center shadow-lg">
+                        <div><p className="text-xs text-gray-400 uppercase">إجمالي الحساب</p><p className="text-2xl font-bold text-white">{selectedBooking.totalPrice} ج.م</p></div>
+                        <div className="text-left border-r border-[#D4AF37]/20 pr-4"><p className="text-xs text-gray-400 uppercase">المبلغ المتبقي</p><p className="text-2xl font-bold text-red-500">{selectedBooking.remaining} ج.م</p></div>
+                      </div>
+                    </div>
+                    <a href={generateGoogleCalendarLink(selectedBooking)} target="_blank" className="w-full mt-6 bg-[#4285F4] text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-blue-600 transition-colors shadow-md"><Icons.CalendarPlus size={20} /> مزامنة مع تقويم جوجل</a>
+                  </div>
+                </div>
+              )}
+              <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                <h2 className="text-3xl font-bold text-[#D4AF37]">تقويم الحجوزات</h2>
+                <div className="text-xl bg-[#111] px-6 py-2 rounded-xl border border-[#333] shadow-lg">{monthNames[month]} {year}</div>
+              </div>
+              <div className="bg-[#111] rounded-3xl border border-[#333] p-6 shadow-2xl">
+                <div className="grid grid-cols-7 gap-1 md:gap-2 mb-4 text-center font-bold text-gray-500 text-sm md:text-base uppercase tracking-wider"><div>الأحد</div><div>الإثنين</div><div>الثلاثاء</div><div>الأربعاء</div><div>الخميس</div><div>الجمعة</div><div>السبت</div></div>
+                <div className="grid grid-cols-7 gap-1 md:gap-3">
+                  {days.map((day, idx) => {
+                    if (!day) return <div key={`empty-${idx}`} className="h-24 md:h-36 bg-black/20 rounded-2xl border border-transparent"></div>;
+                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    const dayBookings = bookings.filter(b => b.date === dateStr);
+                    return (
+                      <div key={idx} onClick={() => onDayClick(dateStr)} className={`h-24 md:h-36 p-1 md:p-3 rounded-2xl border cursor-pointer hover:border-[#D4AF37] transition-all group ${dayBookings.length > 0 ? 'border-[#D4AF37]/40 bg-[#D4AF37]/5' : 'border-[#222] bg-black/40'}`}>
+                        <span className={`text-xs md:text-sm font-bold ${dayBookings.length > 0 ? 'text-[#D4AF37]' : 'text-gray-500'}`}>{day}</span>
+                        <div className="mt-2 space-y-1.5 overflow-y-auto max-h-[70%] no-scrollbar">
+                          {dayBookings.map((b, i) => (<div key={i} onClick={(e) => { e.stopPropagation(); setSelectedBooking(b); }} className="text-[9px] md:text-[11px] bg-[#D4AF37] text-black px-2 py-1 rounded-lg font-bold truncate flex items-center gap-1 hover:scale-105 transition-transform"><Icons.Camera size={10} /> {b.groomName}</div>))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          );
+        }
+
         function SettingsView({ settings, user, isFirebaseActive, onLocalSave, showToast }) {
             const [s, setS] = useState(settings);
             useEffect(() => setS(settings), [settings]);
@@ -626,23 +563,15 @@
             return (
                 <div className="space-y-6 pb-20">
                     <div className="flex justify-between border-b border-[#D4AF37]/20 pb-4"><h2 className="text-3xl font-bold">الإعدادات</h2><button onClick={save} className="bg-[#D4AF37] text-black px-6 py-2 rounded-xl font-bold">حفظ التعديلات</button></div>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div className="bg-[#111] p-6 rounded-3xl border border-[#222]"><h3 className="mb-4 font-bold text-[#D4AF37]">الباكيدجات</h3>{s.packages.map(p => (<div key={p.id} className="flex justify-between py-2 border-b border-white/5"><span>{p.name}</span><span>{p.price} ج.م</span></div>))}</div>
-                    </div>
+                    <div className="bg-[#111] p-6 rounded-3xl border border-[#222] shadow-xl"><h3 className="mb-4 font-bold text-[#D4AF37]">الباكيدجات الأساسية</h3><div className="space-y-2">{s.packages.map(p => (<div key={p.id} className="flex justify-between py-2 border-b border-white/5"><span>{p.name}</span><span className="text-[#D4AF37] font-bold">{p.price} ج.م</span></div>))}</div></div>
                 </div>
             );
         }
 
-        function SelectField({ label, value, onChange, options = [] }) {
-          return (<div className="flex flex-col w-full"><label className="text-xs text-gray-500 mb-1">{label}</label><select value={value} onChange={onChange} className="bg-black border border-[#333] text-white rounded-xl p-3 outline-none focus:border-[#D4AF37]">{options.map((opt, i) => <option key={i} value={opt}>{opt}</option>)}</select></div>);
-        }
-
         function ContractPrintView({ booking, settings, onClose }) {
-          const pkg = settings.packages.find(p => p.id === booking.packageId);
-          const video = booking.snapshotVideoService || {};
           return (
             <div className="min-h-screen bg-white text-black p-10 font-sans" dir="rtl">
-              <div className="print:hidden flex justify-between mb-8 bg-gray-100 p-4 rounded-xl"><p className="text-red-500 font-bold">جاهز للطباعة A4</p><div className="flex gap-4"><button onClick={() => window.print()} className="bg-[#D4AF37] text-black px-6 py-2 rounded-xl font-bold flex items-center gap-2"><Icons.Printer size={20}/> طباعة</button><button onClick={onClose} className="bg-black text-white px-6 py-2 rounded-xl font-bold">عودة</button></div></div>
+              <div className="print:hidden flex justify-between mb-8 bg-gray-100 p-4 rounded-xl shadow"><p className="text-red-500 font-bold">جاهز للطباعة A4</p><div className="flex gap-4"><button onClick={() => window.print()} className="bg-[#D4AF37] text-black px-6 py-2 rounded-xl font-bold flex items-center gap-2"><Icons.Printer size={20}/> طباعة</button><button onClick={onClose} className="bg-black text-white px-6 py-2 rounded-xl font-bold">عودة</button></div></div>
               <div className="max-w-3xl mx-auto border-2 border-black p-10 relative">
                 <header className="flex justify-between items-center border-b-2 border-black pb-6 mb-8"><div className="flex items-center gap-4"><img src={LOGO_URL} className="w-16 h-16 rounded-full"/><h1 className="text-3xl font-black uppercase tracking-tighter">Mrakby <span className="text-gray-500 font-normal">Photography</span></h1></div><h2 className="text-xl font-bold underline">عقد اتفاق تصوير</h2></header>
                 <div className="space-y-6 text-lg">
@@ -655,10 +584,7 @@
                     </div>
                     <div className="border-t-2 border-black pt-4">
                         <p>الباكيدج: {booking.snapshotPackage?.name} ({booking.snapshotPackage?.price} ج.م)</p>
-                        {booking.snapshotVideoService && <p>خدمة الفيديو: {booking.snapshotVideoService.name} ({booking.snapshotVideoService.price} ج.م)</p>}
-                        <div className="mt-6 flex justify-between bg-black text-white p-4 rounded-lg">
-                            <p>الإجمالي: {booking.totalPrice} ج.م</p><p>المدفوع: {booking.paid} ج.م</p><p className="text-xl font-black">المتبقي: {booking.remaining} ج.م</p>
-                        </div>
+                        <div className="mt-6 flex justify-between bg-black text-white p-4 rounded-lg"><p>الإجمالي: {booking.totalPrice} ج.م</p><p>المدفوع: {booking.paid} ج.م</p><p className="text-xl font-black">المتبقي: {booking.remaining} ج.م</p></div>
                     </div>
                 </div>
                 <footer className="mt-20 flex justify-between px-10"><div className="text-center p-4 border-t-2 border-black w-40">توقيع الاستوديو</div><div className="text-center p-4 border-t-2 border-black w-40">توقيع العميل</div></footer>
