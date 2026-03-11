@@ -195,16 +195,19 @@
             let desc = `👰🤵 العرسان: ${booking.groomName} و ${booking.brideName}\n`;
             desc += `📞 الهاتف: ${booking.phone}\n`;
             desc += `🏠 العنوان: ${booking.address || 'غير مسجل'}\n`;
-            desc += `💄 صالون الميك أب: ${booking.makeupArtist || 'غير محدد'} (وقت الخروج: ${booking.makeupLeaveTime || '--:--'})\n`;
-            desc += `📍 اللوكيشن الأساسي: ${loc || 'غير محدد'}\n`;
-            desc += `📸 لوكيشن الكاجوال: ${casualLoc}\n\n`;
             
-            desc += `📦 تفاصيل الباكيدج (فوتوغرافيا):\n`;
-            desc += `- الباكيدج الأساسي: ${booking.snapshotPackage?.name || 'غير محدد'} (${booking.snapshotPackage?.price || 0} ج.م)\n`;
-            if (booking.snapshotAddons && booking.snapshotAddons.length > 0) {
-                desc += `- الإضافات: ${booking.snapshotAddons.map(a => a.name).join('، ')}\n`;
+            const isPhotoBooking = ['تصوير فوتوغرافي', 'فوتوغرافي وفيديو'].includes(booking.bookingMainType || 'فوتوغرافي وفيديو');
+            if (isPhotoBooking) {
+                desc += `💄 صالون الميك أب: ${booking.makeupArtist || 'غير محدد'} (وقت الخروج: ${booking.makeupLeaveTime || '--:--'})\n`;
+                desc += `📍 اللوكيشن الأساسي: ${loc || 'غير محدد'}\n`;
+                desc += `📸 لوكيشن الكاجوال: ${casualLoc}\n\n`;
+                desc += `📦 تفاصيل الباكيدج (فوتوغرافيا):\n`;
+                desc += `- الباكيدج الأساسي: ${booking.snapshotPackage?.name || 'غير محدد'} (${booking.snapshotPackage?.price || 0} ج.م)\n`;
+                if (booking.snapshotAddons && booking.snapshotAddons.length > 0) {
+                    desc += `- الإضافات: ${booking.snapshotAddons.map(a => a.name).join('، ')}\n`;
+                }
+                desc += `\n`;
             }
-            desc += `\n`;
 
             if (booking.snapshotVideoService) {
                 desc += `🎥 تفاصيل الفيديو:\n`;
@@ -466,9 +469,10 @@
             );
         }
 
-        // --- Calendar Component (Restored & Fixed) ---
+        // --- Calendar Component Restored ---
         function CalendarView({ bookings, onDayClick }) {
             const [selectedBooking, setSelectedBooking] = useState(null);
+            
             const today = new Date();
             const [currentDate, setCurrentDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
 
@@ -526,7 +530,7 @@
                 )}
                 
                 <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                  <h2 className="text-3xl font-bold text-[#D4AF37]">تقويم الحجوزات الكامل</h2>
+                  <h2 className="text-3xl font-bold text-[#D4AF37]">تقويم الحجوزات</h2>
                   <div className="flex items-center gap-4 bg-[#111] px-2 py-1 rounded-xl border border-[#333] shadow-lg">
                       <button onClick={prevMonth} className="p-2 text-gray-400 hover:text-[#D4AF37] hover:bg-[#222] rounded-lg transition-colors" title="الشهر السابق">
                           <Icons.ChevronRight size={24} />
@@ -571,19 +575,23 @@
           const [trialInfo, setTrialInfo] = useState(null);
           
           const [bookings, setBookings] = useState(() => {
-              const saved = localStorage.getItem('mrakby_bookings');
-              return saved ? JSON.parse(saved) : [];
+              try {
+                  const saved = localStorage.getItem('mrakby_bookings');
+                  return saved ? JSON.parse(saved) : [];
+              } catch(e) { return []; }
           });
           const [settings, setSettings] = useState(() => {
-              const saved = localStorage.getItem('mrakby_settings');
-              if (saved) {
-                  let parsed = JSON.parse(saved);
-                  // Clean up old broken cache links and personal images
-                  if (parsed.studioLogo && (parsed.studioLogo.includes('Gemini_Generated_Image') || parsed.studioLogo.includes('messages-prod') || parsed.studioLogo.includes('blogger.googleusercontent'))) {
-                      parsed.studioLogo = LOGO_URL;
+              try {
+                  const saved = localStorage.getItem('mrakby_settings');
+                  if (saved) {
+                      let parsed = JSON.parse(saved);
+                      // تنظيف الروابط القديمة والتالفة من ذاكرة المتصفح
+                      if (parsed.studioLogo && (parsed.studioLogo.includes('Gemini_Generated_Image') || parsed.studioLogo.includes('messages-prod') || parsed.studioLogo.includes('blogger.googleusercontent'))) {
+                          parsed.studioLogo = LOGO_URL;
+                      }
+                      return parsed;
                   }
-                  return parsed;
-              }
+              } catch(e) { console.error(e); }
               return DEFAULT_SETTINGS;
           });
           
@@ -1053,7 +1061,7 @@
           }, [bookings]);
 
           const formatMoney = (val) => `${val.toLocaleString()} ج.م`;
-          
+
           return (
             <div className="space-y-8 animate-fadeIn relative">
               
@@ -1322,13 +1330,15 @@
                                 {formData.location === 'آخر' && <div className="mt-2"><InputField label="تفاصيل اللوكيشن" value={formData.otherLocation} onChange={e=>setFormData({...formData, otherLocation: e.target.value})} required /></div>}
                             </div>
                             {isPhotoBooking && (
-                                <div>
-                                    <SelectField label="مكان تصوير الكاجوال (اختياري)" value={formData.casualLocation} onChange={e => setFormData({...formData, casualLocation: e.target.value})} options={['', ...settings.casualLocations]} />
-                                    {formData.casualLocation === 'آخر' && <div className="mt-2"><InputField label="تفاصيل مكان الكاجوال" value={formData.otherCasualLocation} onChange={e=>setFormData({...formData, otherCasualLocation: e.target.value})} required /></div>}
-                                </div>
+                                <>
+                                    <div>
+                                        <SelectField label="مكان تصوير الكاجوال (اختياري)" value={formData.casualLocation} onChange={e => setFormData({...formData, casualLocation: e.target.value})} options={['', ...settings.casualLocations]} />
+                                        {formData.casualLocation === 'آخر' && <div className="mt-2"><InputField label="تفاصيل مكان الكاجوال" value={formData.otherCasualLocation} onChange={e=>setFormData({...formData, otherCasualLocation: e.target.value})} required /></div>}
+                                    </div>
+                                    <InputField label="اسم الميك أب" value={formData.makeupArtist} onChange={e => setFormData({...formData, makeupArtist: e.target.value})} />
+                                    <InputField label="وقت الخروج من الميك أب" type="time" value={formData.makeupLeaveTime} onChange={e => setFormData({...formData, makeupLeaveTime: e.target.value})} />
+                                </>
                             )}
-                            <InputField label="اسم الميك أب" value={formData.makeupArtist} onChange={e => setFormData({...formData, makeupArtist: e.target.value})} />
-                            <InputField label="وقت الخروج من الميك أب" type="time" value={formData.makeupLeaveTime} onChange={e => setFormData({...formData, makeupLeaveTime: e.target.value})} />
                           </div>
                         </div>
 
@@ -1401,31 +1411,31 @@
                                 </div>
                               )}
 
-                              <div className="border-t border-[#333] pt-6">
-                                <label className="block text-sm text-gray-400 mb-2">إضافات الفيديو</label>
-                                <select onChange={handleAddVideoAddon} value="" className="w-full md:w-1/2 bg-black border border-[#333] text-white rounded-lg p-3 focus:outline-none focus:border-[#D4AF37] transition-all mb-4">
-                                  <option value="" disabled>-- اختر إضافة --</option>
-                                  {settings.videoAddons?.filter(va => !formData.videoAddons.find(a => a.id === va.id)).map(va => <option key={va.id} value={va.id}>{va.name}</option>)}
-                                </select>
-                                
-                                {formData.videoAddons.length > 0 && (
-                                  <div className="space-y-3 mt-4">
-                                    {formData.videoAddons.map(addon => (
-                                      <div key={addon.id} className="flex flex-col md:flex-row md:items-center justify-between bg-[#1a1a1a] p-3 rounded-lg border border-[#333] gap-4">
-                                        <span className="font-bold text-white">{addon.name}</span>
-                                        <div className="flex items-center gap-3">
-                                          <div className="flex items-center gap-2">
-                                            <span className="text-gray-400 text-sm">السعر:</span>
-                                            <input type="number" min="0" value={addon.price} onChange={(e) => handleVideoAddonPriceChange(addon.id, e.target.value)} className="w-32 bg-black border border-[#444] text-white rounded px-3 py-2 text-sm focus:border-[#D4AF37] outline-none"/>
-                                          </div>
-                                          <button type="button" onClick={() => removeVideoAddon(addon.id)} className="text-red-500 hover:bg-red-500/10 p-2 rounded"><Icons.X size={20} /></button>
-                                        </div>
+                          <div className="border-t border-[#333] pt-6">
+                            <label className="block text-sm text-gray-400 mb-2">إضافات الفيديو</label>
+                            <select onChange={handleAddVideoAddon} value="" className="w-full md:w-1/2 bg-black border border-[#333] text-white rounded-lg p-3 focus:outline-none focus:border-[#D4AF37] transition-all mb-4">
+                              <option value="" disabled>-- اختر إضافة --</option>
+                              {settings.videoAddons?.filter(va => !formData.videoAddons.find(a => a.id === va.id)).map(va => <option key={va.id} value={va.id}>{va.name}</option>)}
+                            </select>
+                            
+                            {formData.videoAddons.length > 0 && (
+                              <div className="space-y-3 mt-4">
+                                {formData.videoAddons.map(addon => (
+                                  <div key={addon.id} className="flex flex-col md:flex-row md:items-center justify-between bg-[#1a1a1a] p-3 rounded-lg border border-[#333] gap-4">
+                                    <span className="font-bold text-white">{addon.name}</span>
+                                    <div className="flex items-center gap-3">
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-gray-400 text-sm">السعر:</span>
+                                        <input type="number" min="0" value={addon.price} onChange={(e) => handleVideoAddonPriceChange(addon.id, e.target.value)} className="w-32 bg-black border border-[#444] text-white rounded px-3 py-2 text-sm focus:border-[#D4AF37] outline-none"/>
                                       </div>
-                                    ))}
+                                      <button type="button" onClick={() => removeVideoAddon(addon.id)} className="text-red-500 hover:bg-red-500/10 p-2 rounded"><Icons.X size={20} /></button>
+                                    </div>
                                   </div>
-                                )}
+                                ))}
                               </div>
-                            </div>
+                            )}
+                          </div>
+                        </div>
                         )}
 
                         {/* الملاحظات الإضافية تم نقلها للأسفل */}
@@ -1514,6 +1524,7 @@
             );
         }
 
+        // Quick Message Modal (WhatsApp Templates)
         function QuickMessageModal({ booking, settings, onClose, showToast }) {
             const messages = settings.quickMessages || DEFAULT_SETTINGS.quickMessages;
             const [selectedTemplate, setSelectedTemplate] = useState(messages[0]?.id || '');
@@ -1585,6 +1596,7 @@
             const updateArray = (key, newArray) => { setLocalSettings(prev => ({ ...prev, [key]: newArray })); };
             const updateField = (key, value) => { setLocalSettings(prev => ({ ...prev, [key]: value })); };
 
+            // هنا تم إضافة كود ضغط وتصغير الصورة قبل حفظها لمنع الخطأ
             const handleLogoUpload = (e) => {
                 const file = e.target.files[0];
                 if (file) {
@@ -1615,7 +1627,6 @@
                             const ctx = canvas.getContext('2d');
                             ctx.drawImage(img, 0, 0, width, height);
                             
-                            // الحفظ بصيغة PNG للحفاظ على الشفافية وتجنب الخلفية السوداء
                             const dataUrl = canvas.toDataURL('image/png');
                             updateField('studioLogo', dataUrl);
                         };
@@ -1837,10 +1848,12 @@
                     <p><span className="font-bold text-gray-700">النوع:</span> {booking.sessionType === 'آخر' ? booking.otherSessionType : booking.sessionType}</p>
                     <p><span className="font-bold text-gray-700">اللوكيشن الأساسي:</span> {booking.location === 'آخر' ? booking.otherLocation : (booking.location || '---')}</p>
                     {isPhotoBooking && (
-                       <p><span className="font-bold text-gray-700">لوكيشن الكاجوال:</span> {booking.casualLocation === 'آخر' ? booking.otherCasualLocation : (booking.casualLocation || '---')}</p>
+                        <>
+                           <p><span className="font-bold text-gray-700">لوكيشن الكاجوال:</span> {booking.casualLocation === 'آخر' ? booking.otherCasualLocation : (booking.casualLocation || '---')}</p>
+                           <p><span className="font-bold text-gray-700">الميك أب:</span> {booking.makeupArtist || '---'}</p>
+                           <p><span className="font-bold text-gray-700">وقت الخروج:</span> <span dir="ltr" className="font-bold text-red-600">{booking.makeupLeaveTime || '---'}</span></p>
+                        </>
                     )}
-                    <p><span className="font-bold text-gray-700">الميك أب:</span> {booking.makeupArtist || '---'}</p>
-                    <p><span className="font-bold text-gray-700">وقت الخروج:</span> <span dir="ltr" className="font-bold text-red-600">{booking.makeupLeaveTime || '---'}</span></p>
                   </div>
                 </section>
 
