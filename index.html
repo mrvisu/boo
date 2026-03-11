@@ -748,16 +748,14 @@
              const session = booking.sessionType === 'آخر' ? booking.otherSessionType : booking.sessionType;
              const loc = booking.location === 'آخر' ? booking.otherLocation : booking.location;
              
-             const icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Mrakby Photography//Studio System//EN\nBEGIN:VEVENT\nSUMMARY:تصوير ${session} - ${booking.groomName} و ${booking.brideName}\nDTSTART;VALUE=DATE:${startStr}\nDTEND;VALUE=DATE:${endStr}\nLOCATION:${loc || ''}\nDESCRIPTION:رقم الهاتف: ${booking.phone}\\nالباكيدج: المتبقي ${booking.remaining} ج.م\nEND:VEVENT\nEND:VCALENDAR`;
-
-             const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-             const link = document.createElement('a');
-             link.href = window.URL.createObjectURL(blob);
-             link.download = `Booking_${booking.groomName}_${booking.date}.ics`;
-             document.body.appendChild(link);
-             link.click();
-             document.body.removeChild(link);
-             showToast("تم تنزيل موعد التقويم، قم بفتحه للإضافة 📅");
+             const title = encodeURIComponent(`تصوير ${session} - ${booking.groomName} و ${booking.brideName}`);
+             const details = encodeURIComponent(`رقم الهاتف: ${booking.phone}\nالمتبقي: ${booking.remaining} ج.م`);
+             const location = encodeURIComponent(loc || 'استوديو المراكبي');
+             
+             const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startStr}/${endStr}&details=${details}&location=${location}`;
+             
+             window.open(googleCalendarUrl, '_blank');
+             showToast("تم فتح تقويم جوجل لإضافة الموعد 📅");
           };
 
           const sendWhatsApp = (booking) => {
