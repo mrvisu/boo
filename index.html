@@ -182,8 +182,10 @@
         };
 
         const generateGoogleCalendarLink = (booking, studioName) => {
+            if (!booking.date) return "";
             const dateObj = new Date(booking.date);
             if (isNaN(dateObj)) return "";
+            
             const startStr = dateObj.toISOString().split('T')[0].replace(/-/g, '');
             dateObj.setDate(dateObj.getDate() + 1);
             const endStr = dateObj.toISOString().split('T')[0].replace(/-/g, '');
@@ -244,7 +246,7 @@
                 onChange={onChange} 
                 placeholder={placeholder} 
                 required={required} 
-                className="bg-black border border-[#333] text-white rounded-xl p-3 focus:outline-none focus:border-[#D4AF37] transition-all" 
+                className="bg-black border border-[#333] text-white rounded-xl p-3 focus:outline-none focus:border-[#D4AF37] transition-all w-full" 
               />
             </div>
           );
@@ -254,7 +256,7 @@
           return (
             <div className="flex flex-col w-full">
               <label className="text-xs text-gray-500 mb-1">{label}</label>
-              <select value={value} onChange={onChange} className="bg-black border border-[#333] text-white rounded-xl p-3 outline-none focus:border-[#D4AF37]">
+              <select value={value} onChange={onChange} className="bg-black border border-[#333] text-white rounded-xl p-3 outline-none focus:border-[#D4AF37] w-full">
                 {options?.map((opt, i) => <option key={i} value={opt}>{opt}</option>)}
               </select>
             </div>
@@ -470,7 +472,7 @@
         }
 
         // --- Calendar Component Restored ---
-        function CalendarView({ bookings, onDayClick }) {
+        function CalendarView({ bookings, onDayClick, settings }) {
             const [selectedBooking, setSelectedBooking] = useState(null);
             
             const today = new Date();
@@ -525,12 +527,13 @@
                           <div className="text-left border-r border-[#D4AF37]/20 pr-4"><p className="text-xs text-gray-400 uppercase">المبلغ المتبقي</p><p className="text-2xl font-bold text-red-500">{selectedBooking.remaining} ج.م</p></div>
                         </div>
                       </div>
+                      <a href={generateGoogleCalendarLink(selectedBooking, settings?.studioName)} target="_blank" className="w-full mt-6 bg-[#4285F4] text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-blue-600 transition-colors shadow-md"><Icons.CalendarPlus size={20} /> مزامنة مع تقويم جوجل</a>
                     </div>
                   </div>
                 )}
                 
                 <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                  <h2 className="text-3xl font-bold text-[#D4AF37]">تقويم الحجوزات</h2>
+                  <h2 className="text-3xl font-bold text-[#D4AF37]">تقويم الحجوزات الكامل</h2>
                   <div className="flex items-center gap-4 bg-[#111] px-2 py-1 rounded-xl border border-[#333] shadow-lg">
                       <button onClick={prevMonth} className="p-2 text-gray-400 hover:text-[#D4AF37] hover:bg-[#222] rounded-lg transition-colors" title="الشهر السابق">
                           <Icons.ChevronRight size={24} />
@@ -822,7 +825,7 @@
                               {currentView === 'dashboard' && <Dashboard bookings={bookings} settings={settings} onDayClick={navigateToNewBooking} />}
                               {currentView === 'new' && <NewBooking settings={settings} initialDate={initialBookingDate} user={user} bookingToEdit={bookingToEdit} isFirebaseActive={isFirebaseActiveState} onSuccess={(newB, isUpdate) => { if(!isFirebaseActiveState) { if (isUpdate) setBookings(prev => prev.map(b => b.id === newB.id ? newB : b).sort((a, b) => new Date(b.date) - new Date(a.date))); else setBookings([newB, ...bookings].sort((a, b) => new Date(b.date) - new Date(a.date))); } setCurrentView('clients'); setBookingToEdit(null); }} showToast={showToast} />}
                               {currentView === 'clients' && <ClientsList bookings={bookings} settings={settings} onPrint={setContractToPrint} onEdit={navigateToEditBooking} showToast={showToast} user={user} isFirebaseActive={isFirebaseActiveState} onLocalDelete={(id) => setBookings(bookings.filter(b => b.id !== id))} />}
-                              {currentView === 'calendar' && <CalendarView bookings={bookings} onDayClick={navigateToNewBooking} />}
+                              {currentView === 'calendar' && <CalendarView bookings={bookings} settings={settings} onDayClick={navigateToNewBooking} />}
                               {currentView === 'settings' && <SettingsView settings={settings} user={user} isFirebaseActive={isFirebaseActiveState} onLocalSave={(s) => setSettings(s)} showToast={showToast} />}
                           </>
                       )}
@@ -1061,6 +1064,26 @@
           }, [bookings]);
 
           const formatMoney = (val) => `${val.toLocaleString()} ج.م`;
+          
+          // إعدادات التقويم المدمج
+          const todayDate = new Date();
+          const [calendarDate, setCalendarDate] = useState(new Date(todayDate.getFullYear(), todayDate.getMonth(), 1));
+          
+          const calYear = calendarDate.getFullYear();
+          const calMonth = calendarDate.getMonth(); 
+
+          const nextMonth = () => setCalendarDate(new Date(calYear, calMonth + 1, 1));
+          const prevMonth = () => setCalendarDate(new Date(calYear, calMonth - 1, 1));
+          const goToToday = () => setCalendarDate(new Date(todayDate.getFullYear(), todayDate.getMonth(), 1));
+
+          const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+          const firstDayIndex = new Date(calYear, calMonth, 1).getDay();
+          
+          const days = [];
+          for(let i=0; i<firstDayIndex; i++) days.push(null);
+          for(let i=1; i<=daysInMonth; i++) days.push(i);
+          
+          const monthNames = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
 
           return (
             <div className="space-y-8 animate-fadeIn relative">
@@ -1186,12 +1209,14 @@
 
         // --- NEW BOOKING FORM ---
         function NewBooking({ settings, initialDate, bookingToEdit, onSuccess, showToast, user, isFirebaseActive }) {
-            const [formData, setFormData] = useState({
-                bookingMainType: 'فوتوغرافي وفيديو', // النوع الافتراضي الجديد للحجز
+            const initialFormState = {
+                bookingMainType: 'فوتوغرافي وفيديو',
                 groomName: '', brideName: '', phone: '', address: '', date: initialDate || '', location: '', otherLocation: '',
-                sessionType: settings.sessionTypes[0], otherSessionType: '', makeupArtist: '', makeupLeaveTime: '', casualLocation: '', otherCasualLocation: '', packageId: '', addons: [], paid: '',
+                sessionType: settings.sessionTypes && settings.sessionTypes.length > 0 ? settings.sessionTypes[0] : 'زفاف', 
+                otherSessionType: '', makeupArtist: '', makeupLeaveTime: '', casualLocation: '', otherCasualLocation: '', packageId: '', addons: [], paid: '',
                 videoServiceId: '', videoServicePrice: '', videoStartTime: '', videoAddons: [], notes: ''
-            });
+            };
+            const [formData, setFormData] = useState(initialFormState);
             const [isSubmitting, setIsSubmitting] = useState(false);
             
             useEffect(() => { 
@@ -1202,8 +1227,8 @@
                         addons: bookingToEdit.addons || [],
                         videoAddons: bookingToEdit.videoAddons || []
                     });
-                } else if (initialDate) {
-                    setFormData(p => ({ ...p, date: initialDate })); 
+                } else {
+                    setFormData({ ...initialFormState, date: initialDate || '' }); 
                 }
             }, [initialDate, bookingToEdit]);
             
@@ -1212,7 +1237,7 @@
             const isVideoBooking = ['تصوير فيديو', 'فوتوغرافي وفيديو'].includes(formData.bookingMainType);
 
             // الحسابات
-            const pkg = settings.packages.find(p => p.id === formData.packageId) || { price: 0 };
+            const pkg = settings.packages.find(p => p.id === formData.packageId) || { name: 'غير محدد', price: 0 };
             
             const photoPrice = isPhotoBooking ? Number(pkg.price) : 0;
             const addonsTot = isPhotoBooking ? formData.addons.reduce((s, id) => s + (settings.addons.find(a => a.id === id)?.price || 0), 0) : 0;
@@ -1320,20 +1345,41 @@
                         <div className="bg-[#111] p-6 rounded-2xl border border-[#333]">
                           <h3 className="text-xl text-white mb-4 flex items-center gap-2"><Icons.CalendarIcon size={20} className="text-[#D4AF37]"/> تفاصيل المناسبة</h3>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <SelectField label="نوع السيشن" value={formData.sessionType} onChange={e => setFormData({...formData, sessionType: e.target.value})} options={settings.sessionTypes} />
-                                {formData.sessionType === 'آخر' && <div className="mt-2"><InputField label="تفاصيل نوع السيشن" value={formData.otherSessionType} onChange={e=>setFormData({...formData, otherSessionType: e.target.value})} required /></div>}
+                            <div className="flex flex-col sm:flex-row gap-2">
+                                <div className="flex-1">
+                                    <SelectField label="نوع السيشن" value={formData.sessionType} onChange={e => setFormData({...formData, sessionType: e.target.value})} options={settings.sessionTypes} />
+                                </div>
+                                {formData.sessionType === 'آخر' && (
+                                    <div className="flex-1">
+                                        <InputField label="تفاصيل نوع السيشن" value={formData.otherSessionType} onChange={e=>setFormData({...formData, otherSessionType: e.target.value})} required />
+                                    </div>
+                                )}
                             </div>
+                            
                             <InputField label="تاريخ المناسبة" type="date" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} required />
-                            <div>
-                                <SelectField label="اللوكيشن الأساسي" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} options={['', ...settings.locations]} />
-                                {formData.location === 'آخر' && <div className="mt-2"><InputField label="تفاصيل اللوكيشن" value={formData.otherLocation} onChange={e=>setFormData({...formData, otherLocation: e.target.value})} required /></div>}
+                            
+                            <div className="flex flex-col sm:flex-row gap-2">
+                                <div className="flex-1">
+                                    <SelectField label="اللوكيشن الأساسي" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} options={['', ...settings.locations]} />
+                                </div>
+                                {formData.location === 'آخر' && (
+                                    <div className="flex-1">
+                                        <InputField label="تفاصيل اللوكيشن" value={formData.otherLocation} onChange={e=>setFormData({...formData, otherLocation: e.target.value})} required />
+                                    </div>
+                                )}
                             </div>
+                            
                             {isPhotoBooking && (
                                 <>
-                                    <div>
-                                        <SelectField label="مكان تصوير الكاجوال (اختياري)" value={formData.casualLocation} onChange={e => setFormData({...formData, casualLocation: e.target.value})} options={['', ...settings.casualLocations]} />
-                                        {formData.casualLocation === 'آخر' && <div className="mt-2"><InputField label="تفاصيل مكان الكاجوال" value={formData.otherCasualLocation} onChange={e=>setFormData({...formData, otherCasualLocation: e.target.value})} required /></div>}
+                                    <div className="flex flex-col sm:flex-row gap-2">
+                                        <div className="flex-1">
+                                            <SelectField label="مكان تصوير الكاجوال (اختياري)" value={formData.casualLocation} onChange={e => setFormData({...formData, casualLocation: e.target.value})} options={['', ...settings.casualLocations]} />
+                                        </div>
+                                        {formData.casualLocation === 'آخر' && (
+                                            <div className="flex-1">
+                                                <InputField label="تفاصيل مكان الكاجوال" value={formData.otherCasualLocation} onChange={e=>setFormData({...formData, otherCasualLocation: e.target.value})} required />
+                                            </div>
+                                        )}
                                     </div>
                                     <InputField label="اسم الميك أب" value={formData.makeupArtist} onChange={e => setFormData({...formData, makeupArtist: e.target.value})} />
                                     <InputField label="وقت الخروج من الميك أب" type="time" value={formData.makeupLeaveTime} onChange={e => setFormData({...formData, makeupLeaveTime: e.target.value})} />
@@ -1920,4 +1966,3 @@
     </script>
 </body>
 </html>
-
