@@ -77,6 +77,9 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo } = React;
 
+        // ⚠️ إيميل المدير العام (Super Admin) - قم بتغييره إلى إيميلك الشخصي
+        const ADMIN_EMAIL = "mrakbyph@gmail.com";
+
         // --- Mock Lucide Icons ---
         const Icon = ({ path, size = 24, className = "" }) => (
             <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} dangerouslySetInnerHTML={{__html: path}} />
@@ -112,7 +115,8 @@
             MapPin: (props) => <Icon path="<path d='M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z'/><circle cx='12' cy='10' r='3'/>" {...props}/>,
             ChevronRight: (props) => <Icon path="<path d='m9 18 6-6-6-6'/>" {...props}/>,
             ChevronLeft: (props) => <Icon path="<path d='m15 18-6-6 6-6'/>" {...props}/>,
-            ClockIcon: (props) => <Icon path="<circle cx='12' cy='12' r='10'/><polyline points='12 6 12 12 16 14'/>" {...props}/>
+            ClockIcon: (props) => <Icon path="<circle cx='12' cy='12' r='10'/><polyline points='12 6 12 12 16 14'/>" {...props}/>,
+            Shield: (props) => <Icon path="<path d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/>" {...props}/>
         };
 
         // --- Firebase Configuration ---
@@ -273,10 +277,10 @@
 
             const currentAlert = alerts[index];
             const isCasual = type === 'casual';
-            const bgColor = isCasual ? 'bg-blue-900/30' : 'bg-red-900/30';
-            const borderColor = isCasual ? 'border-blue-500' : 'border-red-500';
-            const iconColor = isCasual ? 'text-blue-400' : 'text-red-400';
-            const badgeColor = isCasual ? 'bg-blue-500/20 text-blue-300' : 'bg-red-500/20 text-red-300';
+            const bgColor = isCasual ? 'bg-red-900/30' : 'bg-red-900/30'; 
+            const borderColor = isCasual ? 'border-red-500' : 'border-red-500';
+            const iconColor = isCasual ? 'text-red-400' : 'text-red-400';
+            const badgeColor = isCasual ? 'bg-red-500/20 text-red-300' : 'bg-red-500/20 text-red-300';
 
             return (
                 <div className={`${bgColor} border-r-4 ${borderColor} p-5 rounded-2xl shadow-xl mb-4 overflow-hidden`}>
@@ -312,10 +316,77 @@
             );
         }
 
+        // --- Admin Components ---
+        function AdminDashboard({ showToast }) {
+            const [subscribers, setSubscribers] = useState([]);
+            
+            useEffect(() => {
+                if(!window.firebase) return;
+                const unsub = firebase.firestore().collection('subscribers').onSnapshot(snap => {
+                    setSubscribers(snap.docs.map(doc => doc.data()));
+                });
+                return () => unsub();
+            }, []);
+
+            const toggleStatus = async (uid, currentStatus) => {
+                try {
+                    await firebase.firestore().collection('subscribers').doc(uid).update({ isActive: !currentStatus });
+                    showToast(`تم ${!currentStatus ? 'تفعيل' : 'إيقاف'} الحساب بنجاح`);
+                } catch(e) {
+                    showToast("حدث خطأ أثناء تحديث حالة الحساب", "error");
+                }
+            };
+
+            return (
+                <div className="animate-fadeIn space-y-6 pb-10">
+                    <header className="border-b border-[#222] pb-4">
+                        <h2 className="text-3xl font-bold text-[#D4AF37] flex items-center gap-2"><Icons.Shield size={30} /> لوحة تحكم الإدارة العليا</h2>
+                        <p className="text-gray-400 mt-1">إدارة الاستوديوهات والمصورين المشتركين في النظام.</p>
+                    </header>
+
+                    <div className="bg-[#111] rounded-3xl border border-[#333] overflow-x-auto shadow-xl">
+                        <table className="w-full text-right">
+                            <thead className="bg-black/40 border-b border-[#222]">
+                                <tr>
+                                    <th className="p-4 text-gray-400 font-medium">البريد الإلكتروني</th>
+                                    <th className="p-4 text-gray-400 font-medium">تاريخ التسجيل</th>
+                                    <th className="p-4 text-gray-400 font-medium">الحالة</th>
+                                    <th className="p-4 text-center text-gray-400 font-medium">إجراءات الإدارة</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-[#222]">
+                                {subscribers.map(sub => (
+                                    <tr key={sub.uid} className="hover:bg-[#1a1a1a] transition-colors">
+                                        <td className="p-4 font-mono font-bold text-white">{sub.email}</td>
+                                        <td className="p-4 text-sm text-gray-400">{new Date(sub.createdAt).toLocaleDateString('ar-EG')}</td>
+                                        <td className="p-4">
+                                            {sub.isActive ? 
+                                                <span className="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-bold">نشط</span> : 
+                                                <span className="bg-red-500/20 text-red-400 px-3 py-1 rounded-full text-xs font-bold">موقوف</span>
+                                            }
+                                        </td>
+                                        <td className="p-4 text-center">
+                                            <button 
+                                                onClick={() => toggleStatus(sub.uid, sub.isActive)}
+                                                className={`px-4 py-2 rounded-xl font-bold text-sm transition-colors ${sub.isActive ? 'bg-red-900/30 text-red-500 hover:bg-red-600 hover:text-white' : 'bg-green-900/30 text-green-500 hover:bg-green-600 hover:text-white'}`}
+                                            >
+                                                {sub.isActive ? 'إيقاف الحساب' : 'تفعيل الحساب'}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {subscribers.length === 0 && <tr><td colSpan="4" className="text-center p-10 text-gray-500">لا يوجد مشتركون بعد.</td></tr>}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            );
+        }
 
         // --- Main App Component ---
         function App() {
           const [user, setUser] = useState(null);
+          const [isAdmin, setIsAdmin] = useState(false);
           const [isCheckingAuth, setIsCheckingAuth] = useState(true);
           const [isFirebaseActiveState, setIsFirebaseActiveState] = useState(false);
           const [bookings, setBookings] = useState(() => {
@@ -342,8 +413,43 @@
                       firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
                         .then(() => {
                             firebase.auth().onAuthStateChanged((usr) => {
-                                setUser(usr);
-                                setIsCheckingAuth(false);
+                                if (usr) {
+                                    // Check Admin Status
+                                    if (usr.email === ADMIN_EMAIL) {
+                                        setIsAdmin(true);
+                                        setUser(usr);
+                                        setIsCheckingAuth(false);
+                                    } else {
+                                        // Regular User -> Check if Active in 'subscribers' collection
+                                        firebase.firestore().collection('subscribers').doc(usr.uid).get().then(doc => {
+                                            if (doc.exists && doc.data().isActive === false) {
+                                                firebase.auth().signOut();
+                                                alert("تم إيقاف حسابك من قبل الإدارة. يرجى التواصل مع الدعم.");
+                                                setUser(null);
+                                            } else {
+                                                // Create doc if doesn't exist (for existing users before this update)
+                                                if (!doc.exists) {
+                                                    firebase.firestore().collection('subscribers').doc(usr.uid).set({
+                                                        uid: usr.uid,
+                                                        email: usr.email,
+                                                        createdAt: new Date().toISOString(),
+                                                        isActive: true
+                                                    });
+                                                }
+                                                setUser(usr);
+                                            }
+                                            setIsCheckingAuth(false);
+                                        }).catch(err => {
+                                            console.error("Error checking subscriber status", err);
+                                            setUser(usr); // fallback allow
+                                            setIsCheckingAuth(false);
+                                        });
+                                    }
+                                } else {
+                                    setUser(null);
+                                    setIsAdmin(false);
+                                    setIsCheckingAuth(false);
+                                }
                             });
                         })
                         .catch(err => {
@@ -356,13 +462,18 @@
                   }
               } else {
                   const localUser = localStorage.getItem('mrakby_local_user');
-                  if(localUser) setUser(JSON.parse(localUser));
+                  if(localUser) {
+                      const parsed = JSON.parse(localUser);
+                      if (parsed.email === ADMIN_EMAIL) setIsAdmin(true);
+                      setUser(parsed);
+                  }
                   setIsCheckingAuth(false);
               }
           }, []);
 
           useEffect(() => {
-              if (!user || !isFirebaseActive || !window.firebase) return;
+              if (!user || !isFirebaseActive || !window.firebase || isAdmin) return; // Admin has a different view
+              
               const db = firebase.firestore();
               const unsubB = db.collection('users').doc(user.uid).collection('bookings').onSnapshot((snap) => {
                   const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -373,7 +484,7 @@
                   if(snap.exists) setSettings({ ...DEFAULT_SETTINGS, ...snap.data() });
               });
               return () => { unsubB(); unsubS(); };
-          }, [user, isFirebaseActiveState]);
+          }, [user, isFirebaseActiveState, isAdmin]);
 
           useEffect(() => { localStorage.setItem('mrakby_bookings', JSON.stringify(bookings)); }, [bookings]);
           useEffect(() => { localStorage.setItem('mrakby_settings', JSON.stringify(settings)); }, [settings]);
@@ -385,7 +496,7 @@
 
           const handleLogout = () => {
               if (isFirebaseActive && window.firebase) firebase.auth().signOut();
-              else { localStorage.removeItem('mrakby_local_user'); setUser(null); }
+              else { localStorage.removeItem('mrakby_local_user'); setUser(null); setIsAdmin(false); }
               setCurrentView('dashboard');
           };
 
@@ -429,11 +540,17 @@
                     </div>
                   </div>
                   <nav className="space-y-2 flex-1">
-                    <NavItem icon={<Icons.LayoutDashboard />} label="الرئيسية" active={currentView === 'dashboard'} onClick={() => {setCurrentView('dashboard'); setIsMobileMenuOpen(false);}} />
-                    <NavItem icon={<Icons.PlusCircle />} label="حجز جديد" active={currentView === 'new'} onClick={() => navigateToNewBooking('')} />
-                    <NavItem icon={<Icons.Users />} label="العملاء" active={currentView === 'clients'} onClick={() => {setCurrentView('clients'); setIsMobileMenuOpen(false);}} />
-                    <NavItem icon={<Icons.CalendarIcon />} label="التقويم" active={currentView === 'calendar'} onClick={() => {setCurrentView('calendar'); setIsMobileMenuOpen(false);}} />
-                    <NavItem icon={<Icons.Settings />} label="الإعدادات" active={currentView === 'settings'} onClick={() => {setCurrentView('settings'); setIsMobileMenuOpen(false);}} />
+                    {!isAdmin ? (
+                        <>
+                            <NavItem icon={<Icons.LayoutDashboard />} label="الرئيسية" active={currentView === 'dashboard'} onClick={() => {setCurrentView('dashboard'); setIsMobileMenuOpen(false);}} />
+                            <NavItem icon={<Icons.PlusCircle />} label="حجز جديد" active={currentView === 'new'} onClick={() => navigateToNewBooking('')} />
+                            <NavItem icon={<Icons.Users />} label="العملاء" active={currentView === 'clients'} onClick={() => {setCurrentView('clients'); setIsMobileMenuOpen(false);}} />
+                            <NavItem icon={<Icons.CalendarIcon />} label="التقويم" active={currentView === 'calendar'} onClick={() => {setCurrentView('calendar'); setIsMobileMenuOpen(false);}} />
+                            <NavItem icon={<Icons.Settings />} label="الإعدادات" active={currentView === 'settings'} onClick={() => {setCurrentView('settings'); setIsMobileMenuOpen(false);}} />
+                        </>
+                    ) : (
+                        <NavItem icon={<Icons.Shield />} label="إدارة المشتركين" active={currentView === 'admin'} onClick={() => {setCurrentView('admin'); setIsMobileMenuOpen(false);}} />
+                    )}
                   </nav>
                   <div className="mt-auto pt-10 space-y-4">
                     <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 bg-red-900/20 text-red-500 py-2 rounded-xl border border-red-900/50 hover:bg-red-900/40 transition-colors">
@@ -447,11 +564,17 @@
                 </aside>
 
                 <main className="flex-1 p-4 md:p-8 overflow-y-auto">
-                  {currentView === 'dashboard' && <Dashboard bookings={bookings} settings={settings} />}
-                  {currentView === 'new' && <NewBooking settings={settings} initialDate={initialBookingDate} user={user} isFirebaseActive={isFirebaseActiveState} onSuccess={(newB) => { if(!isFirebaseActiveState) setBookings([newB, ...bookings].sort((a, b) => new Date(b.date) - new Date(a.date))); setCurrentView('clients'); }} showToast={showToast} />}
-                  {currentView === 'clients' && <ClientsList bookings={bookings} settings={settings} onPrint={setContractToPrint} showToast={showToast} user={user} isFirebaseActive={isFirebaseActiveState} onLocalDelete={(id) => setBookings(bookings.filter(b => b.id !== id))} />}
-                  {currentView === 'calendar' && <CalendarView bookings={bookings} onDayClick={navigateToNewBooking} settings={settings} showToast={showToast} />}
-                  {currentView === 'settings' && <SettingsView settings={settings} user={user} isFirebaseActive={isFirebaseActiveState} onLocalSave={(s) => setSettings(s)} showToast={showToast} />}
+                  {isAdmin ? (
+                      <AdminDashboard showToast={showToast} />
+                  ) : (
+                      <>
+                          {currentView === 'dashboard' && <Dashboard bookings={bookings} settings={settings} />}
+                          {currentView === 'new' && <NewBooking settings={settings} initialDate={initialBookingDate} user={user} isFirebaseActive={isFirebaseActiveState} onSuccess={(newB) => { if(!isFirebaseActiveState) setBookings([newB, ...bookings].sort((a, b) => new Date(b.date) - new Date(a.date))); setCurrentView('clients'); }} showToast={showToast} />}
+                          {currentView === 'clients' && <ClientsList bookings={bookings} settings={settings} onPrint={setContractToPrint} showToast={showToast} user={user} isFirebaseActive={isFirebaseActiveState} onLocalDelete={(id) => setBookings(bookings.filter(b => b.id !== id))} />}
+                          {currentView === 'calendar' && <CalendarView bookings={bookings} onDayClick={navigateToNewBooking} settings={settings} showToast={showToast} />}
+                          {currentView === 'settings' && <SettingsView settings={settings} user={user} isFirebaseActive={isFirebaseActiveState} onLocalSave={(s) => setSettings(s)} showToast={showToast} />}
+                      </>
+                  )}
                 </main>
               </div>
             </div>
@@ -474,7 +597,18 @@
                         let userCredential;
                         if (isRegistering) {
                             userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+                            
+                            // 1. Add to global subscribers list
+                            await firebase.firestore().collection('subscribers').doc(userCredential.user.uid).set({
+                                uid: userCredential.user.uid,
+                                email: userCredential.user.email,
+                                createdAt: new Date().toISOString(),
+                                isActive: true // Admin can later change this to false
+                            });
+                            
+                            // 2. Set default config for new studio
                             await firebase.firestore().collection('users').doc(userCredential.user.uid).collection('settings').doc('config').set(DEFAULT_SETTINGS);
+                            
                             showToast("تم إنشاء الحساب بنجاح!");
                         } else {
                             userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
