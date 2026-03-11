@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Studio Management System</title>
     
-    <!-- الأيقونة الجديدة للتبويب -->
-    <link rel="icon" type="image/png" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhQKni80xTpbel7KoC02ERsBCqwsvtC-Ua75S2z4XaDzt6B6XT3jfyOXN-gvjNDhzz_xWwO7n2hVqE4AAItwCN2u5uoQb_N6RglYpymqNuBBZvFG6H2ZqCNPV-LQsx0RhfsN_N9AnnqM6ApioUohuOQpcLOZ2iuuIWMFK3gvc5UbFe6S2FQVWr9OU1zq_w/w640-h640/ChatGPT%20Image%20Mar%2011,%202026,%2008_24_10%20PM.png">
+    <!-- الأيقونة الافتراضية للتبويب -->
+    <link rel="icon" type="image/png" href="https://placehold.co/600x600/111/D4AF37?text=Studio">
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -138,8 +138,11 @@
 
         let isFirebaseActive = false;
 
-        // الصورة الصحيحة الجديدة
-        const LOGO_URL = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhQKni80xTpbel7KoC02ERsBCqwsvtC-Ua75S2z4XaDzt6B6XT3jfyOXN-gvjNDhzz_xWwO7n2hVqE4AAItwCN2u5uoQb_N6RglYpymqNuBBZvFG6H2ZqCNPV-LQsx0RhfsN_N9AnnqM6ApioUohuOQpcLOZ2iuuIWMFK3gvc5UbFe6S2FQVWr9OU1zq_w/w640-h640/ChatGPT%20Image%20Mar%2011,%202026,%2008_24_10%20PM.png";
+        // الصورة الافتراضية للعملاء الجدد
+        const LOGO_URL = "https://placehold.co/600x600/111/D4AF37?text=Studio";
+        
+        // الصورة الافتراضية للقائمة الجانبية (البروفايل)
+        const PROFILE_IMAGE_URL = "https://placehold.co/600x600/111/D4AF37?text=User";
 
         // --- Default Settings ---
         const DEFAULT_SETTINGS = {
@@ -320,6 +323,7 @@
             );
         }
 
+        // --- Admin Components ---
         function AdminDashboard({ showToast }) {
             const [subscribers, setSubscribers] = useState([]);
             const [editingSub, setEditingSub] = useState(null);
@@ -621,9 +625,26 @@
                 </div>
               )}
 
+              {/* شريط التنبيه الخاص بالفترة التجريبية مع زر الاشتراك */}
               {trialInfo && !isAdmin && (
-                  <div className="bg-blue-900/40 text-blue-400 text-center py-2 text-sm font-bold border-b border-blue-500/30">
-                      ℹ️ {trialInfo}
+                  <div className="bg-blue-900/40 text-blue-400 py-3 px-4 border-b border-blue-500/30 flex flex-col md:flex-row items-center justify-center gap-4 shadow-md">
+                      <span className="font-bold text-sm flex items-center gap-2">
+                          <Icons.Info size={18} /> {trialInfo}
+                      </span>
+                      <button 
+                          onClick={() => {
+                              const el = document.createElement('textarea');
+                              el.value = '01126810107';
+                              document.body.appendChild(el);
+                              el.select();
+                              document.execCommand('copy');
+                              document.body.removeChild(el);
+                              showToast("تم النسخ اذهب لطريقة الدفع وقوم بلصق رقم الهاتف");
+                          }}
+                          className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-1.5 rounded-full text-xs font-bold transition-colors shadow-lg flex items-center gap-1"
+                      >
+                          <Icons.Copy size={14} /> اشترك الآن
+                      </button>
                   </div>
               )}
 
@@ -647,6 +668,14 @@
                         <p className="text-xs text-gray-400 tracking-widest uppercase">Photography</p>
                     </div>
                   </div>
+                  
+                  {/* صورة المستخدم الشخصية في القائمة الجانبية */}
+                  <div className="print:hidden hidden md:block mb-4 text-center">
+                      <div className="w-32 h-32 rounded-full border-4 border-[#D4AF37] mx-auto overflow-hidden shadow-2xl">
+                          <img src={PROFILE_IMAGE_URL} alt="Profile" crossOrigin="anonymous" className="w-full h-full object-cover" />
+                      </div>
+                  </div>
+
                   <nav className="space-y-2 flex-1">
                     {!isAdmin ? (
                         <>
@@ -1001,50 +1030,6 @@
                   />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <StatCard title="إجمالي الحجوزات" value={stats.total} subtitle="حجز مسجل" />
-                <StatCard title="إجمالي الإيرادات" value={formatMoney(stats.rev)} highlight subtitle={showAmounts ? `المدفوع: ${stats.paid.toLocaleString()} ج.م` : 'المدفوع: ••••••'} />
-                <StatCard title="المبالغ المتبقية" value={formatMoney(stats.outstanding)} alert={stats.outstanding > 0} subtitle="مستحقات لدى العملاء" />
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Upcoming Queue */}
-                <div className="lg:col-span-2 bg-[#111] p-6 rounded-3xl border border-[#222] shadow-xl">
-                  <div className="flex items-center gap-2 mb-6"><Icons.ClockIcon className="text-[#D4AF37]" size={20} /><h3 className="text-[#D4AF37] font-bold text-xl">العملاء القادمون (خلال شهر)</h3></div>
-                  <div className="space-y-3 max-h-80 overflow-y-auto pr-2 no-scrollbar">
-                      {upcoming.length > 0 ? upcoming.map(b => (
-                          <div key={b.id} onClick={() => setSelectedAlertBooking(b)} className="flex flex-col md:flex-row md:items-center justify-between bg-black/40 p-4 rounded-xl border border-white/5 hover:border-[#D4AF37]/50 transition-colors gap-4 cursor-pointer">
-                              <div className="flex items-center gap-4">
-                                  <div className="bg-[#D4AF37]/10 text-[#D4AF37] font-bold text-center p-3 rounded-xl min-w-[70px] border border-[#D4AF37]/20">
-                                      <p className="text-2xl leading-none">{new Date(b.date).getDate()}</p>
-                                      <p className="text-xs mt-1">{new Date(b.date).toLocaleString('ar-EG', {month: 'short'})}</p>
-                                  </div>
-                                  <div>
-                                      <p className="font-bold text-white text-lg">{b.groomName} & {b.brideName}</p>
-                                      <p className="text-sm text-gray-400">{b.sessionType === 'آخر' ? b.otherSessionType : b.sessionType} • اللوكيشن: {b.location === 'آخر' ? b.otherLocation : b.location}</p>
-                                  </div>
-                              </div>
-                              <div className="text-left bg-black p-3 rounded-lg border border-[#333]">
-                                  <p className="text-xs text-gray-500 mb-1">المتبقي</p>
-                                  <p className="font-bold text-red-500">{showAmounts ? `${b.remaining} ج.م` : '••••••'}</p>
-                              </div>
-                          </div>
-                      )) : <p className="text-gray-500 text-center py-10 bg-black/20 rounded-xl">لا يوجد حجوزات قادمة خلال الشهر الحالي.</p>}
-                  </div>
-                </div>
-
-                {/* Monthly Stats Summary */}
-                <div className="bg-[#111] p-6 rounded-3xl border border-[#222] shadow-xl">
-                  <div className="flex items-center gap-2 mb-6"><Icons.TrendingUp className="text-[#D4AF37]" size={20} /><h3 className="text-[#D4AF37] font-bold text-xl">إحصائيات الشهور</h3></div>
-                  <div className="space-y-6 max-h-80 overflow-y-auto pr-2 no-scrollbar">{stats.sortedMonths.length > 0 ? stats.sortedMonths.map((m, i) => (
-                    <div key={i} className="space-y-2">
-                      <div className="flex justify-between items-end"><div><p className="text-white font-bold">{m.label}</p><p className="text-xs text-gray-500">{m.count} حجوزات</p></div><p className="text-[#D4AF37] font-bold">{formatMoney(m.rev)}</p></div>
-                      <div className="h-2 bg-black rounded-full overflow-hidden"><div className="h-full bg-gradient-to-l from-[#D4AF37] to-[#B8860B] transition-all duration-1000" style={{ width: `${(m.rev / stats.maxMonthlyRev) * 100}%` }}></div></div>
-                    </div>
-                  )) : <p className="text-gray-500 text-center py-4">لا توجد بيانات متاحة بعد.</p>}</div>
-                </div>
-              </div>
-              
               {/* Calendar Section integrated into Dashboard */}
               <div className="bg-[#111] rounded-3xl border border-[#333] p-6 shadow-2xl mt-8">
                 <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
@@ -1082,6 +1067,52 @@
                   })}
                 </div>
               </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+                {/* Upcoming Queue */}
+                <div className="lg:col-span-2 bg-[#111] p-6 rounded-3xl border border-[#222] shadow-xl">
+                  <div className="flex items-center gap-2 mb-6"><Icons.ClockIcon className="text-[#D4AF37]" size={20} /><h3 className="text-[#D4AF37] font-bold text-xl">العملاء القادمون (خلال شهر)</h3></div>
+                  <div className="space-y-3 max-h-80 overflow-y-auto pr-2 no-scrollbar">
+                      {upcoming.length > 0 ? upcoming.map(b => (
+                          <div key={b.id} onClick={() => setSelectedAlertBooking(b)} className="flex flex-col md:flex-row md:items-center justify-between bg-black/40 p-4 rounded-xl border border-white/5 hover:border-[#D4AF37]/50 transition-colors gap-4 cursor-pointer">
+                              <div className="flex items-center gap-4">
+                                  <div className="bg-[#D4AF37]/10 text-[#D4AF37] font-bold text-center p-3 rounded-xl min-w-[70px] border border-[#D4AF37]/20">
+                                      <p className="text-2xl leading-none">{new Date(b.date).getDate()}</p>
+                                      <p className="text-xs mt-1">{new Date(b.date).toLocaleString('ar-EG', {month: 'short'})}</p>
+                                  </div>
+                                  <div>
+                                      <p className="font-bold text-white text-lg">{b.groomName} & {b.brideName}</p>
+                                      <p className="text-sm text-gray-400">{b.sessionType === 'آخر' ? b.otherSessionType : b.sessionType} • اللوكيشن: {b.location === 'آخر' ? b.otherLocation : b.location}</p>
+                                  </div>
+                              </div>
+                              <div className="text-left bg-black p-3 rounded-lg border border-[#333]">
+                                  <p className="text-xs text-gray-500 mb-1">المتبقي</p>
+                                  <p className="font-bold text-red-500">{showAmounts ? `${b.remaining} ج.م` : '••••••'}</p>
+                              </div>
+                          </div>
+                      )) : <p className="text-gray-500 text-center py-10 bg-black/20 rounded-xl">لا يوجد حجوزات قادمة خلال الشهر الحالي.</p>}
+                  </div>
+                </div>
+
+                {/* Monthly Stats Summary */}
+                <div className="bg-[#111] p-6 rounded-3xl border border-[#222] shadow-xl">
+                  <div className="flex items-center gap-2 mb-6"><Icons.TrendingUp className="text-[#D4AF37]" size={20} /><h3 className="text-[#D4AF37] font-bold text-xl">إحصائيات الشهور</h3></div>
+                  <div className="space-y-6 max-h-80 overflow-y-auto pr-2 no-scrollbar">{stats.sortedMonths.length > 0 ? stats.sortedMonths.map((m, i) => (
+                    <div key={i} className="space-y-2">
+                      <div className="flex justify-between items-end"><div><p className="text-white font-bold">{m.label}</p><p className="text-xs text-gray-500">{m.count} حجوزات</p></div><p className="text-[#D4AF37] font-bold">{formatMoney(m.rev)}</p></div>
+                      <div className="h-2 bg-black rounded-full overflow-hidden"><div className="h-full bg-gradient-to-l from-[#D4AF37] to-[#B8860B] transition-all duration-1000" style={{ width: `${(m.rev / stats.maxMonthlyRev) * 100}%` }}></div></div>
+                    </div>
+                  )) : <p className="text-gray-500 text-center py-4">لا توجد بيانات متاحة بعد.</p>}</div>
+                </div>
+              </div>
+
+              {/* Stats moved to the bottom */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                <StatCard title="إجمالي الحجوزات" value={stats.total} subtitle="حجز مسجل" />
+                <StatCard title="إجمالي الإيرادات" value={formatMoney(stats.rev)} highlight subtitle={showAmounts ? `المدفوع: ${stats.paid.toLocaleString()} ج.م` : 'المدفوع: ••••••'} />
+                <StatCard title="المبالغ المتبقية" value={formatMoney(stats.outstanding)} alert={stats.outstanding > 0} subtitle="مستحقات لدى العملاء" />
+              </div>
+              
             </div>
           );
         }
