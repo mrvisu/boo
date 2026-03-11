@@ -70,8 +70,7 @@
             AlertTriangle: (props) => <Icon path="<path d='m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z'/><path d='M12 9v4'/><path d='M12 17h.01'/>" {...props}/>,
             LogOut: (props) => <Icon path="<path d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'/><polyline points='16 17 21 12 16 7'/><line x1='21' x2='9' y1='12' y2='12'/>" {...props}/>,
             CalendarPlus: (props) => <Icon path="<path d='M21 13V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8'/><line x1='16' x2='16' y1='2' y2='6'/><line x1='8' x2='8' y1='2' y2='6'/><line x1='3' x2='21' y1='10' y2='10'/><line x1='19' x2='19' y1='16' y2='22'/><line x1='16' x2='22' y1='19' y2='19'/>" {...props}/>,
-            Info: (props) => <Icon path="<circle cx='12' cy='12' r='10'/><line x1='12' x2='12' y1='16' y2='12'/><line x1='12' x2='12.01' y1='8' y2='8'/>" {...props}/>,
-            TrendingUp: (props) => <Icon path="<polyline points='23 6 13.5 15.5 8.5 10.5 1 18'/><polyline points='17 6 23 6 23 12'/>" {...props}/>
+            Info: (props) => <Icon path="<circle cx='12' cy='12' r='10'/><line x1='12' x2='12' y1='16' y2='12'/><line x1='12' x2='12.01' y1='8' y2='8'/>" {...props}/>
         };
 
         // --- Firebase Configuration ---
@@ -87,6 +86,7 @@
 
         let isFirebaseActive = false;
 
+        // --- Default Settings ---
         const DEFAULT_SETTINGS = {
           packages: [
             { id: 'p1', name: 'Wedding Basic', price: 5000 },
@@ -119,60 +119,6 @@
 
         const LOGO_URL = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh1m611kUbdULF_cv77ptyLsq5ssUUC1GGxZB65Ark2rIeXdbQr__HuuMbl6XbxKt-JNY3ZcGtgC-WjuJaIJTq1Be_DScv2TVEizbU4E1NYzDNj0iiNOIUESe2XyVs5CMgtzc-xsqLsMpYxun6IqzzQ6d8staQJWyUQM_CrGGt6zkLz0gsxONtu8Yd2Jfo/w640-h640/Gemini_Generated_Image_larjc1larjc1larj.png";
 
-        // Helper to generate Google Calendar Link
-        const generateGoogleCalendarLink = (booking) => {
-            const dateObj = new Date(booking.date);
-            if (isNaN(dateObj)) return "";
-            const startStr = dateObj.toISOString().split('T')[0].replace(/-/g, '');
-            dateObj.setDate(dateObj.getDate() + 1);
-            const endStr = dateObj.toISOString().split('T')[0].replace(/-/g, '');
-            const session = booking.sessionType === 'آخر' ? booking.otherSessionType : booking.sessionType;
-            const loc = booking.location === 'آخر' ? booking.otherLocation : booking.location;
-            const casualLoc = booking.casualLocation === 'آخر' ? booking.otherCasualLocation : (booking.casualLocation || 'لا يوجد');
-            const title = encodeURIComponent(`📸 تصوير ${session} - ${booking.groomName} & ${booking.brideName}`);
-            let desc = `📞 الهاتف: ${booking.phone}\n🏠 العنوان: ${booking.address || 'غير مسجل'}\n💄 ميك أب: ${booking.makeupArtist || 'غير محدد'} (خروج: ${booking.makeupLeaveTime || '--:--'})\n📍 اللوكيشن: ${loc || 'غير محدد'}\n📸 كاجوال: ${casualLoc}\n\n💰 مالي:\n- الإجمالي: ${booking.totalPrice} ج.م\n- المتبقي: ${booking.remaining} ج.م\n\n⚠️ تنبيه: تصوير Full HD.`;
-            return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startStr}/${endStr}&details=${encodeURIComponent(desc)}&location=${encodeURIComponent(loc || '')}`;
-        };
-
-        // --- Shared Helper Components ---
-        function InputField({ label, type = "text", value, onChange, placeholder, required }) {
-          return (
-            <div className="flex flex-col w-full">
-              <label className="text-xs text-gray-500 mb-1">{label} {required && <span className="text-red-500">*</span>}</label>
-              <input 
-                type={type} 
-                min={type === 'number' ? "0" : undefined} 
-                value={value} 
-                onChange={onChange} 
-                placeholder={placeholder} 
-                required={required} 
-                className="bg-black border border-[#333] text-white rounded-xl p-3 focus:outline-none focus:border-[#D4AF37] transition-all" 
-              />
-            </div>
-          );
-        }
-
-        function SelectField({ label, value, onChange, options = [] }) {
-          return (
-            <div className="flex flex-col w-full">
-              <label className="text-xs text-gray-500 mb-1">{label}</label>
-              <select value={value} onChange={onChange} className="bg-black border border-[#333] text-white rounded-xl p-3 outline-none focus:border-[#D4AF37]">
-                {options?.map((opt, i) => <option key={i} value={opt}>{opt}</option>)}
-              </select>
-            </div>
-          );
-        }
-
-        function DetailRow({ label, value, isMono }) {
-          return (
-            <div className="flex flex-col border-b border-[#222] pb-2">
-              <span className="text-xs text-gray-500">{label}</span>
-              <span className={`text-sm font-bold text-white ${isMono ? 'font-mono' : ''}`}>{value || '---'}</span>
-            </div>
-          );
-        }
-
-        // --- Main App Component ---
         function App() {
           const [user, setUser] = useState(null);
           const [isCheckingAuth, setIsCheckingAuth] = useState(true);
@@ -194,9 +140,12 @@
           useEffect(() => {
               if (firebaseConfig.apiKey && window.firebase) {
                   try {
-                      if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+                      if (!firebase.apps.length) {
+                          firebase.initializeApp(firebaseConfig);
+                      }
                       isFirebaseActive = true;
                       setIsFirebaseActiveState(true);
+                      
                       firebase.auth().onAuthStateChanged((usr) => {
                           setUser(usr);
                           setIsCheckingAuth(false);
@@ -235,8 +184,12 @@
           };
 
           const handleLogout = () => {
-              if (isFirebaseActive && window.firebase) firebase.auth().signOut();
-              else { localStorage.removeItem('mrakby_local_user'); setUser(null); }
+              if (isFirebaseActive && window.firebase) {
+                  firebase.auth().signOut();
+              } else {
+                  localStorage.removeItem('mrakby_local_user');
+                  setUser(null);
+              }
               setCurrentView('dashboard');
           };
 
@@ -246,9 +199,17 @@
             setIsMobileMenuOpen(false);
           };
 
-          if (isCheckingAuth) return <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center"><p className="text-[#D4AF37] font-bold text-xl">جاري التحميل...</p></div>;
-          if (!user) return <LoginScreen onLogin={setUser} isFirebaseActive={isFirebaseActiveState} showToast={showToast} />;
-          if (contractToPrint) return <ContractPrintView booking={contractToPrint} settings={settings} onClose={() => setContractToPrint(null)} />;
+          if (isCheckingAuth) {
+              return <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center"><p className="text-[#D4AF37] font-bold text-xl">جاري التحميل...</p></div>;
+          }
+
+          if (!user) {
+              return <LoginScreen onLogin={setUser} isFirebaseActive={isFirebaseActiveState} showToast={showToast} />;
+          }
+
+          if (contractToPrint) {
+            return <ContractPrintView booking={contractToPrint} settings={settings} onClose={() => setContractToPrint(null)} />;
+          }
 
           return (
             <div className="min-h-screen bg-[#0a0a0a] text-gray-200 font-sans" dir="rtl">
@@ -271,9 +232,15 @@
               <div className="flex flex-col md:flex-row min-h-screen">
                 <aside className={`${isMobileMenuOpen ? 'block' : 'hidden'} md:block w-full md:w-64 bg-[#111] border-l border-[#222] p-6 flex-shrink-0 transition-all flex flex-col`}>
                   <div className="hidden md:flex items-center gap-3 mb-10">
-                    <div className="p-1 rounded-full border-2 border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.2)]"><img src={LOGO_URL} className="w-12 h-12 rounded-full" /></div>
-                    <div><h1 className="text-[#D4AF37] font-bold text-xl leading-tight">Mrakby</h1><p className="text-xs text-gray-400 tracking-widest uppercase">Photography</p></div>
+                    <div className="p-1 rounded-full border-2 border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.2)]">
+                      <img src={LOGO_URL} alt="Mrakby Logo" className="w-12 h-12 rounded-full" />
+                    </div>
+                    <div>
+                      <h1 className="text-[#D4AF37] font-bold text-xl leading-tight">Mrakby</h1>
+                      <p className="text-xs text-gray-400 tracking-widest">PHOTOGRAPHY</p>
+                    </div>
                   </div>
+
                   <nav className="space-y-2 flex-1">
                     <NavItem icon={<Icons.LayoutDashboard />} label="الرئيسية" active={currentView === 'dashboard'} onClick={() => {setCurrentView('dashboard'); setIsMobileMenuOpen(false);}} />
                     <NavItem icon={<Icons.PlusCircle />} label="حجز جديد" active={currentView === 'new'} onClick={() => navigateToNewBooking('')} />
@@ -281,100 +248,166 @@
                     <NavItem icon={<Icons.CalendarIcon />} label="التقويم" active={currentView === 'calendar'} onClick={() => {setCurrentView('calendar'); setIsMobileMenuOpen(false);}} />
                     <NavItem icon={<Icons.Settings />} label="الإعدادات" active={currentView === 'settings'} onClick={() => {setCurrentView('settings'); setIsMobileMenuOpen(false);}} />
                   </nav>
+
                   <div className="mt-auto pt-10 space-y-4">
-                    <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 bg-red-900/20 text-red-500 py-2 rounded-xl border border-red-900/50 hover:bg-red-900/40 transition-colors"><Icons.LogOut size={18} /> تسجيل الخروج</button>
-                    <div className="p-4 bg-black/50 rounded-xl border border-[#D4AF37]/20 text-center"><p className="text-xs text-gray-500 mb-1">Studio ID</p><p className="font-mono text-[#D4AF37] font-bold">#MRKBY_2026</p></div>
+                    <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 bg-red-900/20 text-red-500 py-2 rounded-xl border border-red-900/50 hover:bg-red-900/40 transition-colors">
+                        <Icons.LogOut size={18} /> تسجيل الخروج
+                    </button>
+                    <div className="p-4 bg-black/50 rounded-xl border border-[#D4AF37]/20 text-center">
+                      <p className="text-xs text-gray-500 mb-1">Studio ID</p>
+                      <p className="font-mono text-[#D4AF37] font-bold">#MRKBY_2026</p>
+                    </div>
                   </div>
                 </aside>
 
                 <main className="flex-1 p-4 md:p-8 overflow-y-auto">
                   {currentView === 'dashboard' && <Dashboard bookings={bookings} />}
-                  {currentView === 'new' && <NewBooking settings={settings} initialDate={initialBookingDate} user={user} isFirebaseActive={isFirebaseActiveState} onSuccess={(newB) => { if(!isFirebaseActiveState) setBookings([newB, ...bookings].sort((a, b) => new Date(b.date) - new Date(a.date))); setCurrentView('clients'); }} showToast={showToast} />}
-                  {currentView === 'clients' && <ClientsList bookings={bookings} settings={settings} onPrint={setContractToPrint} showToast={showToast} user={user} isFirebaseActive={isFirebaseActiveState} onLocalDelete={(id) => setBookings(bookings.filter(b => b.id !== id))} />}
+                  {currentView === 'new' && <NewBooking settings={settings} initialDate={initialBookingDate} 
+                      user={user} isFirebaseActive={isFirebaseActiveState}
+                      onSuccess={(newB) => {
+                          if(!isFirebaseActiveState) setBookings([newB, ...bookings].sort((a, b) => new Date(b.date) - new Date(a.date))); 
+                          setCurrentView('clients');
+                      }} 
+                      showToast={showToast} />}
+                  {currentView === 'clients' && <ClientsList bookings={bookings} settings={settings} onPrint={setContractToPrint} showToast={showToast} 
+                      user={user} isFirebaseActive={isFirebaseActiveState}
+                      onLocalDelete={(id) => setBookings(bookings.filter(b => b.id !== id))} />}
                   {currentView === 'calendar' && <CalendarView bookings={bookings} onDayClick={navigateToNewBooking} settings={settings} showToast={showToast} />}
-                  {currentView === 'settings' && <SettingsView settings={settings} user={user} isFirebaseActive={isFirebaseActiveState} onLocalSave={(s) => setSettings(s)} showToast={showToast} />}
+                  {currentView === 'settings' && <SettingsView settings={settings} user={user} isFirebaseActive={isFirebaseActiveState} 
+                      onLocalSave={(s) => setSettings(s)} showToast={showToast} />}
                 </main>
               </div>
             </div>
           );
         }
 
-        // --- Screens ---
-
         function LoginScreen({ onLogin, isFirebaseActive, showToast }) {
             const [email, setEmail] = useState('');
             const [password, setPassword] = useState('');
             const [isLoading, setIsLoading] = useState(false);
             const [isRegistering, setIsRegistering] = useState(false);
+
             const handleAuth = async (e) => {
-                e.preventDefault(); setIsLoading(true);
+                e.preventDefault();
+                setIsLoading(true);
                 if (isFirebaseActive && window.firebase) {
                     try {
-                        let userCredential = isRegistering ? await firebase.auth().createUserWithEmailAndPassword(email, password) : await firebase.auth().signInWithEmailAndPassword(email, password);
+                        let userCredential;
+                        if (isRegistering) {
+                            userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+                            showToast("تم إنشاء الحساب بنجاح!");
+                        } else {
+                            userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+                        }
                         onLogin(userCredential.user);
-                    } catch (error) { showToast("خطأ في البيانات!", "error"); }
+                    } catch (error) {
+                        let errorMsg = "حدث خطأ غير معروف!";
+                        if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                            errorMsg = "بيانات الدخول غير صحيحة!";
+                        } else if (error.code === 'auth/email-already-in-use') {
+                            errorMsg = "هذا الإيميل مسجل مسبقاً!";
+                        } else if (error.code === 'auth/weak-password') {
+                             errorMsg = "كلمة المرور ضعيفة جداً (يجب أن تكون 6 أحرف على الأقل)";
+                        }
+                        showToast(errorMsg, "error");
+                    }
                 } else {
-                    if(email && password) { const usr = { uid: 'local_admin', email }; localStorage.setItem('mrakby_local_user', JSON.stringify(usr)); onLogin(usr); } 
-                    else showToast("أدخل البيانات", "error");
+                    if(email && password) {
+                        const mockUser = { uid: 'local_admin', email };
+                        localStorage.setItem('mrakby_local_user', JSON.stringify(mockUser));
+                        onLogin(mockUser);
+                        showToast("تم الدخول (وضع الأوفلاين)");
+                    } else {
+                        showToast("يرجى إدخال الإيميل وكلمة المرور", "error");
+                    }
                 }
                 setIsLoading(false);
             };
+
             return (
-                <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
-                    <div className="bg-[#111] p-8 rounded-3xl border border-[#D4AF37]/30 w-full max-w-md shadow-2xl">
-                        <div className="text-center mb-8"><img src={LOGO_URL} className="w-20 h-20 rounded-full mx-auto mb-4 border border-[#D4AF37]"/><h1 className="text-2xl font-bold text-[#D4AF37]">MRAKBY STUDIO</h1></div>
+                <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4 relative overflow-hidden" dir="rtl">
+                    <div className="absolute inset-0 opacity-10 pointer-events-none flex items-center justify-center">
+                         <Icons.Camera size={600} className="text-[#D4AF37]" />
+                    </div>
+                    <div className="bg-[#111] p-8 rounded-3xl border border-[#D4AF37]/30 w-full max-w-md relative z-10 shadow-2xl shadow-[#D4AF37]/10">
+                        <div className="text-center mb-8">
+                            <img src={LOGO_URL} alt="Logo" className="w-24 h-24 rounded-full mx-auto mb-4 border-2 border-[#D4AF37] p-1" />
+                            <h1 className="text-3xl font-bold text-[#D4AF37] uppercase tracking-widest">Mrakby</h1>
+                            <p className="text-gray-400 mt-1">نظام إدارة الاستوديو</p>
+                        </div>
+                        {!isFirebaseActive && <div className="bg-yellow-900/20 border border-yellow-700 p-3 rounded-xl mb-6 text-sm text-yellow-500 text-center">⚠️ النظام يعمل في الوضع المحلي (الأوفلاين). يرجى إضافة مفاتيح السحابة للربط. يمكنك تسجيل الدخول بأي بيانات مؤقتاً.</div>}
                         <form onSubmit={handleAuth} className="space-y-4">
-                            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required className="w-full bg-black border border-[#333] text-white rounded-xl p-3 outline-none focus:border-[#D4AF37]" placeholder="البريد الإلكتروني" />
-                            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required className="w-full bg-black border border-[#333] text-white rounded-xl p-3 outline-none focus:border-[#D4AF37]" placeholder="كلمة المرور" />
-                            <button type="submit" disabled={isLoading} className="w-full bg-[#D4AF37] text-black font-bold py-3 rounded-xl">{isLoading ? 'جاري التحميل...' : (isRegistering ? 'إنشاء حساب' : 'دخول')}</button>
+                            <div>
+                                <label className="block text-gray-400 mb-2 text-sm">البريد الإلكتروني</label>
+                                <input type="email" value={email} onChange={e => setEmail(e.target.value)} required className="w-full bg-black border border-[#333] text-white rounded-xl p-3 focus:outline-none focus:border-[#D4AF37]" placeholder="admin@mrakby.com" />
+                            </div>
+                            <div>
+                                <label className="block text-gray-400 mb-2 text-sm">كلمة المرور</label>
+                                <input type="password" value={password} onChange={e => setPassword(e.target.value)} required className="w-full bg-black border border-[#333] text-white rounded-xl p-3 focus:outline-none focus:border-[#D4AF37]" placeholder="••••••••" />
+                            </div>
+                            <button type="submit" disabled={isLoading} className="w-full bg-[#D4AF37] text-black font-bold py-3 rounded-xl hover:bg-yellow-500 transition-all mt-4">{isLoading ? 'جاري التحميل...' : (isRegistering ? 'إنشاء حساب جديد' : 'تسجيل الدخول')}</button>
                         </form>
-                        <div className="mt-4 text-center"><button onClick={() => setIsRegistering(!isRegistering)} className="text-gray-500 text-sm">{isRegistering ? 'دخول؟' : 'إنشاء حساب؟'}</button></div>
+                        {isFirebaseActive && <div className="mt-4 text-center"><button onClick={() => setIsRegistering(!isRegistering)} className="text-gray-400 hover:text-[#D4AF37] text-sm transition-colors">{isRegistering ? 'لديك حساب بالفعل؟ قم بتسجيل الدخول' : 'لا تملك حساباً؟ أنشئ حساب جديد'}</button></div>}
                     </div>
                 </div>
-            );
+            )
+        }
+
+        function NavItem({ icon, label, active, onClick }) {
+          return (
+            <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${active ? 'bg-gradient-to-r from-[#D4AF37]/20 to-transparent text-[#D4AF37] border-r-4 border-[#D4AF37]' : 'text-gray-400 hover:bg-[#222] hover:text-white'}`}>
+              {icon} <span className="font-medium text-lg">{label}</span>
+            </button>
+          );
         }
 
         function Dashboard({ bookings }) {
           const stats = useMemo(() => {
-            let rev = 0, paid = 0, counts = { 'زفاف': 0, 'خطوبة': 0, 'كاجول': 0, 'حنة': 0, 'كتب كتاب': 0, 'فوتوغرافي': 0 };
-            const monthly = {};
-            const monthNames = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+            let totalRevenue = 0, totalPaid = 0;
+            let counts = { 'زفاف': 0, 'خطوبة': 0, 'كاجول': 0, 'حنة': 0, 'كتب كتاب': 0, 'فوتوغرافي': 0 };
             bookings.forEach(b => {
-              const bRev = Number(b.totalPrice) || 0; const bPaid = Number(b.paid) || 0; rev += bRev; paid += bPaid;
-              const type = b.sessionType === 'آخر' ? b.otherSessionType : b.sessionType;
+              totalRevenue += Number(b.totalPrice) || 0;
+              totalPaid += Number(b.paid) || 0;
+              const type = b.sessionType === 'آخر' ? (b.otherSessionType || 'أخرى') : (b.sessionType || 'غير محدد');
               if (counts[type] !== undefined) counts[type]++; else counts[type] = 1;
-              const d = new Date(b.date);
-              if (!isNaN(d)) {
-                  const mKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-                  if (!monthly[mKey]) monthly[mKey] = { label: `${monthNames[d.getMonth()]} ${d.getFullYear()}`, rev: 0, count: 0 };
-                  monthly[mKey].rev += bRev; monthly[mKey].count += 1;
-              }
             });
-            const sortedMonths = Object.keys(monthly).sort().reverse().map(key => monthly[key]);
-            const maxMonthlyRev = Math.max(...sortedMonths.map(m => m.rev), 1);
-            return { total: bookings.length, rev, paid, outstanding: rev - paid, counts, sortedMonths, maxMonthlyRev };
+            return { totalBookings: bookings.length, revenue: totalRevenue, paid: totalPaid, outstanding: totalRevenue - totalPaid, counts };
           }, [bookings]);
+          const maxCount = Math.max(...Object.values(stats.counts), 1);
           return (
             <div className="space-y-8 animate-fadeIn">
-              <header><h2 className="text-3xl font-bold">لوحة التحكم 📸</h2></header>
+              <header>
+                <h2 className="text-3xl font-bold text-white mb-2">مرحباً بك في الاستوديو 📸</h2>
+                <p className="text-gray-400">إليك ملخص سريع لأعمالك وحجوزاتك.</p>
+              </header>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <StatCard title="إجمالي الحجوزات" value={stats.total} subtitle="حجز" />
-                <StatCard title="إجمالي الإيرادات" value={`${stats.rev.toLocaleString()} ج.م`} highlight />
-                <StatCard title="المبالغ المتبقية" value={`${stats.outstanding.toLocaleString()} ج.م`} alert={stats.outstanding > 0} />
+                <StatCard title="إجمالي الحجوزات" value={stats.totalBookings} subtitle="حجز مسجل" />
+                <StatCard title="إجمالي الإيرادات" value={`${stats.revenue.toLocaleString()} ج.م`} subtitle={`المدفوع: ${stats.paid.toLocaleString()} ج.م`} highlight />
+                <StatCard title="إجمالي المتبقي" value={`${stats.outstanding.toLocaleString()} ج.م`} subtitle="مستحقات لدى العملاء" alert={stats.outstanding > 0} />
               </div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="bg-[#111] p-6 rounded-3xl border border-[#222] shadow-xl">
-                  <div className="flex items-center gap-2 mb-6"><Icons.TrendingUp className="text-[#D4AF37]" size={20} /><h3 className="text-[#D4AF37] font-bold text-xl">إحصائيات الشهور</h3></div>
-                  <div className="space-y-6">{stats.sortedMonths.map((m, i) => (
-                    <div key={i} className="space-y-2">
-                      <div className="flex justify-between items-end"><div><p className="text-white font-bold">{m.label}</p><p className="text-xs text-gray-500">{m.count} حجز</p></div><p className="text-[#D4AF37] font-bold">{m.rev.toLocaleString()} ج.م</p></div>
-                      <div className="h-2 bg-black rounded-full overflow-hidden"><div className="h-full bg-gradient-to-l from-[#D4AF37] to-[#B8860B] transition-all duration-1000" style={{ width: `${(m.rev / stats.maxMonthlyRev) * 100}%` }}></div></div>
-                    </div>
-                  ))}</div>
+                <div className="bg-[#111] p-6 rounded-2xl border border-[#222]">
+                  <h3 className="text-xl font-bold text-[#D4AF37] mb-6">تحليل أنواع الحجوزات</h3>
+                  <div className="space-y-4">
+                    {Object.entries(stats.counts).filter(([_, count]) => count > 0).map(([type, count]) => (
+                      <div key={type} className="space-y-2">
+                        <div className="flex justify-between text-sm"><span>{type}</span><span className="text-[#D4AF37] font-bold">{count} حجوزات</span></div>
+                        <div className="h-3 bg-black rounded-full overflow-hidden"><div className="h-full bg-gradient-to-l from-[#D4AF37] to-[#B8860B] rounded-full transition-all duration-1000" style={{ width: `${(count / maxCount) * 100}%` }}></div></div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="bg-[#111] p-6 rounded-3xl border border-[#222] shadow-xl">
-                  <div className="flex items-center gap-2 mb-6"><Icons.Camera className="text-[#D4AF37]" size={20} /><h3 className="text-[#D4AF37] font-bold text-xl">أنواع الحجوزات</h3></div>
-                  <div className="grid grid-cols-1 gap-2">{Object.entries(stats.counts).filter(([_, c]) => c > 0).map(([t, c]) => (<div key={t} className="flex justify-between py-3 px-4 rounded-xl bg-black/40 border border-white/5 hover:border-[#D4AF37]/30 transition-colors"><span className="text-gray-300">{t}</span><span className="font-bold text-[#D4AF37]">{c}</span></div>))}</div>
+                <div className="bg-[#111] p-6 rounded-2xl border border-[#222]">
+                  <h3 className="text-xl font-bold text-[#D4AF37] mb-6">أحدث الحجوزات</h3>
+                  <div className="space-y-4">
+                    {bookings.slice(0, 4).map((b, i) => (
+                      <div key={i} className="flex justify-between items-center p-3 bg-black/40 rounded-lg border border-[#333]">
+                        <div><p className="font-bold text-white">{b.groomName} & {b.brideName}</p><p className="text-xs text-gray-400">{b.date} • {b.sessionType === 'آخر' ? b.otherSessionType : b.sessionType}</p></div>
+                        <div className="text-left"><p className="text-[#D4AF37] font-bold">{b.totalPrice} ج.م</p></div>
+                      </div>
+                    ))}
+                    {bookings.length === 0 && <p className="text-gray-500 text-center py-4">لا توجد حجوزات بعد.</p>}
+                  </div>
                 </div>
               </div>
             </div>
@@ -382,103 +415,179 @@
         }
 
         function StatCard({ title, value, subtitle, highlight, alert }) {
-          return (<div className={`p-6 rounded-3xl border ${highlight ? 'bg-[#D4AF37]/10 border-[#D4AF37]/50' : 'bg-[#111] border-[#222]'}`}><h3 className="text-gray-500 text-sm mb-1">{title}</h3><p className={`text-3xl font-bold ${alert ? 'text-red-500' : 'text-white'}`}>{value}</p><p className="text-xs text-gray-600 mt-1">{subtitle}</p></div>);
+          return (
+            <div className={`p-6 rounded-2xl border ${highlight ? 'bg-gradient-to-br from-[#1a1500] to-[#0a0a0a] border-[#D4AF37]/50' : 'bg-[#111] border-[#222]'} relative overflow-hidden`}>
+              {highlight && <div className="absolute top-0 right-0 w-32 h-32 bg-[#D4AF37]/10 rounded-full blur-2xl -mr-10 -mt-10"></div>}
+              <h3 className="text-gray-400 font-medium mb-2">{title}</h3>
+              <p className={`text-4xl font-bold mb-2 ${alert ? 'text-red-400' : 'text-white'}`}>{value}</p>
+              <p className="text-sm text-gray-500">{subtitle}</p>
+            </div>
+          );
         }
 
-        function NavItem({ icon, label, active, onClick }) {
-          return (<button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all ${active ? 'bg-[#D4AF37] text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}>{icon}<span>{label}</span></button>);
-        }
+        function NewBooking({ user, isFirebaseActive, settings, initialDate, onSuccess, showToast }) {
+          const [formData, setFormData] = useState({
+            groomName: '', brideName: '', phone: '', address: '', date: initialDate || '', location: '', otherLocation: '',
+            sessionType: settings.sessionTypes[0] || '', otherSessionType: '', makeupArtist: '', makeupLeaveTime: '', casualLocation: '', otherCasualLocation: '', packageId: '', addons: [], paid: '',
+            videoServiceId: '', videoServicePrice: '', videoStartTime: '', videoAddons: []
+          });
+          const [isSubmitting, setIsSubmitting] = useState(false);
+          useEffect(() => { if (initialDate) setFormData(prev => ({ ...prev, date: initialDate })); }, [initialDate]);
+          const selectedPackage = settings.packages.find(p => p.id === formData.packageId) || { price: 0, name: '' };
+          const addonsTotal = formData.addons.reduce((sum, addonId) => {
+            const addon = settings.addons.find(a => a.id === addonId);
+            return sum + (addon ? Number(addon.price) : 0);
+          }, 0);
+          const videoServicePriceTotal = Number(formData.videoServicePrice) || 0;
+          const videoAddonsTotal = formData.videoAddons.reduce((sum, a) => sum + (Number(a.price) || 0), 0);
+          const totalPrice = Number(selectedPackage.price) + addonsTotal + videoServicePriceTotal + videoAddonsTotal;
+          const remaining = totalPrice - (Number(formData.paid) || 0);
+          const handleAddonToggle = (addonId) => { setFormData(prev => ({ ...prev, addons: prev.addons.includes(addonId) ? prev.addons.filter(id => id !== addonId) : [...prev.addons, addonId] })); };
+          const handleAddVideoAddon = (e) => {
+            const addonId = e.target.value; if (!addonId) return;
+            const addonDef = settings.videoAddons.find(a => a.id === addonId);
+            if (addonDef && !formData.videoAddons.find(a => a.id === addonId)) { setFormData(prev => ({ ...prev, videoAddons: [...prev.videoAddons, { id: addonDef.id, name: addonDef.name, price: addonDef.price }] })); }
+            e.target.value = '';
+          };
+          const handleVideoAddonPriceChange = (id, newPrice) => { setFormData(prev => ({ ...prev, videoAddons: prev.videoAddons.map(a => a.id === id ? { ...a, price: newPrice } : a) })); };
+          const removeVideoAddon = (id) => { setFormData(prev => ({ ...prev, videoAddons: prev.videoAddons.filter(a => a.id !== id) })); };
+          const handleSubmit = async (e) => {
+            e.preventDefault();
+            if (!formData.groomName || !formData.date || !formData.packageId) { return showToast("يرجى إكمال البيانات الأساسية", "error"); }
+            setIsSubmitting(true);
+            const newBooking = {
+                id: 'b_' + Date.now(), ...formData,
+                snapshotPackage: { name: selectedPackage.name, price: selectedPackage.price },
+                snapshotAddons: formData.addons.map(aId => { const a = settings.addons.find(x => x.id === aId); return a ? { name: a.name, price: a.price } : null; }).filter(Boolean),
+                snapshotVideoService: formData.videoServiceId ? { name: settings.videoServices.find(v => v.id === formData.videoServiceId)?.name, price: formData.videoServicePrice } : null,
+                totalPrice, remaining, createdAt: new Date().toISOString()
+              };
+            if (isFirebaseActive && user && window.firebase) {
+                try { await firebase.firestore().collection('users').doc(user.uid).collection('bookings').add(newBooking); showToast("تم حفظ الحجز في السحابة!"); onSuccess(newBooking); } catch(e) { showToast("حدث خطأ أثناء الحفظ السحابي", "error"); }
+            } else { setTimeout(() => { showToast("تم حفظ الحجز بنجاح!"); onSuccess(newBooking); }, 500); }
+            setIsSubmitting(false);
+          };
 
-        function NewBooking({ settings, initialDate, onSuccess, showToast, user, isFirebaseActive }) {
-            const [formData, setFormData] = useState({
-                groomName: '', brideName: '', phone: '', address: '', date: initialDate || '', location: '', otherLocation: '',
-                sessionType: settings.sessionTypes[0], otherSessionType: '', makeupArtist: '', makeupLeaveTime: '', casualLocation: '', otherCasualLocation: '', packageId: '', addons: [], paid: '',
-                videoServiceId: '', videoServicePrice: '', videoStartTime: '', videoAddons: []
-            });
-            const [isSubmitting, setIsSubmitting] = useState(false);
-            useEffect(() => { if (initialDate) setFormData(p => ({ ...p, date: initialDate })); }, [initialDate]);
-            const pkg = settings.packages.find(p => p.id === formData.packageId) || { price: 0 };
-            const addonsTot = formData.addons.reduce((s, id) => s + (settings.addons.find(a => a.id === id)?.price || 0), 0);
-            const vServPrice = Number(formData.videoServicePrice) || 0;
-            const vAddTot = formData.videoAddons.reduce((s, a) => s + (Number(a.price) || 0), 0);
-            const total = Number(pkg.price) + addonsTot + vServPrice + vAddTot;
-            const remaining = total - (Number(formData.paid) || 0);
-
-            const submit = async (e) => {
-                e.preventDefault(); if (!formData.groomName || !formData.date || !formData.packageId) return showToast("أكمل البيانات الأساسية", "error");
-                setIsSubmitting(true);
-                const snap = {
-                    id: 'b_' + Date.now(), ...formData,
-                    snapshotPackage: { name: pkg.name, price: pkg.price },
-                    snapshotAddons: formData.addons.map(id => { const a = settings.addons.find(x => x.id === id); return a ? { name: a.name, price: a.price } : null; }).filter(Boolean),
-                    snapshotVideoService: formData.videoServiceId ? { name: settings.videoServices.find(v => v.id === formData.videoServiceId)?.name, price: formData.videoServicePrice } : null,
-                    totalPrice: total, remaining, createdAt: new Date().toISOString()
-                };
-                if (isFirebaseActive && user && window.firebase) {
-                    try { await firebase.firestore().collection('users').doc(user.uid).collection('bookings').add(snap); onSuccess(snap); } catch(e) { showToast("خطأ سحابي", "error"); }
-                } else { onSuccess(snap); showToast("تم الحفظ محلياً"); }
-                setIsSubmitting(false);
-            };
-
-            return (
-                <div className="max-w-4xl mx-auto pb-10 animate-fadeIn">
-                    <h2 className="text-3xl font-bold text-[#D4AF37] mb-8 border-b border-[#D4AF37]/20 pb-4">تسجيل حجز جديد</h2>
-                    <form onSubmit={submit} className="space-y-6">
-                        <div className="bg-[#111] p-6 rounded-3xl border border-[#222] grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <InputField label="اسم العريس" value={formData.groomName} onChange={e => setFormData({...formData, groomName: e.target.value})} required />
-                            <InputField label="اسم العروسة" value={formData.brideName} onChange={e => setFormData({...formData, brideName: e.target.value})} required />
-                            <InputField label="الهاتف" type="tel" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} required />
-                            <InputField label="العنوان" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} />
-                        </div>
-                        <div className="bg-[#111] p-6 rounded-3xl border border-[#222] grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <SelectField label="نوع السيشن" value={formData.sessionType} onChange={e => setFormData({...formData, sessionType: e.target.value})} options={settings.sessionTypes} />
-                            <InputField label="التاريخ" type="date" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} required />
-                            <SelectField label="اللوكيشن" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} options={['', ...settings.locations]} />
-                            <InputField label="اسم الميك أب" value={formData.makeupArtist} onChange={e => setFormData({...formData, makeupArtist: e.target.value})} />
-                            <InputField label="وقت الخروج" type="time" value={formData.makeupLeaveTime} onChange={e => setFormData({...formData, makeupLeaveTime: e.target.value})} />
-                        </div>
-                        <div className="bg-[#111] p-6 rounded-3xl border border-[#222]">
-                            <h4 className="mb-4 font-bold text-[#D4AF37]">الباكيدج والإضافات</h4>
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
-                                {settings.packages.map(p => (<div key={p.id} onClick={() => setFormData({...formData, packageId: p.id})} className={`p-4 rounded-2xl border cursor-pointer transition-all ${formData.packageId === p.id ? 'border-[#D4AF37] bg-[#D4AF37]/10' : 'border-[#333]'}`}><p className="font-bold">{p.name}</p><p className="text-xs text-gray-500">{p.price} ج.م</p></div>))}
-                            </div>
-                        </div>
-                        <div className="bg-[#D4AF37] text-black p-6 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-4 shadow-xl">
-                            <div><p className="text-sm font-bold opacity-60 uppercase">إجمالي المبلغ</p><p className="text-4xl font-bold">{total} ج.م</p></div>
-                            <div className="w-full md:w-48"><input type="number" value={formData.paid} onChange={e => setFormData({...formData, paid: e.target.value})} className="w-full p-3 rounded-xl bg-black/10 border border-black/20 text-black font-bold placeholder-black/40" placeholder="المبلغ المدفوع" /></div>
-                            <div className="text-left"><p className="text-sm font-bold opacity-60 uppercase">المتبقي</p><p className="text-4xl font-bold">{remaining} ج.م</p></div>
-                        </div>
-                        <button type="submit" disabled={isSubmitting} className="w-full bg-[#D4AF37] text-black font-bold py-4 rounded-3xl shadow-2xl hover:bg-yellow-500">{isSubmitting ? 'جاري الحفظ...' : 'تأكيد الحجز وحفظ البيانات'}</button>
-                    </form>
+          return (
+            <div className="max-w-4xl mx-auto animate-fadeIn pb-10">
+              <h2 className="text-3xl font-bold text-[#D4AF37] mb-8 border-b border-[#D4AF37]/30 pb-4">📝 تسجيل حجز جديد</h2>
+              <form onSubmit={handleSubmit} className="space-y-8">
+                <div className="bg-[#111] p-6 rounded-2xl border border-[#333]">
+                  <h3 className="text-xl text-white mb-4 flex items-center gap-2"><Icons.Users size={20} className="text-[#D4AF37]"/> بيانات العميل</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <InputField label="اسم العريس" value={formData.groomName} onChange={e => setFormData({...formData, groomName: e.target.value})} required />
+                    <InputField label="اسم العروسة" value={formData.brideName} onChange={e => setFormData({...formData, brideName: e.target.value})} required />
+                    <InputField label="رقم الهاتف" type="tel" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} required />
+                    <InputField label="العنوان" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} />
+                  </div>
                 </div>
-            );
+                <div className="bg-[#111] p-6 rounded-2xl border border-[#333]">
+                  <h3 className="text-xl text-white mb-4 flex items-center gap-2"><Icons.CalendarIcon size={20} className="text-[#D4AF37]"/> تفاصيل المناسبة</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <SelectField label="نوع السيشن" value={formData.sessionType} onChange={e => setFormData({...formData, sessionType: e.target.value})} options={settings.sessionTypes} />
+                      {formData.sessionType === 'آخر' && <div className="mt-2"><InputField label="تفاصيل نوع السيشن" value={formData.otherSessionType} onChange={e => setFormData({...formData, otherSessionType: e.target.value})} required /></div>}
+                    </div>
+                    <InputField label="تاريخ المناسبة" type="date" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} required />
+                    <div>
+                      <SelectField label="اللوكيشن" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} options={['', ...settings.locations]} />
+                      {formData.location === 'آخر' && <div className="mt-2"><InputField label="تفاصيل اللوكيشن" value={formData.otherLocation} onChange={e => setFormData({...formData, otherLocation: e.target.value})} required /></div>}
+                    </div>
+                    <div>
+                       <SelectField label="مكان تصوير الكاجوال (اختياري)" value={formData.casualLocation} onChange={e => setFormData({...formData, casualLocation: e.target.value})} options={['', ...settings.casualLocations]} />
+                       {formData.casualLocation === 'آخر' && <div className="mt-2"><InputField label="تفاصيل مكان الكاجوال" value={formData.otherCasualLocation} onChange={e => setFormData({...formData, otherCasualLocation: e.target.value})} required /></div>}
+                    </div>
+                    <InputField label="اسم الميك أب" value={formData.makeupArtist} onChange={e => setFormData({...formData, makeupArtist: e.target.value})} />
+                    <InputField label="وقت الخروج من الميك أب" type="time" value={formData.makeupLeaveTime} onChange={e => setFormData({...formData, makeupLeaveTime: e.target.value})} />
+                  </div>
+                </div>
+                <div className="bg-[#111] p-6 rounded-2xl border border-[#333]">
+                  <h3 className="text-xl text-white mb-4 flex items-center gap-2"><Icons.Camera size={20} className="text-[#D4AF37]"/> الباكيدج والإضافات</h3>
+                  <div className="mb-6"><label className="block text-sm text-gray-400 mb-2">اختر الباكيدج الأساسي</label><div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {settings.packages.map(pkg => (<div key={pkg.id} onClick={() => setFormData({...formData, packageId: pkg.id})} className={`p-4 rounded-xl cursor-pointer border-2 transition-all ${formData.packageId === pkg.id ? 'border-[#D4AF37] bg-[#D4AF37]/10' : 'border-[#333] hover:border-gray-500'}`}><p className="font-bold text-white">{pkg.name}</p><p className="text-[#D4AF37]">{pkg.price} ج.م</p></div>))}
+                  </div></div>
+                  <div><label className="block text-sm text-gray-400 mb-2">الإضافات (اختياري)</label><div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {settings.addons.map(addon => (<label key={addon.id} className="flex items-center gap-2 p-3 bg-black border border-[#333] rounded-lg cursor-pointer hover:bg-[#222]"><input type="checkbox" checked={formData.addons.includes(addon.id)} onChange={() => handleAddonToggle(addon.id)} className="accent-[#D4AF37] w-5 h-5"/><div><p className="text-sm font-bold">{addon.name}</p><p className="text-xs text-[#D4AF37]">+{addon.price}</p></div></label>))}
+                  </div></div>
+                </div>
+                <div className="bg-[#111] p-6 rounded-2xl border border-[#333]"><div className="flex justify-between items-start mb-4"><div><h3 className="text-xl text-white flex items-center gap-2 mb-2"><Icons.Video size={20} className="text-[#D4AF37]"/> قسم تصوير الفيديو (اختياري)</h3><p className="text-sm text-gray-400 max-w-2xl leading-relaxed">كل خدمات الفيديو تصوير Full HD يتم تسلم المناسبه على فلاشه خاصه.<span className="text-red-400 text-xs mt-1 block">تنبيه: برجاء عمل نسخه احتياطيه من الحفل، عند حذف الفيديو بعد مدة تزيد عن 3 اشهر لا يمكن استرجاعه. تكلفة النسخه تتم على حسب حجم الفلاشه بدأً من 500 الى 800 ج.م.</span></p></div>{formData.videoServiceId && <button type="button" onClick={() => setFormData({...formData, videoServiceId: '', videoServicePrice: '', videoStartTime: '', videoAddons: []})} className="text-red-400 text-sm hover:underline border border-red-500/30 px-3 py-1 rounded shrink-0">إلغاء قسم الفيديو</button>}</div><div className="mb-6"><label className="block text-sm text-gray-400 mb-2">اختر خدمة الفيديو الأساسية</label><div className="grid grid-cols-1 md:grid-cols-2 gap-3">{settings.videoServices.map(vs => (<div key={vs.id} onClick={() => setFormData(prev => ({...prev, videoServiceId: vs.id, videoServicePrice: prev.videoServiceId !== vs.id ? vs.price : prev.videoServicePrice}))} className={`p-4 rounded-xl cursor-pointer border-2 transition-all ${formData.videoServiceId === vs.id ? 'border-[#D4AF37] bg-[#D4AF37]/10' : 'border-[#333] hover:border-gray-500'}`}><p className="font-bold text-white">{vs.name}</p>{vs.subtext && <p className="text-xs text-gray-400 mt-1">{vs.subtext}</p>}</div>))}</div></div>{formData.videoServiceId && (<div className="mb-6 border-t border-[#333] pt-6 flex flex-col md:flex-row gap-4"><div className="md:w-1/2"><InputField label={`سعر ${settings.videoServices.find(v => v.id === formData.videoServiceId)?.name} (قابل للتعديل)`} type="number" value={formData.videoServicePrice} onChange={e => setFormData({...formData, videoServicePrice: e.target.value})} /></div>{formData.videoServiceId === 'v4' && <div className="md:w-1/2"><InputField label="وقت البدء (من بعد الظهر)" type="time" value={formData.videoStartTime} onChange={e => setFormData({...formData, videoStartTime: e.target.value})} /></div>}</div>)}<div className="border-t border-[#333] pt-6"><label className="block text-sm text-gray-400 mb-2">إضافات الفيديو</label><select onChange={handleAddVideoAddon} value="" className="w-full md:w-1/2 bg-black border border-[#333] text-white rounded-lg p-3 focus:outline-none focus:border-[#D4AF37] transition-all mb-4"><option value="" disabled>-- اختر إضافة --</option>{settings.videoAddons?.filter(va => !formData.videoAddons.find(a => a.id === va.id)).map(va => <option key={va.id} value={va.id}>{va.name}</option>)}</select>{formData.videoAddons.length > 0 && (<div className="space-y-3 mt-4">{formData.videoAddons.map(addon => (<div key={addon.id} className="flex flex-col md:flex-row md:items-center justify-between bg-[#1a1a1a] p-3 rounded-lg border border-[#333] gap-4"><span className="font-bold text-white">{addon.name}</span><div className="flex items-center gap-3"><div className="flex items-center gap-2"><span className="text-gray-400 text-sm">السعر:</span><input type="number" min="0" value={addon.price} onChange={(e) => handleVideoAddonPriceChange(addon.id, e.target.value)} className="w-32 bg-black border border-[#444] text-white rounded px-3 py-2 text-sm focus:border-[#D4AF37] outline-none"/></div><button type="button" onClick={() => removeVideoAddon(addon.id)} className="text-red-500 hover:bg-red-500/10 p-2 rounded"><Icons.X size={20} /></button></div></div>))}</div>)}</div></div>
+                <div className="bg-gradient-to-br from-[#1a1500] to-[#0a0a0a] p-6 rounded-2xl border border-[#D4AF37]/50"><h3 className="text-xl text-[#D4AF37] font-bold mb-4">الملخص المالي</h3><div className="flex flex-col md:flex-row gap-6 items-center justify-between"><div className="text-center md:text-right w-full"><p className="text-gray-400">الإجمالي</p><p className="text-3xl font-bold text-white">{totalPrice} ج.م</p></div><div className="w-full"><InputField label="المدفوع (عربون)" type="number" value={formData.paid} onChange={e => setFormData({...formData, paid: e.target.value})} placeholder="أدخل المبلغ..." /></div><div className="text-center md:text-right w-full"><p className="text-gray-400">المتبقي</p><p className={`text-3xl font-bold ${remaining > 0 ? 'text-red-400' : 'text-green-400'}`}>{remaining} ج.م</p></div></div></div>
+                <button type="submit" disabled={isSubmitting} className={`w-full text-black font-bold text-xl py-4 rounded-xl transition-all shadow-[0_0_20px_rgba(212,175,55,0.3)] ${isSubmitting ? 'bg-yellow-700 cursor-not-allowed opacity-70' : 'bg-[#D4AF37] hover:bg-yellow-500'}`}>{isSubmitting ? 'جاري الحفظ...' : 'تأكيد وحفظ الحجز'}</button>
+              </form>
+            </div>
+          );
         }
 
-        function ClientsList({ bookings, settings, onPrint, showToast, user, isFirebaseActive, onLocalDelete }) {
-            const [search, setSearch] = useState('');
-            const filtered = bookings.filter(b => b.phone?.includes(search) || b.groomName?.includes(search));
-            const remove = async (id) => {
-                if(!confirm("حذف الحجز؟")) return;
-                if (isFirebaseActive && user) { try { await firebase.firestore().collection('users').doc(user.uid).collection('bookings').doc(id).delete(); showToast("تم الحذف"); } catch(e) { showToast("خطأ", "error"); } }
-                else { onLocalDelete(id); showToast("تم الحذف"); }
-            };
-            return (
-                <div className="space-y-6">
-                    <div className="flex justify-between items-center"><h2 className="text-3xl font-bold">العملاء</h2><input type="text" placeholder="بحث بالهاتف أو الاسم..." value={search} onChange={e => setSearch(e.target.value)} className="bg-[#111] border border-[#333] p-3 rounded-xl outline-none focus:border-[#D4AF37] w-64"/></div>
-                    <div className="bg-[#111] rounded-3xl border border-[#333] overflow-x-auto"><table className="w-full text-right"><thead className="bg-black/40 border-b border-[#222]"><tr><th className="p-4">العروسين</th><th className="p-4">التاريخ</th><th className="p-4">المتبقي</th><th className="p-4">إجراءات</th></tr></thead><tbody>
-                        {filtered.map(b => (
-                            <tr key={b.id} className="border-b border-[#222] hover:bg-white/5">
-                                <td className="p-4 font-bold">{b.groomName} & {b.brideName}</td><td className="p-4 text-sm text-gray-400">{b.date}</td><td className="p-4 text-red-500 font-bold">{b.remaining} ج.م</td>
-                                <td className="p-4 flex gap-2">
-                                    <button onClick={() => window.open(generateGoogleCalendarLink(b), '_blank')} className="p-2 bg-blue-500/20 text-blue-500 rounded-lg"><Icons.CalendarPlus size={18}/></button>
-                                    <button onClick={() => onPrint(b)} className="p-2 bg-[#D4AF37]/20 text-[#D4AF37] rounded-lg"><Icons.Printer size={18}/></button>
-                                    <button onClick={() => remove(b.id)} className="p-2 bg-red-500/20 text-red-500 rounded-lg"><Icons.Trash2 size={18}/></button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody></table></div>
-                </div>
-            );
+        function InputField({ label, type = "text", value, onChange, placeholder, required }) {
+          return (<div className="flex flex-col w-full"><label className="text-sm text-gray-400 mb-1">{label} {required && <span className="text-red-500">*</span>}</label><input type={type} min={type === 'number' ? "0" : undefined} value={value} onChange={onChange} placeholder={placeholder} required={required} className="bg-black border border-[#333] text-white rounded-lg p-3 focus:outline-none focus:border-[#D4AF37] transition-all" /></div>);
+        }
+
+        function SelectField({ label, value, onChange, options = [] }) {
+          return (<div className="flex flex-col w-full"><label className="text-sm text-gray-400 mb-1">{label}</label><select value={value} onChange={onChange} className="bg-black border border-[#333] text-white rounded-lg p-3 focus:outline-none focus:border-[#D4AF37] transition-all">{options?.map((opt, i) => <option key={i} value={opt}>{opt}</option>)}</select></div>);
+        }
+
+        function ClientsList({ user, isFirebaseActive, bookings, settings, onPrint, showToast, onLocalDelete }) {
+          const [searchTerm, setSearchTerm] = useState('');
+          const [bookingToDelete, setBookingToDelete] = useState(null);
+          const filtered = bookings.filter(b => b.phone?.includes(searchTerm) || b.groomName?.includes(searchTerm) || b.brideName?.includes(searchTerm));
+          const executeDelete = async () => {
+            if(!bookingToDelete) return;
+            if (isFirebaseActive && user && window.firebase) {
+                try { await firebase.firestore().collection('users').doc(user.uid).collection('bookings').doc(bookingToDelete).delete(); showToast("تم الحذف بنجاح من السحابة"); } catch(e) { showToast("خطأ في الحذف السحابي", "error"); }
+            } else { onLocalDelete(bookingToDelete); showToast("تم الحذف بنجاح"); }
+            setBookingToDelete(null);
+          };
+          const addEventToCalendar = (booking) => {
+             const dateObj = new Date(booking.date); if (isNaN(dateObj)) return showToast("تاريخ الحجز غير صالح", "error");
+             const startStr = dateObj.toISOString().split('T')[0].replace(/-/g, '');
+             dateObj.setDate(dateObj.getDate() + 1);
+             const endStr = dateObj.toISOString().split('T')[0].replace(/-/g, '');
+             const session = booking.sessionType === 'آخر' ? booking.otherSessionType : booking.sessionType;
+             const loc = booking.location === 'آخر' ? booking.otherLocation : booking.location;
+             const title = encodeURIComponent(`تصوير ${session} - ${booking.groomName} و ${booking.brideName}`);
+             const details = encodeURIComponent(`رقم الهاتف: ${booking.phone}\nالمتبقي: ${booking.remaining} ج.م`);
+             const location = encodeURIComponent(loc || 'استوديو المراكبي');
+             window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startStr}/${endStr}&details=${details}&location=${location}`, '_blank');
+             showToast("تم فتح تقويم جوجل لإضافة الموعد 📅");
+          };
+          const sendWhatsApp = (booking) => {
+            const session = booking.sessionType === 'آخر' ? booking.otherSessionType : booking.sessionType;
+            const loc = booking.location === 'آخر' ? booking.otherLocation : booking.location;
+            const casualLoc = booking.casualLocation === 'آخر' ? booking.otherCasualLocation : booking.casualLocation;
+            let text = `أهلاً بك أستاذ/ *${booking.groomName}* وعروستنا *${booking.brideName}*،\n\nتم تأكيد حجزكم مع *Mrakby Photography* 📸✨\n\n*📌 تفاصيل الحجز والمناسبة:*\n📅 التاريخ: ${booking.date}\n🎉 نوع السيشن: ${session}\n`;
+            if (loc) text += `📍 اللوكيشن: ${loc}\n`;
+            if (casualLoc) text += `📍 مكان الكاجوال: ${casualLoc}\n`;
+            if (booking.makeupArtist) text += `💄 الميك أب: ${booking.makeupArtist}\n`;
+            if (booking.makeupLeaveTime) text += `⏰ وقت الخروج: ${booking.makeupLeaveTime}\n`;
+            if (booking.address) text += `🏠 العنوان: ${booking.address}\n`;
+            const pkg = settings.packages.find(p => p.id === booking.packageId);
+            const displayPkgName = booking.snapshotPackage?.name || pkg?.name || 'غير محدد';
+            const displayPkgPrice = booking.snapshotPackage?.price || pkg?.price || 0;
+            text += `\n*📦 الباكيدج المتفق عليه:*\n▪️ ${displayPkgName} (${displayPkgPrice} ج.م)\n`;
+            const addonsList = booking.snapshotAddons && booking.snapshotAddons.length > 0 ? booking.snapshotAddons : (booking.addons || []).map(aId => settings.addons.find(a => a.id === aId)).filter(Boolean);
+            if (addonsList.length > 0) { text += `➕ الإضافات:\n▪️ ${addonsList.map(a => `${a.name} (${a.price} ج.م)`).join('\n▪️ ')}\n`; }
+            if (booking.videoServiceId || booking.snapshotVideoService) {
+              const vName = booking.snapshotVideoService?.name || settings.videoServices.find(v => v.id === booking.videoServiceId)?.name;
+              const vPrice = booking.snapshotVideoService?.price || booking.videoServicePrice;
+              text += `\n*🎥 تفاصيل الفيديو والتكلفة:*\n🔹 الخدمة: ${vName} (${vPrice} ج.م)\n`;
+              if (booking.videoStartTime) text += `⏳ وقت البدء: ${booking.videoStartTime}\n`;
+              if (booking.videoAddons && booking.videoAddons.length > 0) { text += `➕ إضافات الفيديو:\n▪️ ${booking.videoAddons.map(a => `${a.name} (${a.price} ج.م)`).join('\n▪️ ')}\n`; }
+              text += `\n⚠️ *تنبيه:* يتم تسليم المناسبة Full HD على فلاشة خاصة. برجاء عمل نسخة احتياطية (لا يمكن الاسترجاع بعد 3 أشهر). تكلفة النسخة من 500 لـ 800 ج.م.\n`;
+            }
+            text += `\n*💰 التفاصيل المالية:*\n▪️ إجمالي التكلفة: ${booking.totalPrice} ج.م\n▪️ المدفوع (عربون): ${booking.paid || 0} ج.م\n❗ المبلغ المتبقي: ${booking.remaining} ج.م (يُسدد يوم المناسبة)\n\nيسعدنا توثيق لحظاتكم الجميلة! لمعرفة أي تفاصيل إضافية، نحن في خدمتكم.`;
+            window.open(`https://wa.me/2${booking.phone}?text=${encodeURIComponent(text)}`, '_blank');
+          };
+
+          return (
+            <div className="animate-fadeIn pb-10">
+              {bookingToDelete && (<div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 animate-fadeIn p-4"><div className="bg-[#111] border border-red-900/50 shadow-2xl p-6 rounded-2xl max-w-sm w-full text-center"><Icons.AlertTriangle className="mx-auto text-red-500 mb-4" size={48} /><h3 className="text-xl text-white font-bold mb-2">تأكيد الحذف</h3><p className="text-gray-400 mb-8 text-sm leading-relaxed">هل أنت متأكد من حذف هذا الحجز نهائياً؟ لا يمكن التراجع عن هذا الإجراء.</p><div className="flex justify-center gap-4"><button onClick={() => setBookingToDelete(null)} className="flex-1 py-3 bg-[#222] hover:bg-[#333] text-white rounded-xl transition-colors font-bold">إلغاء</button><button onClick={executeDelete} className="flex-1 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors font-bold">نعم، احذف</button></div></div></div>)}
+              <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4"><h2 className="text-3xl font-bold text-[#D4AF37]">قاعدة بيانات العملاء</h2><div className="relative w-full md:w-96"><Icons.Search className="absolute right-3 top-3 text-gray-500" size={20} /><input type="text" placeholder="بحث برقم الهاتف أو الاسم..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full bg-[#111] border border-[#333] text-white rounded-xl py-3 pr-10 pl-4 focus:outline-none focus:border-[#D4AF37]" /></div></div>
+              <div className="bg-[#111] rounded-2xl border border-[#333] overflow-x-auto"><table className="w-full text-right"><thead className="bg-black/50 text-[#D4AF37] border-b border-[#333]"><tr><th className="p-4">الأسماء</th><th className="p-4">النوع / اللوكيشن</th><th className="p-4">التاريخ</th><th className="p-4">الرقم</th><th className="p-4">الإجمالي / المتبقي</th><th className="p-4 text-center">إجراءات</th></tr></thead><tbody className="divide-y divide-[#222]">
+                {filtered.map((b) => (<tr key={b.id} className="hover:bg-[#1a1a1a] transition-colors"><td className="p-4 font-bold">{b.groomName} <br/><span className="text-gray-400 text-sm">& {b.brideName}</span></td><td className="p-4">{b.sessionType === 'آخر' ? b.otherSessionType : b.sessionType} <br/><span className="text-xs text-[#D4AF37] border border-[#D4AF37]/30 rounded px-1">{b.location === 'آخر' ? b.otherLocation : b.location}</span></td><td className="p-4 text-gray-300">{b.date}</td><td className="p-4 font-mono text-sm">{b.phone}</td><td className="p-4"><span className="text-white">{b.totalPrice}</span><br/><span className={`text-sm ${b.remaining > 0 ? 'text-red-400' : 'text-green-400'}`}>متبقي: {b.remaining}</span></td><td className="p-4 flex justify-center gap-2"><button onClick={() => addEventToCalendar(b)} className="p-2 bg-blue-900/30 text-blue-400 hover:bg-blue-600 hover:text-white rounded-lg transition-colors" title="إضافة للتقويم"><Icons.CalendarPlus size={20} /></button><button onClick={() => sendWhatsApp(b)} className="p-2 bg-green-900/30 text-green-400 hover:bg-green-600 hover:text-white rounded-lg transition-colors" title="إرسال واتساب"><Icons.MessageCircle size={20} /></button><button onClick={() => onPrint(b)} className="p-2 bg-[#D4AF37]/10 text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black rounded-lg transition-colors" title="طباعة العقد"><Icons.Printer size={20} /></button><button onClick={() => setBookingToDelete(b.id)} className="p-2 bg-red-900/30 text-red-400 hover:bg-red-600 hover:text-white rounded-lg transition-colors" title="حذف العميل"><Icons.Trash2 size={20} /></button></td></tr>))}
+                {filtered.length === 0 && <tr><td colSpan="6" className="text-center p-8 text-gray-500">لا يوجد نتائج للبحث.</td></tr>}
+              </tbody></table></div>
+            </div>
+          );
         }
 
         function CalendarView({ bookings, onDayClick, settings, showToast }) {
@@ -493,15 +602,30 @@
           for(let i=1; i<=daysInMonth; i++) days.push(i);
           const monthNames = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
 
+          const addEventToGoogle = (booking) => {
+             const dateObj = new Date(booking.date);
+             const startStr = dateObj.toISOString().split('T')[0].replace(/-/g, '');
+             dateObj.setDate(dateObj.getDate() + 1);
+             const endStr = dateObj.toISOString().split('T')[0].replace(/-/g, '');
+             const session = booking.sessionType === 'آخر' ? booking.otherSessionType : booking.sessionType;
+             const loc = booking.location === 'آخر' ? booking.otherLocation : booking.location;
+             const title = encodeURIComponent(`تصوير ${session} - ${booking.groomName} و ${booking.brideName}`);
+             const details = encodeURIComponent(`رقم الهاتف: ${booking.phone}\nالمتبقي: ${booking.remaining} ج.م`);
+             const googleUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startStr}/${endStr}&details=${details}&location=${encodeURIComponent(loc || '')}`;
+             window.open(googleUrl, '_blank');
+          };
+
           return (
             <div className="animate-fadeIn max-w-5xl mx-auto pb-10 relative">
+              {/* Detail Modal */}
               {selectedBooking && (
-                <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[60] p-4 animate-fadeIn">
+                <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[60] p-4">
                   <div className="bg-[#111] border border-[#D4AF37]/30 p-6 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl">
                     <div className="flex justify-between items-center mb-6 border-b border-[#222] pb-4">
-                      <h3 className="text-2xl font-bold text-[#D4AF37]">بيانات الحجز التفصيلية</h3>
+                      <h3 className="text-2xl font-bold text-[#D4AF37]">تفاصيل الحجز الكاملة</h3>
                       <button onClick={() => setSelectedBooking(null)} className="text-gray-400 hover:text-white"><Icons.X size={30} /></button>
                     </div>
+
                     <div className="space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <DetailRow label="العريس" value={selectedBooking.groomName} />
@@ -510,39 +634,73 @@
                         <DetailRow label="التاريخ" value={selectedBooking.date} />
                         <DetailRow label="نوع السيشن" value={selectedBooking.sessionType === 'آخر' ? selectedBooking.otherSessionType : selectedBooking.sessionType} />
                         <DetailRow label="اللوكيشن" value={selectedBooking.location === 'آخر' ? selectedBooking.otherLocation : selectedBooking.location} />
+                        <DetailRow label="كاجوال" value={selectedBooking.casualLocation === 'آخر' ? selectedBooking.otherCasualLocation : selectedBooking.casualLocation || 'غير محدد'} />
                         <DetailRow label="الميك أب" value={selectedBooking.makeupArtist || 'غير محدد'} />
                         <DetailRow label="خروج ميك أب" value={selectedBooking.makeupLeaveTime || '--:--'} />
                         <DetailRow label="العنوان" value={selectedBooking.address || 'غير محدد'} />
                       </div>
+
                       <div className="bg-black/40 p-4 rounded-2xl border border-[#222]">
                         <h4 className="text-[#D4AF37] font-bold mb-2 flex items-center gap-2"><Icons.Camera size={18} /> الباكيج والإضافات</h4>
-                        <p className="text-sm">الباكيدج: {selectedBooking.snapshotPackage?.name} ({selectedBooking.snapshotPackage?.price} ج.م)</p>
+                        <p className="text-sm">الباكيدج: {selectedBooking.snapshotPackage?.name || 'غير محدد'} ({selectedBooking.snapshotPackage?.price || 0} ج.م)</p>
+                        {selectedBooking.snapshotAddons?.length > 0 && (
+                          <div className="mt-2 text-xs text-gray-400">إضافات: {selectedBooking.snapshotAddons.map(a => `${a.name} (${a.price})`).join(' ، ')}</div>
+                        )}
                       </div>
-                      <div className="bg-[#D4AF37]/10 p-4 rounded-2xl border border-[#D4AF37]/30 flex justify-between items-center shadow-lg">
-                        <div><p className="text-xs text-gray-400 uppercase">إجمالي الحساب</p><p className="text-2xl font-bold text-white">{selectedBooking.totalPrice} ج.م</p></div>
-                        <div className="text-left border-r border-[#D4AF37]/20 pr-4"><p className="text-xs text-gray-400 uppercase">المبلغ المتبقي</p><p className="text-2xl font-bold text-red-500">{selectedBooking.remaining} ج.م</p></div>
+
+                      {selectedBooking.snapshotVideoService && (
+                        <div className="bg-black/40 p-4 rounded-2xl border border-[#222]">
+                          <h4 className="text-[#D4AF37] font-bold mb-2 flex items-center gap-2"><Icons.Video size={18} /> تفاصيل الفيديو</h4>
+                          <p className="text-sm">الخدمة: {selectedBooking.snapshotVideoService.name} ({selectedBooking.snapshotVideoService.price} ج.م)</p>
+                          {selectedBooking.videoStartTime && <p className="text-xs text-gray-400">وقت البدء: {selectedBooking.videoStartTime}</p>}
+                          {selectedBooking.videoAddons?.length > 0 && (
+                            <div className="mt-2 text-xs text-gray-400">إضافات فيديو: {selectedBooking.videoAddons.map(a => `${a.name} (${a.price})`).join(' ، ')}</div>
+                          )}
+                        </div>
+                      )}
+
+                      <div className="bg-[#D4AF37]/10 p-4 rounded-2xl border border-[#D4AF37]/30 flex justify-between items-center">
+                        <div>
+                           <p className="text-xs text-gray-400">إجمالي الحساب</p>
+                           <p className="text-2xl font-bold text-white">{selectedBooking.totalPrice} ج.م</p>
+                        </div>
+                        <div className="text-left">
+                           <p className="text-xs text-gray-400">المتبقي</p>
+                           <p className="text-2xl font-bold text-red-500">{selectedBooking.remaining} ج.م</p>
+                        </div>
                       </div>
                     </div>
-                    <a href={generateGoogleCalendarLink(selectedBooking)} target="_blank" className="w-full mt-6 bg-[#4285F4] text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-blue-600 transition-colors shadow-md"><Icons.CalendarPlus size={20} /> مزامنة مع تقويم جوجل</a>
+                    
+                    <button onClick={() => addEventToGoogle(selectedBooking)} className="w-full mt-6 bg-[#4285F4] text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-blue-600 transition-colors">
+                        <Icons.CalendarPlus size={20} /> مزامنة مع تقويم جوجل
+                    </button>
                   </div>
                 </div>
               )}
+
               <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
                 <h2 className="text-3xl font-bold text-[#D4AF37]">تقويم الحجوزات</h2>
-                <div className="text-xl bg-[#111] px-6 py-2 rounded-xl border border-[#333] shadow-lg">{monthNames[month]} {year}</div>
+                <div className="text-xl bg-[#111] px-6 py-2 rounded-xl border border-[#333]">{monthNames[month]} {year}</div>
               </div>
-              <div className="bg-[#111] rounded-3xl border border-[#333] p-6 shadow-2xl">
-                <div className="grid grid-cols-7 gap-1 md:gap-2 mb-4 text-center font-bold text-gray-500 text-sm md:text-base uppercase tracking-wider"><div>الأحد</div><div>الإثنين</div><div>الثلاثاء</div><div>الأربعاء</div><div>الخميس</div><div>الجمعة</div><div>السبت</div></div>
-                <div className="grid grid-cols-7 gap-1 md:gap-3">
+              <div className="bg-[#111] rounded-2xl border border-[#333] p-6">
+                <p className="text-gray-400 mb-4 text-sm"><span className="text-[#D4AF37] font-bold">💡 تلميح:</span> اضغط على اليوم لإضافة حجز، أو اضغط على اسم العميل لعرض كافة بياناته.</p>
+                <div className="grid grid-cols-7 gap-1 md:gap-2 mb-4 text-center font-bold text-gray-400 text-sm md:text-base">
+                  <div>الأحد</div><div>الإثنين</div><div>الثلاثاء</div><div>الأربعاء</div><div>الخميس</div><div>الجمعة</div><div>السبت</div>
+                </div>
+                <div className="grid grid-cols-7 gap-1 md:gap-2">
                   {days.map((day, idx) => {
-                    if (!day) return <div key={`empty-${idx}`} className="h-24 md:h-36 bg-black/20 rounded-2xl border border-transparent"></div>;
+                    if (!day) return <div key={`empty-${idx}`} className="h-24 md:h-32 bg-black/20 rounded-xl border border-transparent"></div>;
                     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                     const dayBookings = bookings.filter(b => b.date === dateStr);
                     return (
-                      <div key={idx} onClick={() => onDayClick(dateStr)} className={`h-24 md:h-36 p-1 md:p-3 rounded-2xl border cursor-pointer hover:border-[#D4AF37] transition-all group ${dayBookings.length > 0 ? 'border-[#D4AF37]/40 bg-[#D4AF37]/5' : 'border-[#222] bg-black/40'}`}>
-                        <span className={`text-xs md:text-sm font-bold ${dayBookings.length > 0 ? 'text-[#D4AF37]' : 'text-gray-500'}`}>{day}</span>
-                        <div className="mt-2 space-y-1.5 overflow-y-auto max-h-[70%] no-scrollbar">
-                          {dayBookings.map((b, i) => (<div key={i} onClick={(e) => { e.stopPropagation(); setSelectedBooking(b); }} className="text-[9px] md:text-[11px] bg-[#D4AF37] text-black px-2 py-1 rounded-lg font-bold truncate flex items-center gap-1 hover:scale-105 transition-transform"><Icons.Camera size={10} /> {b.groomName}</div>))}
+                      <div key={idx} onClick={() => onDayClick(dateStr)} className={`h-24 md:h-32 p-1 md:p-2 rounded-xl border cursor-pointer hover:border-[#D4AF37] transition-colors ${dayBookings.length > 0 ? 'border-[#D4AF37] bg-[#D4AF37]/10' : 'border-[#222] bg-black'}`}>
+                        <span className="text-gray-500 text-xs md:text-sm font-bold">{day}</span>
+                        <div className="mt-1 space-y-1 overflow-y-auto max-h-16 md:max-h-24 no-scrollbar">
+                          {dayBookings.map((b, i) => (
+                            <div key={i} onClick={(e) => { e.stopPropagation(); setSelectedBooking(b); }} className="text-[9px] md:text-[10px] bg-[#D4AF37] text-black px-1.5 py-1 rounded font-bold truncate flex items-center gap-1 hover:bg-yellow-500">
+                              <Icons.Info size={10} /> {b.groomName}
+                            </div>
+                          ))}
                         </div>
                       </div>
                     );
@@ -553,46 +711,112 @@
           );
         }
 
-        function SettingsView({ settings, user, isFirebaseActive, onLocalSave, showToast }) {
-            const [s, setS] = useState(settings);
-            useEffect(() => setS(settings), [settings]);
-            const save = async () => {
-                if (isFirebaseActive && user) { try { await firebase.firestore().collection('users').doc(user.uid).collection('settings').doc('config').set(s); showToast("حفظ سحابي ✅"); } catch(e) { showToast("خطأ", "error"); } }
-                else { onLocalSave(s); showToast("حفظ محلي ✅"); }
-            };
-            return (
-                <div className="space-y-6 pb-20">
-                    <div className="flex justify-between border-b border-[#D4AF37]/20 pb-4"><h2 className="text-3xl font-bold">الإعدادات</h2><button onClick={save} className="bg-[#D4AF37] text-black px-6 py-2 rounded-xl font-bold">حفظ التعديلات</button></div>
-                    <div className="bg-[#111] p-6 rounded-3xl border border-[#222] shadow-xl"><h3 className="mb-4 font-bold text-[#D4AF37]">الباكيدجات الأساسية</h3><div className="space-y-2">{s.packages.map(p => (<div key={p.id} className="flex justify-between py-2 border-b border-white/5"><span>{p.name}</span><span className="text-[#D4AF37] font-bold">{p.price} ج.م</span></div>))}</div></div>
-                </div>
-            );
+        function DetailRow({ label, value, isMono }) {
+          return (
+            <div className="flex flex-col border-b border-[#222] pb-2">
+              <span className="text-xs text-gray-500">{label}</span>
+              <span className={`text-sm font-bold text-white ${isMono ? 'font-mono' : ''}`}>{value || '---'}</span>
+            </div>
+          );
         }
 
-        function ContractPrintView({ booking, settings, onClose }) {
+        function SettingsView({ settings, user, isFirebaseActive, onLocalSave, showToast }) {
+          const [localSettings, setLocalSettings] = useState(settings);
+          const [isSaving, setIsSaving] = useState(false);
+          useEffect(() => { setLocalSettings(settings); }, [settings]);
+          const handleSave = async () => {
+            setIsSaving(true);
+            if (isFirebaseActive && user && window.firebase) {
+                try { await firebase.firestore().collection('users').doc(user.uid).collection('settings').doc('config').set(localSettings); showToast("تم حفظ الإعدادات في السحابة ☁️"); } catch(e) { showToast("حدث خطأ في السحابة", "error"); }
+            } else { onLocalSave(localSettings); setTimeout(() => showToast("تم حفظ الإعدادات بنجاح"), 500); }
+            setIsSaving(false);
+          };
+          const updateArray = (key, newArray) => { setLocalSettings(prev => ({ ...prev, [key]: newArray })); };
           return (
-            <div className="min-h-screen bg-white text-black p-10 font-sans" dir="rtl">
-              <div className="print:hidden flex justify-between mb-8 bg-gray-100 p-4 rounded-xl shadow"><p className="text-red-500 font-bold">جاهز للطباعة A4</p><div className="flex gap-4"><button onClick={() => window.print()} className="bg-[#D4AF37] text-black px-6 py-2 rounded-xl font-bold flex items-center gap-2"><Icons.Printer size={20}/> طباعة</button><button onClick={onClose} className="bg-black text-white px-6 py-2 rounded-xl font-bold">عودة</button></div></div>
-              <div className="max-w-3xl mx-auto border-2 border-black p-10 relative">
-                <header className="flex justify-between items-center border-b-2 border-black pb-6 mb-8"><div className="flex items-center gap-4"><img src={LOGO_URL} className="w-16 h-16 rounded-full"/><h1 className="text-3xl font-black uppercase tracking-tighter">Mrakby <span className="text-gray-500 font-normal">Photography</span></h1></div><h2 className="text-xl font-bold underline">عقد اتفاق تصوير</h2></header>
-                <div className="space-y-6 text-lg">
-                    <p>إنه في يوم <b>{new Date().toLocaleDateString('ar-EG')}</b> تم الاتفاق بين:</p>
-                    <p>١. الطرف الأول: <b>محمود المراكبي (استوديو المراكبي)</b></p>
-                    <p>٢. الطرف الثاني الاسم: <b>{booking.groomName} / {booking.brideName}</b></p>
-                    <div className="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg border">
-                        <p>التاريخ: {booking.date}</p><p>اللوكيشن: {booking.location === 'آخر' ? booking.otherLocation : booking.location}</p>
-                        <p>السيشن: {booking.sessionType === 'آخر' ? booking.otherSessionType : booking.sessionType}</p><p>الميك أب: {booking.makeupArtist}</p>
-                    </div>
-                    <div className="border-t-2 border-black pt-4">
-                        <p>الباكيدج: {booking.snapshotPackage?.name} ({booking.snapshotPackage?.price} ج.م)</p>
-                        <div className="mt-6 flex justify-between bg-black text-white p-4 rounded-lg"><p>الإجمالي: {booking.totalPrice} ج.م</p><p>المدفوع: {booking.paid} ج.م</p><p className="text-xl font-black">المتبقي: {booking.remaining} ج.م</p></div>
-                    </div>
-                </div>
-                <footer className="mt-20 flex justify-between px-10"><div className="text-center p-4 border-t-2 border-black w-40">توقيع الاستوديو</div><div className="text-center p-4 border-t-2 border-black w-40">توقيع العميل</div></footer>
+            <div className="animate-fadeIn max-w-5xl mx-auto pb-20">
+              <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 border-b border-[#D4AF37]/30 pb-4">
+                <div><h2 className="text-3xl font-bold text-[#D4AF37] flex items-center gap-2"><Icons.Settings size={30}/> إعدادات النظام</h2><p className="text-gray-400 mt-2">قم بتعديل وإضافة باقاتك، الخدمات، والأماكن.</p></div>
+                <button onClick={handleSave} disabled={isSaving} className="bg-[#D4AF37] text-black px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-yellow-500 transition-colors shrink-0"><Icons.Save size={20} /> {isSaving ? "جاري الحفظ..." : "حفظ التعديلات"}</button>
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <SettingObjectList title="الباكيدجات الأساسية" items={localSettings.packages} onChange={(arr) => updateArray('packages', arr)} />
+                <SettingObjectList title="إضافات الفوتوغرافيا" items={localSettings.addons} onChange={(arr) => updateArray('addons', arr)} />
+                <SettingObjectList title="خدمات الفيديو الأساسية" items={localSettings.videoServices} hasSubtext={true} onChange={(arr) => updateArray('videoServices', arr)} />
+                <SettingObjectList title="إضافات الفيديو" items={localSettings.videoAddons} onChange={(arr) => updateArray('videoAddons', arr)} />
+                <SettingStringList title="أماكن التصوير الأساسية" items={localSettings.locations} onChange={(arr) => updateArray('locations', arr)} />
+                <SettingStringList title="أماكن تصوير الكاجوال" items={localSettings.casualLocations} onChange={(arr) => updateArray('casualLocations', arr)} />
+                <SettingStringList title="أنواع السيشن" items={localSettings.sessionTypes} onChange={(arr) => updateArray('sessionTypes', arr)} />
               </div>
             </div>
           );
         }
 
+        function SettingObjectList({ title, items = [], hasSubtext, onChange }) {
+          const [newItem, setNewItem] = useState({ name: '', price: '', subtext: '' });
+          const handleAdd = () => {
+            if(!newItem.name) return;
+            onChange([...items, { id: 'id_' + Date.now(), name: newItem.name, price: Number(newItem.price) || 0, subtext: newItem.subtext || '' }]);
+            setNewItem({ name: '', price: '', subtext: '' });
+          };
+          const handleRemove = (id) => { onChange(items.filter(i => i.id !== id)); };
+          return (
+            <div className="bg-[#111] p-6 rounded-2xl border border-[#333]">
+              <h3 className="text-xl font-bold text-white mb-4 border-b border-[#222] pb-2">{title}</h3>
+              <div className="space-y-3 mb-6 max-h-60 overflow-y-auto pr-2 no-scrollbar">
+                {items.map(item => (
+                  <div key={item.id} className="flex justify-between items-center bg-black p-3 rounded-lg border border-[#222]">
+                    <div><p className="font-bold text-white">{item.name} <span className="text-[#D4AF37] text-sm mr-2">({item.price} ج.م)</span></p>{hasSubtext && item.subtext && <p className="text-xs text-gray-500">{item.subtext}</p>}</div>
+                    <button onClick={() => handleRemove(item.id)} className="text-red-500 hover:text-red-400 p-2"><Icons.Trash2 size={18}/></button>
+                  </div>
+                ))}
+              </div>
+              <div className="bg-black/50 p-4 rounded-xl border border-[#333] flex flex-col gap-2">
+                <input placeholder="الاسم..." value={newItem.name} onChange={e => setNewItem({...newItem, name: e.target.value})} className="bg-black border border-[#444] rounded p-2 text-sm text-white focus:border-[#D4AF37] outline-none" />
+                <input placeholder="السعر الافتراضي..." type="number" min="0" value={newItem.price} onChange={e => setNewItem({...newItem, price: e.target.value})} className="bg-black border border-[#444] rounded p-2 text-sm text-white focus:border-[#D4AF37] outline-none" />
+                {hasSubtext && <input placeholder="ملاحظة أو نص صغير (اختياري)..." value={newItem.subtext} onChange={e => setNewItem({...newItem, subtext: e.target.value})} className="bg-black border border-[#444] rounded p-2 text-sm text-white focus:border-[#D4AF37] outline-none" />}
+                <button onClick={handleAdd} className="mt-2 flex items-center justify-center gap-1 bg-[#222] text-[#D4AF37] border border-[#D4AF37]/50 rounded py-2 hover:bg-[#D4AF37] hover:text-black transition-colors"><Icons.Plus size={16}/> إضافة</button>
+              </div>
+            </div>
+          );
+        }
+
+        function SettingStringList({ title, items = [], onChange }) {
+          const [newVal, setNewVal] = useState('');
+          const handleAdd = () => { if(!newVal.trim() || items.includes(newVal.trim())) return; onChange([...items, newVal.trim()]); setNewVal(''); };
+          const handleRemove = (valToRemove) => { onChange(items.filter(i => i !== valToRemove)); };
+          return (
+            <div className="bg-[#111] p-6 rounded-2xl border border-[#333]">
+              <h3 className="text-xl font-bold text-white mb-4 border-b border-[#222] pb-2">{title}</h3>
+              <div className="flex flex-wrap gap-2 mb-6 max-h-48 overflow-y-auto no-scrollbar">
+                {items.map((item, idx) => (<div key={idx} className="flex items-center gap-2 bg-black px-3 py-1.5 rounded-full border border-[#222]"><span className="text-sm text-gray-300">{item}</span><button onClick={() => handleRemove(item)} className="text-red-500 hover:text-red-400"><Icons.X size={14}/></button></div>))}
+              </div>
+              <div className="flex gap-2"><input placeholder="إضافة جديد..." value={newVal} onChange={e => setNewVal(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleAdd()} className="flex-1 bg-black border border-[#444] rounded p-2 text-sm text-white focus:border-[#D4AF37] outline-none" /><button onClick={handleAdd} className="bg-[#222] text-[#D4AF37] border border-[#D4AF37]/50 rounded px-4 hover:bg-[#D4AF37] hover:text-black transition-colors">إضافة</button></div>
+            </div>
+          );
+        }
+
+        function ContractPrintView({ booking, settings, onClose }) {
+          const pkg = settings.packages.find(p => p.id === booking.packageId);
+          const displayPkgName = booking.snapshotPackage?.name || pkg?.name || 'غير محدد';
+          const displayPkgPrice = booking.snapshotPackage?.price || pkg?.price || 0;
+          const addonsList = booking.snapshotAddons && booking.snapshotAddons.length > 0 ? booking.snapshotAddons : (booking.addons || []).map(aId => settings.addons.find(a => a.id === aId)).filter(Boolean);
+          const videoName = booking.snapshotVideoService?.name || settings.videoServices.find(v => v.id === booking.videoServiceId)?.name;
+          const videoPrice = booking.snapshotVideoService?.price || booking.videoServicePrice;
+          return (
+            <div className="min-h-screen bg-white text-black p-8 font-sans" dir="rtl">
+              <div className="print:hidden flex justify-between items-center mb-8 bg-gray-100 p-4 rounded-lg shadow"><p className="text-red-500 font-bold">هذه الصفحة مصممة للطباعة. اضغط على زر الطباعة أو Ctrl+P</p><div className="flex gap-4"><button onClick={() => window.print()} className="bg-[#D4AF37] text-black px-6 py-2 rounded font-bold flex items-center gap-2"><Icons.Printer size={20} /> طباعة</button><button onClick={onClose} className="bg-black text-white px-6 py-2 rounded font-bold">عودة للبرنامج</button></div></div>
+              <div className="max-w-3xl mx-auto border-2 border-black p-6 md:p-10 relative">
+                <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none"><Icons.Camera size={400} /></div>
+                <header className="flex items-center justify-between mb-6 border-b-2 border-black pb-4"><div className="flex items-center gap-4"><img src={LOGO_URL} alt="Mrakby Logo" className="w-16 h-16 rounded-full" /><h1 className="text-3xl font-bold uppercase tracking-widest" style={{ color: '#000' }}>Mrakby <span className="text-2xl font-medium text-gray-600 tracking-[0.2em]">Photography</span></h1></div><h2 className="text-2xl font-bold underline">عقد اتفاق تصوير</h2></header>
+                <section className="mb-6"><p className="text-lg leading-relaxed mb-4">إنه في يوم <span className="font-bold border-b border-black px-2">{new Date().toLocaleDateString('ar-EG')}</span>، تم الاتفاق بين كل من:</p><ul className="list-disc list-inside space-y-2 text-lg"><li><span className="font-bold">الطرف الأول:</span> استوديو المراكبي (Mahmoud El Marakby)</li><li><span className="font-bold">الطرف الثاني الاسم:</span> {booking.groomName} / {booking.brideName}</li><li><span className="font-bold">رقم الهاتف:</span> <span dir="ltr">{booking.phone}</span></li><li><span className="font-bold">العنوان:</span> {booking.address || 'لم يحدد'}</li></ul></section>
+                <section className="mb-6"><h3 className="text-xl font-bold bg-black text-white p-2 mb-4">تفاصيل الحجز والمناسبة</h3><div className="grid grid-cols-2 gap-4 text-lg"><p><span className="font-bold">تاريخ المناسبة:</span> <span dir="ltr">{booking.date}</span></p><p><span className="font-bold">نوع السيشن:</span> {booking.sessionType === 'آخر' ? booking.otherSessionType : booking.sessionType}</p><p><span className="font-bold">اللوكيشن:</span> {booking.location === 'آخر' ? booking.otherLocation : (booking.location || 'لم يحدد')}</p><p><span className="font-bold">مكان الكاجوال:</span> {booking.casualLocation === 'آخر' ? booking.otherCasualLocation : (booking.casualLocation || 'لا يوجد')}</p><p><span className="font-bold">اسم الميك أب:</span> {booking.makeupArtist || 'لم يحدد'}</p><p><span className="font-bold">وقت الخروج:</span> <span dir="ltr">{booking.makeupLeaveTime || 'لم يحدد'}</span></p><div className="col-span-2 mt-4 pt-4 border-t border-gray-300"><p><span className="font-bold">الباكيدج المتفق عليه:</span> {displayPkgName} <span className="text-gray-600">({displayPkgPrice} ج.م)</span></p>{addonsList && addonsList.length > 0 && <p className="mt-2"><span className="font-bold">الإضافات (فوتوغرافيا):</span> {addonsList.map(a => `${a.name} (${a.price} ج.م)`).join(' ، ')}</p>}</div></div></section>
+                <section className="mb-8 mt-4"><h3 className="text-xl font-bold bg-black text-white p-2 mb-4">تفاصيل الفيديو والتكلفة</h3><div className="text-lg space-y-2">{booking.videoServiceId || booking.snapshotVideoService ? (<div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded text-base"><p><span className="font-bold">خدمة الفيديو:</span> {videoName} - ({videoPrice} ج.م) {booking.videoStartTime && ` | وقت البدء: ${booking.videoStartTime}`}</p>{booking.videoAddons && booking.videoAddons.length > 0 && <p className="mt-2"><span className="font-bold">إضافات الفيديو:</span> {booking.videoAddons.map(a => `${a.name} (${a.price} ج.م)`).join(' ، ')}</p>}<p className="mt-3 text-sm text-red-600 border-t border-gray-300 pt-2 font-bold">* تنبيه: يتم تسليم المناسبة Full HD على فلاشة خاصة. برجاء عمل نسخة احتياطية (لا يمكن الاسترجاع بعد 3 أشهر). تكلفة النسخة من 500 لـ 800 ج.م.</p></div>) : <p className="mb-6 text-gray-500 italic">لا يوجد خدمات فيديو مسجلة لهذا الحجز.</p>}<div className="border-t-2 border-black pt-4 mt-4 space-y-3"><p className="text-xl"><span className="font-bold">إجمالي التكلفة:</span> {booking.totalPrice} جنيه مصري</p><p className="text-xl"><span className="font-bold">المدفوع (عربون):</span> {booking.paid || 0} جنيه مصري</p><p className="text-2xl mt-4"><span className="font-bold">المبلغ المتبقي:</span> <span className="font-bold border-b-2 border-black px-2 text-red-600">{booking.remaining} جنيه مصري</span> (يُسدد يوم المناسبة)</p></div></div></section>
+                <section className="mb-8 mt-4"><h3 className="text-xl font-bold bg-black text-white p-2 mb-4">إقرار وشروط</h3><p className="text-sm leading-relaxed text-gray-700">يقر الطرف الثاني (العميل) بمعاينته لأسلوب التصوير والباكيدج المختارة، ويوافق على التعديلات الفنية التي يراها الاستوديو مناسبة. يلتزم الطرف الأول بتسليم العمل (الصور والفيديو) خلال الفترة المتفق عليها بعد اختيار الصور من قبل العميل. العربون المدفوع لا يُسترد في حالة الإلغاء من قبل العميل.</p></section>
+                <footer className="mt-10 flex justify-between px-10"><div className="text-center"><p className="font-bold text-lg mb-8">توقيع الطرف الأول (الاستوديو)</p><p className="border-t-2 border-black w-48 pt-2">Mahmoud El Marakby</p></div><div className="text-center"><p className="font-bold text-lg mb-8">توقيع الطرف الثاني (العميل)</p><p className="border-t-2 border-black w-48 pt-2"></p></div></footer>
+              </div>
+            </div>
+          );
+        }
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>
