@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Studio Management System</title>
     
-    <!-- الأيقونة الجديدة للتبويب -->
-    <link rel="icon" type="image/png" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhQKni80xTpbel7KoC02ERsBCqwsvtC-Ua75S2z4XaDzt6B6XT3jfyOXN-gvjNDhzz_xWwO7n2hVqE4AAItwCN2u5uoQb_N6RglYpymqNuBBZvFG6H2ZqCNPV-LQsx0RhfsN_N9AnnqM6ApioUohuOQpcLOZ2iuuIWMFK3gvc5UbFe6S2FQVWr9OU1zq_w/w640-h640/ChatGPT%20Image%20Mar%2011,%202026,%2008_24_10%20PM.png">
+    <!-- الأيقونة الافتراضية للتبويب -->
+    <link rel="icon" type="image/png" href="https://placehold.co/600x600/111/D4AF37?text=Studio">
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -139,7 +139,7 @@
 
         let isFirebaseActive = false;
 
-        // الصورة الافتراضية للعملاء الجدد
+        // الصورة الافتراضية المؤقتة
         const LOGO_URL = "https://placehold.co/600x600/111/D4AF37?text=Studio";
 
         // --- Default Settings ---
@@ -466,6 +466,102 @@
             );
         }
 
+        // --- Calendar Component (Restored & Fixed) ---
+        function CalendarView({ bookings, onDayClick }) {
+            const [selectedBooking, setSelectedBooking] = useState(null);
+            const today = new Date();
+            const [currentDate, setCurrentDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
+
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth(); 
+
+            const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
+            const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
+            const goToToday = () => setCurrentDate(new Date(today.getFullYear(), today.getMonth(), 1));
+
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            
+            const days = [];
+            for(let i=0; i<firstDayIndex; i++) days.push(null);
+            for(let i=1; i<=daysInMonth; i++) days.push(i);
+            const monthNames = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+
+            return (
+              <div className="animate-fadeIn max-w-5xl mx-auto pb-10 relative">
+                {selectedBooking && (
+                  <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[60] p-4 animate-fadeIn">
+                    <div className="bg-[#111] border border-[#D4AF37]/30 p-6 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl">
+                      <div className="flex justify-between items-center mb-6 border-b border-[#222] pb-4">
+                        <h3 className="text-2xl font-bold text-[#D4AF37]">بيانات الحجز التفصيلية</h3>
+                        <button onClick={() => setSelectedBooking(null)} className="text-gray-400 hover:text-white"><Icons.X size={30} /></button>
+                      </div>
+                      <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <DetailRow label="العريس" value={selectedBooking.groomName} />
+                          <DetailRow label="العروسة" value={selectedBooking.brideName} />
+                          <DetailRow label="الهاتف" value={selectedBooking.phone} isMono />
+                          <DetailRow label="التاريخ" value={selectedBooking.date} />
+                          <DetailRow label="نوع السيشن" value={selectedBooking.sessionType === 'آخر' ? selectedBooking.otherSessionType : selectedBooking.sessionType} />
+                          <DetailRow label="اللوكيشن" value={selectedBooking.location === 'آخر' ? selectedBooking.otherLocation : selectedBooking.location} />
+                          <DetailRow label="الميك أب" value={selectedBooking.makeupArtist || 'غير محدد'} />
+                          <DetailRow label="خروج ميك أب" value={selectedBooking.makeupLeaveTime || '--:--'} />
+                          <DetailRow label="العنوان" value={selectedBooking.address || 'غير محدد'} />
+                        </div>
+                        
+                        {selectedBooking.notes && (
+                           <div className="bg-black/40 p-4 rounded-2xl border border-[#222]">
+                              <h4 className="text-[#D4AF37] font-bold mb-2 flex items-center gap-2"><Icons.FileText size={18} /> ملاحظات إضافية</h4>
+                              <p className="text-sm text-gray-300 whitespace-pre-wrap">{selectedBooking.notes}</p>
+                           </div>
+                        )}
+
+                        <div className="bg-[#D4AF37]/10 p-4 rounded-2xl border border-[#D4AF37]/30 flex justify-between items-center shadow-lg">
+                          <div><p className="text-xs text-gray-400 uppercase">إجمالي الحساب</p><p className="text-2xl font-bold text-white">{selectedBooking.totalPrice} ج.م</p></div>
+                          <div className="text-left border-r border-[#D4AF37]/20 pr-4"><p className="text-xs text-gray-400 uppercase">المبلغ المتبقي</p><p className="text-2xl font-bold text-red-500">{selectedBooking.remaining} ج.م</p></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                  <h2 className="text-3xl font-bold text-[#D4AF37]">تقويم الحجوزات الكامل</h2>
+                  <div className="flex items-center gap-4 bg-[#111] px-2 py-1 rounded-xl border border-[#333] shadow-lg">
+                      <button onClick={prevMonth} className="p-2 text-gray-400 hover:text-[#D4AF37] hover:bg-[#222] rounded-lg transition-colors" title="الشهر السابق">
+                          <Icons.ChevronRight size={24} />
+                      </button>
+                      <div className="text-xl font-bold min-w-[120px] text-center cursor-pointer hover:text-[#D4AF37] transition-colors" onClick={goToToday} title="العودة للشهر الحالي">
+                          {monthNames[month]} {year}
+                      </div>
+                      <button onClick={nextMonth} className="p-2 text-gray-400 hover:text-[#D4AF37] hover:bg-[#222] rounded-lg transition-colors" title="الشهر القادم">
+                          <Icons.ChevronLeft size={24} />
+                      </button>
+                  </div>
+                </div>
+
+                <div className="bg-[#111] rounded-3xl border border-[#333] p-6 shadow-2xl">
+                  <div className="grid grid-cols-7 gap-1 md:gap-2 mb-4 text-center font-bold text-gray-500 text-sm md:text-base uppercase tracking-wider"><div>الأحد</div><div>الإثنين</div><div>الثلاثاء</div><div>الأربعاء</div><div>الخميس</div><div>الجمعة</div><div>السبت</div></div>
+                  <div className="grid grid-cols-7 gap-1 md:gap-3">
+                    {days.map((day, idx) => {
+                      if (!day) return <div key={`empty-${idx}`} className="h-24 md:h-36 bg-black/20 rounded-2xl border border-transparent"></div>;
+                      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                      const dayBookings = bookings.filter(b => b.date === dateStr);
+                      return (
+                        <div key={idx} onClick={() => onDayClick(dateStr)} className={`h-24 md:h-36 p-1 md:p-3 rounded-2xl border cursor-pointer hover:border-[#D4AF37] transition-all group ${dayBookings.length > 0 ? 'border-[#D4AF37]/40 bg-[#D4AF37]/5' : 'border-[#222] bg-black/40'}`}>
+                          <span className={`text-xs md:text-sm font-bold ${dayBookings.length > 0 ? 'text-[#D4AF37]' : 'text-gray-500'}`}>{day}</span>
+                          <div className="mt-2 space-y-1.5 overflow-y-auto max-h-[70%] no-scrollbar">
+                            {dayBookings.map((b, i) => (<div key={i} onClick={(e) => { e.stopPropagation(); setSelectedBooking(b); }} className="text-[9px] md:text-[11px] bg-[#D4AF37] text-black px-2 py-1 rounded-lg font-bold truncate flex items-center gap-1 hover:scale-105 transition-transform"><Icons.Camera size={10} /> {b.groomName}</div>))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            );
+        }
+
         // --- Main App Component ---
         function App() {
           const [user, setUser] = useState(null);
@@ -482,8 +578,8 @@
               const saved = localStorage.getItem('mrakby_settings');
               if (saved) {
                   let parsed = JSON.parse(saved);
-                  // Clean up old broken cache links
-                  if (parsed.studioLogo && (parsed.studioLogo.includes('Gemini_Generated_Image') || parsed.studioLogo.includes('messages-prod'))) {
+                  // Clean up old broken cache links and personal images
+                  if (parsed.studioLogo && (parsed.studioLogo.includes('Gemini_Generated_Image') || parsed.studioLogo.includes('messages-prod') || parsed.studioLogo.includes('blogger.googleusercontent'))) {
                       parsed.studioLogo = LOGO_URL;
                   }
                   return parsed;
@@ -493,7 +589,7 @@
           
           const [currentView, setCurrentView] = useState('dashboard');
           const [contractToPrint, setContractToPrint] = useState(null);
-          const [bookingToEdit, setBookingToEdit] = useState(null); // مسار التعديل الجديد
+          const [bookingToEdit, setBookingToEdit] = useState(null); 
           const [toast, setToast] = useState(null);
           const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
           const [initialBookingDate, setInitialBookingDate] = useState('');
@@ -514,7 +610,6 @@
                                         setUser(usr);
                                         setIsCheckingAuth(false);
                                     } else {
-                                        // Regular User Checks
                                         firebase.firestore().collection('subscribers').doc(usr.uid).get().then(doc => {
                                             if (doc.exists) {
                                                 const data = doc.data();
@@ -523,7 +618,6 @@
                                                     alert("تم إيقاف حسابك من قبل الإدارة. يرجى التواصل لتفعيل الحساب.");
                                                     setUser(null);
                                                 } else {
-                                                    // Check Trial Period
                                                     if (data.trialEndsAt) {
                                                         const trialEnd = new Date(data.trialEndsAt);
                                                         if (new Date() > trialEnd) {
@@ -657,7 +751,13 @@
 
               <div className="md:hidden flex items-center justify-between bg-[#111] p-4 border-b border-[#D4AF37]/30">
                 <h1 className="text-[#D4AF37] font-bold text-xl flex items-center gap-2">
-                  <img src={settings?.studioLogo || LOGO_URL} onError={(e) => { e.target.onerror = null; e.target.src = LOGO_URL; }} alt="Logo" crossOrigin="anonymous" className="w-8 h-8 rounded-full border border-[#D4AF37] object-cover bg-white" /> {settings?.studioName || 'اسم الاستوديو'}
+                  <img 
+                      src={settings?.studioLogo || LOGO_URL} 
+                      onError={(e) => { if(e.target.src !== LOGO_URL) e.target.src = LOGO_URL; }} 
+                      alt="Logo" 
+                      crossOrigin="anonymous" 
+                      className="w-8 h-8 rounded-full border border-[#D4AF37] object-cover bg-white" 
+                  /> {settings?.studioName || 'اسم الاستوديو'}
                 </h1>
                 <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-[#D4AF37]">
                   {isMobileMenuOpen ? <Icons.X size={28} /> : <Icons.LayoutDashboard size={28} />}
@@ -668,7 +768,12 @@
                 <aside className={`${isMobileMenuOpen ? 'block' : 'hidden'} md:block w-full md:w-64 bg-[#111] border-l border-[#222] p-6 flex-shrink-0 transition-all flex flex-col`}>
                   <div className="hidden md:flex items-center gap-3 mb-10">
                     <div className="p-1 rounded-full border-2 border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.2)]">
-                        <img src={settings?.studioLogo || LOGO_URL} onError={(e) => { e.target.onerror = null; e.target.src = LOGO_URL; }} crossOrigin="anonymous" className="w-12 h-12 rounded-full object-cover bg-white" />
+                        <img 
+                            src={settings?.studioLogo || LOGO_URL} 
+                            onError={(e) => { if(e.target.src !== LOGO_URL) e.target.src = LOGO_URL; }} 
+                            crossOrigin="anonymous" 
+                            className="w-12 h-12 rounded-full object-cover bg-white" 
+                        />
                     </div>
                     <div className="overflow-hidden">
                         <h1 className="text-[#D4AF37] font-bold text-lg leading-tight truncate" title={settings?.studioName}>{settings?.studioName || 'اسم الاستوديو'}</h1>
@@ -682,6 +787,7 @@
                             <NavItem icon={<Icons.LayoutDashboard />} label="الرئيسية" active={currentView === 'dashboard'} onClick={() => {setCurrentView('dashboard'); setIsMobileMenuOpen(false);}} />
                             <NavItem icon={<Icons.PlusCircle />} label="حجز جديد" active={currentView === 'new'} onClick={() => navigateToNewBooking('')} />
                             <NavItem icon={<Icons.Users />} label="العملاء" active={currentView === 'clients'} onClick={() => {setCurrentView('clients'); setIsMobileMenuOpen(false);}} />
+                            <NavItem icon={<Icons.CalendarIcon />} label="التقويم" active={currentView === 'calendar'} onClick={() => {setCurrentView('calendar'); setIsMobileMenuOpen(false);}} />
                             <NavItem icon={<Icons.Settings />} label="الإعدادات" active={currentView === 'settings'} onClick={() => {setCurrentView('settings'); setIsMobileMenuOpen(false);}} />
                         </>
                     ) : (
@@ -708,6 +814,7 @@
                               {currentView === 'dashboard' && <Dashboard bookings={bookings} settings={settings} onDayClick={navigateToNewBooking} />}
                               {currentView === 'new' && <NewBooking settings={settings} initialDate={initialBookingDate} user={user} bookingToEdit={bookingToEdit} isFirebaseActive={isFirebaseActiveState} onSuccess={(newB, isUpdate) => { if(!isFirebaseActiveState) { if (isUpdate) setBookings(prev => prev.map(b => b.id === newB.id ? newB : b).sort((a, b) => new Date(b.date) - new Date(a.date))); else setBookings([newB, ...bookings].sort((a, b) => new Date(b.date) - new Date(a.date))); } setCurrentView('clients'); setBookingToEdit(null); }} showToast={showToast} />}
                               {currentView === 'clients' && <ClientsList bookings={bookings} settings={settings} onPrint={setContractToPrint} onEdit={navigateToEditBooking} showToast={showToast} user={user} isFirebaseActive={isFirebaseActiveState} onLocalDelete={(id) => setBookings(bookings.filter(b => b.id !== id))} />}
+                              {currentView === 'calendar' && <CalendarView bookings={bookings} onDayClick={navigateToNewBooking} />}
                               {currentView === 'settings' && <SettingsView settings={settings} user={user} isFirebaseActive={isFirebaseActiveState} onLocalSave={(s) => setSettings(s)} showToast={showToast} />}
                           </>
                       )}
@@ -807,7 +914,12 @@
                     <div className="bg-[#111] p-8 rounded-3xl border border-[#D4AF37]/30 w-full max-w-md shadow-2xl relative z-10 mt-8 mb-8">
                         <div className="text-center mb-6">
                             <div className="w-24 h-24 bg-white rounded-full mx-auto mb-4 border-2 border-[#D4AF37] flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(212,175,55,0.3)]">
-                                <img src={settings?.studioLogo || LOGO_URL} onError={(e) => { e.target.onerror = null; e.target.src = LOGO_URL; }} crossOrigin="anonymous" className="w-full h-full object-cover" />
+                                <img 
+                                    src={settings?.studioLogo || LOGO_URL} 
+                                    onError={(e) => { if(e.target.src !== LOGO_URL) e.target.src = LOGO_URL; }} 
+                                    crossOrigin="anonymous" 
+                                    className="w-full h-full object-cover" 
+                                />
                             </div>
                             <h1 className="text-3xl font-bold text-[#D4AF37] tracking-wider">{settings?.studioName || 'نظام إدارة الاستوديو'}</h1>
                             <p className="text-gray-400 text-sm mt-2">
@@ -942,26 +1054,6 @@
 
           const formatMoney = (val) => `${val.toLocaleString()} ج.م`;
           
-          // إعدادات التقويم المدمج
-          const todayDate = new Date();
-          const [calendarDate, setCalendarDate] = useState(new Date(todayDate.getFullYear(), todayDate.getMonth(), 1));
-          
-          const calYear = calendarDate.getFullYear();
-          const calMonth = calendarDate.getMonth(); 
-
-          const nextMonth = () => setCalendarDate(new Date(calYear, calMonth + 1, 1));
-          const prevMonth = () => setCalendarDate(new Date(calYear, calMonth - 1, 1));
-          const goToToday = () => setCalendarDate(new Date(todayDate.getFullYear(), todayDate.getMonth(), 1));
-
-          const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-          const firstDayIndex = new Date(calYear, calMonth, 1).getDay();
-          
-          const days = [];
-          for(let i=0; i<firstDayIndex; i++) days.push(null);
-          for(let i=1; i<=daysInMonth; i++) days.push(i);
-          
-          const monthNames = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
-
           return (
             <div className="space-y-8 animate-fadeIn relative">
               
@@ -1027,44 +1119,6 @@
                   />
               </div>
 
-              {/* Calendar Section integrated into Dashboard */}
-              <div className="bg-[#111] rounded-3xl border border-[#333] p-6 shadow-2xl mt-8">
-                <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-                  <div className="flex items-center gap-2">
-                    <Icons.CalendarIcon className="text-[#D4AF37]" size={24} />
-                    <h3 className="text-[#D4AF37] font-bold text-xl">تقويم الحجوزات</h3>
-                  </div>
-                  <div className="flex items-center gap-4 bg-black/50 px-2 py-1 rounded-xl border border-[#333]">
-                      <button onClick={prevMonth} className="p-2 text-gray-400 hover:text-[#D4AF37] hover:bg-[#222] rounded-lg transition-colors" title="الشهر السابق">
-                          <Icons.ChevronRight size={20} />
-                      </button>
-                      <div className="text-lg font-bold min-w-[100px] text-center cursor-pointer hover:text-[#D4AF37] transition-colors" onClick={goToToday} title="العودة للشهر الحالي">
-                          {monthNames[calMonth]} {calYear}
-                      </div>
-                      <button onClick={nextMonth} className="p-2 text-gray-400 hover:text-[#D4AF37] hover:bg-[#222] rounded-lg transition-colors" title="الشهر القادم">
-                          <Icons.ChevronLeft size={20} />
-                      </button>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-7 gap-1 md:gap-2 mb-4 text-center font-bold text-gray-500 text-xs md:text-sm uppercase tracking-wider"><div>الأحد</div><div>الإثنين</div><div>الثلاثاء</div><div>الأربعاء</div><div>الخميس</div><div>الجمعة</div><div>السبت</div></div>
-                <div className="grid grid-cols-7 gap-1 md:gap-2">
-                  {days.map((day, idx) => {
-                    if (!day) return <div key={`empty-${idx}`} className="h-20 md:h-28 bg-black/20 rounded-xl border border-transparent"></div>;
-                    const dateStr = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                    const dayBookings = bookings.filter(b => b.date === dateStr);
-                    return (
-                      <div key={idx} onClick={() => onDayClick(dateStr)} className={`h-20 md:h-28 p-1 md:p-2 rounded-xl border cursor-pointer hover:border-[#D4AF37] transition-all group ${dayBookings.length > 0 ? 'border-[#D4AF37]/40 bg-[#D4AF37]/5' : 'border-[#222] bg-black/40'}`}>
-                        <span className={`text-xs md:text-sm font-bold ${dayBookings.length > 0 ? 'text-[#D4AF37]' : 'text-gray-500'}`}>{day}</span>
-                        <div className="mt-1 space-y-1 overflow-y-auto max-h-[70%] no-scrollbar">
-                          {dayBookings.map((b, i) => (<div key={i} onClick={(e) => { e.stopPropagation(); setSelectedAlertBooking(b); }} className="text-[9px] md:text-[10px] bg-[#D4AF37] text-black px-1.5 py-0.5 rounded font-bold truncate flex items-center gap-1 hover:scale-105 transition-transform"><Icons.Camera size={10} /> {b.groomName}</div>))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
                 {/* Upcoming Queue */}
                 <div className="lg:col-span-2 bg-[#111] p-6 rounded-3xl border border-[#222] shadow-xl">
@@ -1125,6 +1179,7 @@
         // --- NEW BOOKING FORM ---
         function NewBooking({ settings, initialDate, bookingToEdit, onSuccess, showToast, user, isFirebaseActive }) {
             const [formData, setFormData] = useState({
+                bookingMainType: 'فوتوغرافي وفيديو', // النوع الافتراضي الجديد للحجز
                 groomName: '', brideName: '', phone: '', address: '', date: initialDate || '', location: '', otherLocation: '',
                 sessionType: settings.sessionTypes[0], otherSessionType: '', makeupArtist: '', makeupLeaveTime: '', casualLocation: '', otherCasualLocation: '', packageId: '', addons: [], paid: '',
                 videoServiceId: '', videoServicePrice: '', videoStartTime: '', videoAddons: [], notes: ''
@@ -1135,6 +1190,7 @@
                 if (bookingToEdit) {
                     setFormData({
                         ...bookingToEdit,
+                        bookingMainType: bookingToEdit.bookingMainType || 'فوتوغرافي وفيديو',
                         addons: bookingToEdit.addons || [],
                         videoAddons: bookingToEdit.videoAddons || []
                     });
@@ -1143,11 +1199,20 @@
                 }
             }, [initialDate, bookingToEdit]);
             
+            // متغيرات التحكم في العرض بناءً على نوع الحجز
+            const isPhotoBooking = ['تصوير فوتوغرافي', 'فوتوغرافي وفيديو'].includes(formData.bookingMainType);
+            const isVideoBooking = ['تصوير فيديو', 'فوتوغرافي وفيديو'].includes(formData.bookingMainType);
+
+            // الحسابات
             const pkg = settings.packages.find(p => p.id === formData.packageId) || { price: 0 };
-            const addonsTot = formData.addons.reduce((s, id) => s + (settings.addons.find(a => a.id === id)?.price || 0), 0);
-            const vServPrice = Number(formData.videoServicePrice) || 0;
-            const vAddTot = formData.videoAddons.reduce((s, a) => s + (Number(a.price) || 0), 0);
-            const totalPrice = Number(pkg.price) + addonsTot + vServPrice + vAddTot;
+            
+            const photoPrice = isPhotoBooking ? Number(pkg.price) : 0;
+            const addonsTot = isPhotoBooking ? formData.addons.reduce((s, id) => s + (settings.addons.find(a => a.id === id)?.price || 0), 0) : 0;
+            
+            const vServPrice = isVideoBooking ? (Number(formData.videoServicePrice) || 0) : 0;
+            const vAddTot = isVideoBooking ? formData.videoAddons.reduce((s, a) => s + (Number(a.price) || 0), 0) : 0;
+            
+            const totalPrice = photoPrice + addonsTot + vServPrice + vAddTot;
             const remaining = totalPrice - (Number(formData.paid) || 0);
 
             const handleAddonToggle = (addonId) => {
@@ -1177,14 +1242,20 @@
 
             const submit = async (e) => {
                 e.preventDefault(); 
-                if (!formData.groomName || !formData.date || !formData.packageId) return showToast("أكمل البيانات الأساسية", "error");
+                if (!formData.groomName || !formData.date) return showToast("أكمل البيانات الأساسية", "error");
+                
+                // التأكد من اختيار باكيدج فقط لو كان الحجز فيه فوتوغرافي
+                if (isPhotoBooking && !formData.packageId) return showToast("يرجى اختيار باكيدج التصوير الفوتوغرافي", "error");
+                
+                // التأكد من اختيار خدمة فيديو فقط لو كان الحجز فيه فيديو
+                if (isVideoBooking && !formData.videoServiceId) return showToast("يرجى اختيار خدمة تصوير الفيديو", "error");
                 
                 setIsSubmitting(true);
                 const snapData = {
                     ...formData,
-                    snapshotPackage: { name: pkg.name, price: pkg.price },
-                    snapshotAddons: formData.addons.map(id => { const a = settings.addons.find(x => x.id === id); return a ? { name: a.name, price: a.price } : null; }).filter(Boolean),
-                    snapshotVideoService: formData.videoServiceId ? { name: settings.videoServices.find(v => v.id === formData.videoServiceId)?.name, price: formData.videoServicePrice } : null,
+                    snapshotPackage: isPhotoBooking ? { name: pkg.name, price: pkg.price } : null,
+                    snapshotAddons: isPhotoBooking ? formData.addons.map(id => { const a = settings.addons.find(x => x.id === id); return a ? { name: a.name, price: a.price } : null; }).filter(Boolean) : [],
+                    snapshotVideoService: isVideoBooking && formData.videoServiceId ? { name: settings.videoServices.find(v => v.id === formData.videoServiceId)?.name, price: formData.videoServicePrice } : null,
                     totalPrice: totalPrice, remaining, 
                     createdAt: bookingToEdit ? bookingToEdit.createdAt : new Date().toISOString()
                 };
@@ -1226,6 +1297,17 @@
                           </div>
                         </div>
 
+                        {/* نوع الحجز الأساسي */}
+                        <div className="bg-[#111] p-6 rounded-2xl border border-[#333]">
+                            <h3 className="text-xl text-white mb-4 flex items-center gap-2"><Icons.Settings size={20} className="text-[#D4AF37]"/> نوع الحجز</h3>
+                            <SelectField 
+                                label="اختر نوع الخدمة المطلوبة" 
+                                value={formData.bookingMainType} 
+                                onChange={e => setFormData({...formData, bookingMainType: e.target.value})} 
+                                options={['فوتوغرافي وفيديو', 'تصوير فوتوغرافي', 'تصوير فيديو']} 
+                            />
+                        </div>
+
                         {/* تفاصيل المناسبة */}
                         <div className="bg-[#111] p-6 rounded-2xl border border-[#333]">
                           <h3 className="text-xl text-white mb-4 flex items-center gap-2"><Icons.CalendarIcon size={20} className="text-[#D4AF37]"/> تفاصيل المناسبة</h3>
@@ -1239,111 +1321,117 @@
                                 <SelectField label="اللوكيشن الأساسي" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} options={['', ...settings.locations]} />
                                 {formData.location === 'آخر' && <div className="mt-2"><InputField label="تفاصيل اللوكيشن" value={formData.otherLocation} onChange={e=>setFormData({...formData, otherLocation: e.target.value})} required /></div>}
                             </div>
-                            <div>
-                                <SelectField label="مكان تصوير الكاجوال (اختياري)" value={formData.casualLocation} onChange={e => setFormData({...formData, casualLocation: e.target.value})} options={['', ...settings.casualLocations]} />
-                                {formData.casualLocation === 'آخر' && <div className="mt-2"><InputField label="تفاصيل مكان الكاجوال" value={formData.otherCasualLocation} onChange={e=>setFormData({...formData, otherCasualLocation: e.target.value})} required /></div>}
-                            </div>
+                            {isPhotoBooking && (
+                                <div>
+                                    <SelectField label="مكان تصوير الكاجوال (اختياري)" value={formData.casualLocation} onChange={e => setFormData({...formData, casualLocation: e.target.value})} options={['', ...settings.casualLocations]} />
+                                    {formData.casualLocation === 'آخر' && <div className="mt-2"><InputField label="تفاصيل مكان الكاجوال" value={formData.otherCasualLocation} onChange={e=>setFormData({...formData, otherCasualLocation: e.target.value})} required /></div>}
+                                </div>
+                            )}
                             <InputField label="اسم الميك أب" value={formData.makeupArtist} onChange={e => setFormData({...formData, makeupArtist: e.target.value})} />
                             <InputField label="وقت الخروج من الميك أب" type="time" value={formData.makeupLeaveTime} onChange={e => setFormData({...formData, makeupLeaveTime: e.target.value})} />
                           </div>
                         </div>
 
-                        {/* الملاحظات */}
+                        {/* الباكيدج والإضافات (فوتوغرافيا) */}
+                        {isPhotoBooking && (
+                            <div className="bg-[#111] p-6 rounded-2xl border border-[#333] animate-fadeIn">
+                              <h3 className="text-xl text-white mb-4 flex items-center gap-2"><Icons.Camera size={20} className="text-[#D4AF37]"/> الباكيدج والإضافات (فوتوغرافيا)</h3>
+                              <div className="mb-6">
+                                <label className="block text-sm text-gray-400 mb-2">اختر الباكيدج الأساسي</label>
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                    {settings.packages.map(pkg => (
+                                      <div key={pkg.id} onClick={() => setFormData({...formData, packageId: pkg.id})} className={`p-4 rounded-xl cursor-pointer border-2 transition-all ${formData.packageId === pkg.id ? 'border-[#D4AF37] bg-[#D4AF37]/10' : 'border-[#333] hover:border-gray-500'}`}>
+                                        <p className="font-bold text-white">{pkg.name}</p>
+                                        <p className="text-[#D4AF37] mt-1 font-bold">{pkg.price} ج.م</p>
+                                      </div>
+                                    ))}
+                                </div>
+                              </div>
+                              <div>
+                                <label className="block text-sm text-gray-400 mb-2">الإضافات (اختياري)</label>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                    {settings.addons.map(addon => (
+                                      <label key={addon.id} className="flex items-center gap-2 p-3 bg-black border border-[#333] rounded-lg cursor-pointer hover:bg-[#222]">
+                                        <input type="checkbox" checked={formData.addons.includes(addon.id)} onChange={() => handleAddonToggle(addon.id)} className="accent-[#D4AF37] w-5 h-5"/>
+                                        <div><p className="text-sm font-bold text-white">{addon.name}</p><p className="text-xs text-[#D4AF37]">+{addon.price}</p></div>
+                                      </label>
+                                    ))}
+                                </div>
+                              </div>
+                            </div>
+                        )}
+
+                        {/* قسم تصوير الفيديو */}
+                        {isVideoBooking && (
+                            <div className="bg-[#111] p-6 rounded-2xl border border-[#333] animate-fadeIn">
+                              <div className="flex justify-between items-start mb-4">
+                                <div>
+                                    <h3 className="text-xl text-white flex items-center gap-2 mb-2"><Icons.Video size={20} className="text-[#D4AF37]"/> قسم تصوير الفيديو</h3>
+                                    <p className="text-sm text-gray-400 max-w-2xl leading-relaxed">
+                                        كل خدمات الفيديو تصوير Full HD يتم تسلم المناسبه على فلاشه خاصه.
+                                        <br/>
+                                        <span className="text-red-400 text-xs mt-1 block">تنبيه: برجاء عمل نسخه احتياطيه من الحفل، عند حذف الفيديو بعد مدة تزيد عن 3 اشهر لا يمكن استرجاعه. تكلفة النسخه تتم على حسب حجم الفلاشه بدأً من 500 الى 800 ج.م.</span>
+                                    </p>
+                                </div>
+                                {formData.videoServiceId && <button type="button" onClick={() => setFormData({...formData, videoServiceId: '', videoServicePrice: '', videoStartTime: '', videoAddons: []})} className="text-red-400 text-sm hover:underline border border-red-500/30 px-3 py-1 rounded shrink-0">إلغاء قسم الفيديو</button>}
+                              </div>
+                              
+                              <div className="mb-6">
+                                <label className="block text-sm text-gray-400 mb-2">اختر خدمة الفيديو الأساسية</label>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                  {settings.videoServices.map(vs => (
+                                    <div key={vs.id} onClick={() => setFormData(prev => ({...prev, videoServiceId: vs.id, videoServicePrice: prev.videoServiceId !== vs.id ? vs.price : prev.videoServicePrice}))} className={`p-4 rounded-xl cursor-pointer border-2 transition-all ${formData.videoServiceId === vs.id ? 'border-[#D4AF37] bg-[#D4AF37]/10' : 'border-[#333] hover:border-gray-500'}`}>
+                                      <p className="font-bold text-white">{vs.name}</p>
+                                      {vs.subtext && <p className="text-xs text-gray-400 mt-1">{vs.subtext}</p>}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                              
+                              {formData.videoServiceId && (
+                                <div className="mb-6 border-t border-[#333] pt-6 flex flex-col md:flex-row gap-4">
+                                  <div className="md:w-1/2">
+                                    <InputField label={`سعر ${settings.videoServices.find(v => v.id === formData.videoServiceId)?.name} (قابل للتعديل)`} type="number" value={formData.videoServicePrice} onChange={e => setFormData({...formData, videoServicePrice: e.target.value})} />
+                                  </div>
+                                  {formData.videoServiceId === 'v4' && (
+                                    <div className="md:w-1/2">
+                                      <InputField label="وقت البدء (من بعد الظهر)" type="time" value={formData.videoStartTime} onChange={e => setFormData({...formData, videoStartTime: e.target.value})} />
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+
+                              <div className="border-t border-[#333] pt-6">
+                                <label className="block text-sm text-gray-400 mb-2">إضافات الفيديو</label>
+                                <select onChange={handleAddVideoAddon} value="" className="w-full md:w-1/2 bg-black border border-[#333] text-white rounded-lg p-3 focus:outline-none focus:border-[#D4AF37] transition-all mb-4">
+                                  <option value="" disabled>-- اختر إضافة --</option>
+                                  {settings.videoAddons?.filter(va => !formData.videoAddons.find(a => a.id === va.id)).map(va => <option key={va.id} value={va.id}>{va.name}</option>)}
+                                </select>
+                                
+                                {formData.videoAddons.length > 0 && (
+                                  <div className="space-y-3 mt-4">
+                                    {formData.videoAddons.map(addon => (
+                                      <div key={addon.id} className="flex flex-col md:flex-row md:items-center justify-between bg-[#1a1a1a] p-3 rounded-lg border border-[#333] gap-4">
+                                        <span className="font-bold text-white">{addon.name}</span>
+                                        <div className="flex items-center gap-3">
+                                          <div className="flex items-center gap-2">
+                                            <span className="text-gray-400 text-sm">السعر:</span>
+                                            <input type="number" min="0" value={addon.price} onChange={(e) => handleVideoAddonPriceChange(addon.id, e.target.value)} className="w-32 bg-black border border-[#444] text-white rounded px-3 py-2 text-sm focus:border-[#D4AF37] outline-none"/>
+                                          </div>
+                                          <button type="button" onClick={() => removeVideoAddon(addon.id)} className="text-red-500 hover:bg-red-500/10 p-2 rounded"><Icons.X size={20} /></button>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                        )}
+
+                        {/* الملاحظات الإضافية تم نقلها للأسفل */}
                         <div className="bg-[#111] p-6 rounded-2xl border border-[#333]">
                             <h3 className="text-xl text-white mb-4 flex items-center gap-2"><Icons.FileText size={20} className="text-[#D4AF37]"/> ملاحظات إضافية</h3>
                             <textarea value={formData.notes} onChange={e => setFormData({...formData, notes: e.target.value})} rows="3" className="w-full bg-black border border-[#333] text-white rounded-xl p-4 focus:outline-none focus:border-[#D4AF37] transition-all" placeholder="اكتب هنا أي تفاصيل أو اتفاقات خاصة مع العميل..."></textarea>
-                        </div>
-
-                        {/* الباكيدج والإضافات */}
-                        <div className="bg-[#111] p-6 rounded-2xl border border-[#333]">
-                          <h3 className="text-xl text-white mb-4 flex items-center gap-2"><Icons.Camera size={20} className="text-[#D4AF37]"/> الباكيدج والإضافات</h3>
-                          <div className="mb-6">
-                            <label className="block text-sm text-gray-400 mb-2">اختر الباكيدج الأساسي</label>
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                {settings.packages.map(pkg => (
-                                  <div key={pkg.id} onClick={() => setFormData({...formData, packageId: pkg.id})} className={`p-4 rounded-xl cursor-pointer border-2 transition-all ${formData.packageId === pkg.id ? 'border-[#D4AF37] bg-[#D4AF37]/10' : 'border-[#333] hover:border-gray-500'}`}>
-                                    <p className="font-bold text-white">{pkg.name}</p>
-                                    <p className="text-[#D4AF37] mt-1 font-bold">{pkg.price} ج.م</p>
-                                  </div>
-                                ))}
-                            </div>
-                          </div>
-                          <div>
-                            <label className="block text-sm text-gray-400 mb-2">الإضافات (اختياري)</label>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                {settings.addons.map(addon => (
-                                  <label key={addon.id} className="flex items-center gap-2 p-3 bg-black border border-[#333] rounded-lg cursor-pointer hover:bg-[#222]">
-                                    <input type="checkbox" checked={formData.addons.includes(addon.id)} onChange={() => handleAddonToggle(addon.id)} className="accent-[#D4AF37] w-5 h-5"/>
-                                    <div><p className="text-sm font-bold text-white">{addon.name}</p><p className="text-xs text-[#D4AF37]">+{addon.price}</p></div>
-                                  </label>
-                                ))}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* قسم تصوير الفيديو */}
-                        <div className="bg-[#111] p-6 rounded-2xl border border-[#333]">
-                          <div className="flex justify-between items-start mb-4">
-                            <div>
-                                <h3 className="text-xl text-white flex items-center gap-2 mb-2"><Icons.Video size={20} className="text-[#D4AF37]"/> قسم تصوير الفيديو (اختياري)</h3>
-                                <p className="text-sm text-gray-400 max-w-2xl leading-relaxed">
-                                    كل خدمات الفيديو تصوير Full HD يتم تسلم المناسبه على فلاشه خاصه.
-                                    <br/>
-                                    <span className="text-red-400 text-xs mt-1 block">تنبيه: برجاء عمل نسخه احتياطيه من الحفل، عند حذف الفيديو بعد مدة تزيد عن 3 اشهر لا يمكن استرجاعه. تكلفة النسخه تتم على حسب حجم الفلاشه بدأً من 500 الى 800 ج.م.</span>
-                                </p>
-                            </div>
-                            {formData.videoServiceId && <button type="button" onClick={() => setFormData({...formData, videoServiceId: '', videoServicePrice: '', videoStartTime: '', videoAddons: []})} className="text-red-400 text-sm hover:underline border border-red-500/30 px-3 py-1 rounded shrink-0">إلغاء قسم الفيديو</button>}
-                          </div>
-                          
-                          <div className="mb-6">
-                            <label className="block text-sm text-gray-400 mb-2">اختر خدمة الفيديو الأساسية</label>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                              {settings.videoServices.map(vs => (
-                                <div key={vs.id} onClick={() => setFormData(prev => ({...prev, videoServiceId: vs.id, videoServicePrice: prev.videoServiceId !== vs.id ? vs.price : prev.videoServicePrice}))} className={`p-4 rounded-xl cursor-pointer border-2 transition-all ${formData.videoServiceId === vs.id ? 'border-[#D4AF37] bg-[#D4AF37]/10' : 'border-[#333] hover:border-gray-500'}`}>
-                                  <p className="font-bold text-white">{vs.name}</p>
-                                  {vs.subtext && <p className="text-xs text-gray-400 mt-1">{vs.subtext}</p>}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                          
-                          {formData.videoServiceId && (
-                            <div className="mb-6 border-t border-[#333] pt-6 flex flex-col md:flex-row gap-4">
-                              <div className="md:w-1/2">
-                                <InputField label={`سعر ${settings.videoServices.find(v => v.id === formData.videoServiceId)?.name} (قابل للتعديل)`} type="number" value={formData.videoServicePrice} onChange={e => setFormData({...formData, videoServicePrice: e.target.value})} />
-                              </div>
-                              {formData.videoServiceId === 'v4' && (
-                                <div className="md:w-1/2">
-                                  <InputField label="وقت البدء (من بعد الظهر)" type="time" value={formData.videoStartTime} onChange={e => setFormData({...formData, videoStartTime: e.target.value})} />
-                                </div>
-                              )}
-                            </div>
-                          )}
-
-                          <div className="border-t border-[#333] pt-6">
-                            <label className="block text-sm text-gray-400 mb-2">إضافات الفيديو</label>
-                            <select onChange={handleAddVideoAddon} value="" className="w-full md:w-1/2 bg-black border border-[#333] text-white rounded-lg p-3 focus:outline-none focus:border-[#D4AF37] transition-all mb-4">
-                              <option value="" disabled>-- اختر إضافة --</option>
-                              {settings.videoAddons?.filter(va => !formData.videoAddons.find(a => a.id === va.id)).map(va => <option key={va.id} value={va.id}>{va.name}</option>)}
-                            </select>
-                            
-                            {formData.videoAddons.length > 0 && (
-                              <div className="space-y-3 mt-4">
-                                {formData.videoAddons.map(addon => (
-                                  <div key={addon.id} className="flex flex-col md:flex-row md:items-center justify-between bg-[#1a1a1a] p-3 rounded-lg border border-[#333] gap-4">
-                                    <span className="font-bold text-white">{addon.name}</span>
-                                    <div className="flex items-center gap-3">
-                                      <div className="flex items-center gap-2">
-                                        <span className="text-gray-400 text-sm">السعر:</span>
-                                        <input type="number" min="0" value={addon.price} onChange={(e) => handleVideoAddonPriceChange(addon.id, e.target.value)} className="w-32 bg-black border border-[#444] text-white rounded px-3 py-2 text-sm focus:border-[#D4AF37] outline-none"/>
-                                      </div>
-                                      <button type="button" onClick={() => removeVideoAddon(addon.id)} className="text-red-500 hover:bg-red-500/10 p-2 rounded"><Icons.X size={20} /></button>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
                         </div>
 
                         {/* الملخص المالي */}
@@ -1426,7 +1514,6 @@
             );
         }
 
-        // Quick Message Modal (WhatsApp Templates)
         function QuickMessageModal({ booking, settings, onClose, showToast }) {
             const messages = settings.quickMessages || DEFAULT_SETTINGS.quickMessages;
             const [selectedTemplate, setSelectedTemplate] = useState(messages[0]?.id || '');
@@ -1498,7 +1585,6 @@
             const updateArray = (key, newArray) => { setLocalSettings(prev => ({ ...prev, [key]: newArray })); };
             const updateField = (key, value) => { setLocalSettings(prev => ({ ...prev, [key]: value })); };
 
-            // هنا تم إضافة كود ضغط وتصغير الصورة قبل حفظها لمنع الخطأ
             const handleLogoUpload = (e) => {
                 const file = e.target.files[0];
                 if (file) {
@@ -1529,8 +1615,8 @@
                             const ctx = canvas.getContext('2d');
                             ctx.drawImage(img, 0, 0, width, height);
                             
-                            // تحويلها لبيانات أصغر جودة 0.7
-                            const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                            // الحفظ بصيغة PNG للحفاظ على الشفافية وتجنب الخلفية السوداء
+                            const dataUrl = canvas.toDataURL('image/png');
                             updateField('studioLogo', dataUrl);
                         };
                         img.src = event.target.result;
@@ -1638,10 +1724,14 @@
         }
 
         function ContractPrintView({ booking, settings, onClose }) {
+          const isPhotoBooking = ['تصوير فوتوغرافي', 'فوتوغرافي وفيديو'].includes(booking.bookingMainType || 'فوتوغرافي وفيديو');
+          const isVideoBooking = ['تصوير فيديو', 'فوتوغرافي وفيديو'].includes(booking.bookingMainType || 'فوتوغرافي وفيديو');
+
           const pkg = settings.packages.find(p => p.id === booking.packageId);
           const displayPkgName = booking.snapshotPackage?.name || pkg?.name || 'غير محدد';
           const displayPkgPrice = booking.snapshotPackage?.price || pkg?.price || 0;
           const addonsList = booking.snapshotAddons && booking.snapshotAddons.length > 0 ? booking.snapshotAddons : (booking.addons || []).map(aId => settings.addons.find(a => a.id === aId)).filter(Boolean);
+          
           const videoName = booking.snapshotVideoService?.name || settings.videoServices.find(v => v.id === booking.videoServiceId)?.name;
           const videoPrice = booking.snapshotVideoService?.price || booking.videoServicePrice;
           
@@ -1746,7 +1836,9 @@
                     <p><span className="font-bold text-gray-700">التاريخ:</span> <span dir="ltr" className="font-bold">{booking.date}</span></p>
                     <p><span className="font-bold text-gray-700">النوع:</span> {booking.sessionType === 'آخر' ? booking.otherSessionType : booking.sessionType}</p>
                     <p><span className="font-bold text-gray-700">اللوكيشن الأساسي:</span> {booking.location === 'آخر' ? booking.otherLocation : (booking.location || '---')}</p>
-                    <p><span className="font-bold text-gray-700">لوكيشن الكاجوال:</span> {booking.casualLocation === 'آخر' ? booking.otherCasualLocation : (booking.casualLocation || '---')}</p>
+                    {isPhotoBooking && (
+                       <p><span className="font-bold text-gray-700">لوكيشن الكاجوال:</span> {booking.casualLocation === 'آخر' ? booking.otherCasualLocation : (booking.casualLocation || '---')}</p>
+                    )}
                     <p><span className="font-bold text-gray-700">الميك أب:</span> {booking.makeupArtist || '---'}</p>
                     <p><span className="font-bold text-gray-700">وقت الخروج:</span> <span dir="ltr" className="font-bold text-red-600">{booking.makeupLeaveTime || '---'}</span></p>
                   </div>
@@ -1755,13 +1847,16 @@
                 <section className="mb-4">
                   <h3 className="text-lg font-black mb-2 border-r-[3px] border-black pr-2 bg-gray-100 py-1">الخدمات والأسعار</h3>
                   <div className="bg-gray-50 p-3 rounded border border-gray-200 space-y-3">
-                    <div>
-                        <p><span className="font-bold text-gray-800">الباكيدج الأساسي (فوتوغرافيا):</span> {displayPkgName} <span className="text-gray-600 font-bold">({displayPkgPrice} ج.م)</span></p>
-                        {addonsList && addonsList.length > 0 && <p className="mt-1 text-sm"><span className="font-bold text-gray-700">الإضافات:</span> {addonsList.map(a => `${a.name}`).join(' ، ')}</p>}
-                    </div>
+                    
+                    {isPhotoBooking && (
+                        <div>
+                            <p><span className="font-bold text-gray-800">الباكيدج الأساسي (فوتوغرافيا):</span> {displayPkgName} <span className="text-gray-600 font-bold">({displayPkgPrice} ج.م)</span></p>
+                            {addonsList && addonsList.length > 0 && <p className="mt-1 text-sm"><span className="font-bold text-gray-700">الإضافات:</span> {addonsList.map(a => `${a.name}`).join(' ، ')}</p>}
+                        </div>
+                    )}
 
-                    {booking.snapshotVideoService && (
-                        <div className="border-t border-gray-300 pt-2">
+                    {isVideoBooking && booking.snapshotVideoService && (
+                        <div className={isPhotoBooking ? "border-t border-gray-300 pt-2" : ""}>
                             <p><span className="font-bold text-gray-800">خدمة الفيديو:</span> {videoName} <span className="text-gray-600 font-bold">({videoPrice} ج.م)</span> {booking.videoStartTime && <span className="text-red-600">| وقت البدء: {booking.videoStartTime}</span>}</p>
                             {booking.videoAddons && booking.videoAddons.length > 0 && <p className="mt-1 text-sm"><span className="font-bold text-gray-700">الإضافات:</span> {booking.videoAddons.map(a => `${a.name}`).join(' ، ')}</p>}
                         </div>
