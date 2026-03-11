@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Studio Management System</title>
     
-    <link rel="icon" type="image/png" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh1m611kUbdULF_cv77ptyLsq5ssUUC1GGxZB65Ark2rIeXdbQr__HuuMbl6XbxKt-JNY3ZcGtgC-WjuJaIJTq1Be_DScv2TVEizbU4E1NYzDNj0iiNOIUESe2XyVs5CMgtzc-xsqLsMpYxun6IqzzQ6d8staQJWyUQM_CrGGt6zkLz0gsxONtu8Yd2Jfo/w640-h640/Gemini_Generated_Image_larjc1larjc1larj.png">
+    <!-- الأيقونة الجديدة للتبويب -->
+    <link rel="icon" type="image/png" href="https://messages-prod.27c852f3500f38c1e7786e2c9ff9e48f.r2.cloudflarestorage.com/019c32e5-b2a2-717c-932f-e2bfcdd426dd/1773251968197-019cde0d-1c4f-7e08-be43-ba5de3e0701c.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=75514238966d6677c3874ef9149f1398%2F20260311%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260311T175928Z&X-Amz-Expires=3600&X-Amz-Signature=c5c38dab2f155957d1f36be1e1c5c098fac9ea4654073b58a5462d0b2beceeaa&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject">
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -132,12 +133,13 @@
 
         let isFirebaseActive = false;
 
-        const LOGO_URL = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh1m611kUbdULF_cv77ptyLsq5ssUUC1GGxZB65Ark2rIeXdbQr__HuuMbl6XbxKt-JNY3ZcGtgC-WjuJaIJTq1Be_DScv2TVEizbU4E1NYzDNj0iiNOIUESe2XyVs5CMgtzc-xsqLsMpYxun6IqzzQ6d8staQJWyUQM_CrGGt6zkLz0gsxONtu8Yd2Jfo/w640-h640/Gemini_Generated_Image_larjc1larjc1larj.png";
+        // الصورة الجديدة التي تم اختيارها للاستخدام كأيقونة واسم افتراضي للصورة الشخصية
+        const LOGO_URL = "https://messages-prod.27c852f3500f38c1e7786e2c9ff9e48f.r2.cloudflarestorage.com/019c32e5-b2a2-717c-932f-e2bfcdd426dd/1773251968197-019cde0d-1c4f-7e08-be43-ba5de3e0701c.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=75514238966d6677c3874ef9149f1398%2F20260311%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260311T175928Z&X-Amz-Expires=3600&X-Amz-Signature=c5c38dab2f155957d1f36be1e1c5c098fac9ea4654073b58a5462d0b2beceeaa&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject";
 
         // --- Default Settings ---
         const DEFAULT_SETTINGS = {
-          studioName: "استوديو المراكبي",
-          studioLogo: LOGO_URL,
+          studioName: "", // اسم الاستوديو فارغ لكي يقوم المشترك بملئه
+          studioLogo: "", // فارغ أيضاً، وفي حال كان فارغاً يتم استخدام LOGO_URL كصورة افتراضية
           packages: [
             { id: 'p1', name: 'Wedding Basic', price: 5000 },
             { id: 'p2', name: 'Wedding Premium', price: 10000 },
@@ -367,34 +369,36 @@
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-[#222]">
-                                {subscribers.map(sub => (
-                                    <tr key={sub.uid} className="hover:bg-[#1a1a1a] transition-colors">
-                                        <td className="p-4 font-mono font-bold text-white">{sub.email}</td>
-                                        <td className="p-4 font-mono text-gray-300">{sub.phone || 'غير مسجل'}</td>
-                                        <td className="p-4 text-sm text-gray-400">{new Date(sub.createdAt).toLocaleDateString('ar-EG')}</td>
-                                        <td className="p-4">
-                                            {sub.isActive ? 
-                                                <span className="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-bold">نشط</span> : 
-                                                <span className="bg-red-500/20 text-red-400 px-3 py-1 rounded-full text-xs font-bold">موقوف</span>
-                                            }
-                                        </td>
-                                        <td className="p-4 text-center flex justify-center gap-2">
-                                            <button 
-                                                onClick={() => toggleStatus(sub.uid, sub.isActive)}
-                                                className={`px-4 py-2 rounded-xl font-bold text-sm transition-colors ${sub.isActive ? 'bg-orange-900/30 text-orange-500 hover:bg-orange-600 hover:text-white' : 'bg-green-900/30 text-green-500 hover:bg-green-600 hover:text-white'}`}
-                                            >
-                                                {sub.isActive ? 'إيقاف الحساب' : 'تفعيل الحساب'}
-                                            </button>
-                                            <button 
-                                                onClick={() => deleteSubscriber(sub.uid, sub.email)}
-                                                className="px-3 py-2 bg-red-900/30 text-red-500 hover:bg-red-600 hover:text-white rounded-xl transition-colors"
-                                                title="حذف المشترك نهائياً"
-                                            >
-                                                <Icons.Trash2 size={18} />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
+                                {subscribers.map(sub => {
+                                    const isTrialActive = sub.trialEndsAt ? new Date(sub.trialEndsAt) > new Date() : false;
+                                    const statusDisplay = sub.isActive 
+                                        ? (isTrialActive ? <span className="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-xs font-bold">فترة تجريبية</span> : <span className="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-bold">نشط</span>)
+                                        : <span className="bg-red-500/20 text-red-400 px-3 py-1 rounded-full text-xs font-bold">موقوف</span>;
+
+                                    return (
+                                        <tr key={sub.uid} className="hover:bg-[#1a1a1a] transition-colors">
+                                            <td className="p-4 font-mono font-bold text-white">{sub.email}</td>
+                                            <td className="p-4 font-mono text-gray-300">{sub.phone || 'غير مسجل'}</td>
+                                            <td className="p-4 text-sm text-gray-400">{new Date(sub.createdAt).toLocaleDateString('ar-EG')}</td>
+                                            <td className="p-4">{statusDisplay}</td>
+                                            <td className="p-4 text-center flex justify-center gap-2">
+                                                <button 
+                                                    onClick={() => toggleStatus(sub.uid, sub.isActive)}
+                                                    className={`px-4 py-2 rounded-xl font-bold text-sm transition-colors ${sub.isActive ? 'bg-orange-900/30 text-orange-500 hover:bg-orange-600 hover:text-white' : 'bg-green-900/30 text-green-500 hover:bg-green-600 hover:text-white'}`}
+                                                >
+                                                    {sub.isActive ? 'إيقاف الحساب' : 'تفعيل الحساب'}
+                                                </button>
+                                                <button 
+                                                    onClick={() => deleteSubscriber(sub.uid, sub.email)}
+                                                    className="px-3 py-2 bg-red-900/30 text-red-500 hover:bg-red-600 hover:text-white rounded-xl transition-colors"
+                                                    title="حذف المشترك نهائياً"
+                                                >
+                                                    <Icons.Trash2 size={18} />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                                 {subscribers.length === 0 && <tr><td colSpan="5" className="text-center p-10 text-gray-500">لا يوجد مشتركون بعد.</td></tr>}
                             </tbody>
                         </table>
@@ -409,6 +413,8 @@
           const [isAdmin, setIsAdmin] = useState(false);
           const [isCheckingAuth, setIsCheckingAuth] = useState(true);
           const [isFirebaseActiveState, setIsFirebaseActiveState] = useState(false);
+          const [trialInfo, setTrialInfo] = useState(null);
+          
           const [bookings, setBookings] = useState(() => {
               const saved = localStorage.getItem('mrakby_bookings');
               return saved ? JSON.parse(saved) : [];
@@ -432,42 +438,54 @@
                       
                       firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
                         .then(() => {
-                            firebase.auth().onAuthStateChanged((usr) => {
+                            firebase.auth().onAuthStateChanged(async (usr) => {
                                 if (usr) {
-                                    // Check Admin Status
                                     if (usr.email === ADMIN_EMAIL) {
                                         setIsAdmin(true);
                                         setUser(usr);
                                         setIsCheckingAuth(false);
                                     } else {
-                                        // Regular User -> Check if Active in 'subscribers' collection
+                                        // Regular User Checks
                                         firebase.firestore().collection('subscribers').doc(usr.uid).get().then(doc => {
-                                            if (doc.exists && doc.data().isActive === false) {
-                                                firebase.auth().signOut();
-                                                alert("تم إيقاف حسابك من قبل الإدارة. يرجى التواصل مع الدعم.");
-                                                setUser(null);
-                                            } else {
-                                                // Create doc if doesn't exist (for existing users before this update)
-                                                if (!doc.exists) {
-                                                    firebase.firestore().collection('subscribers').doc(usr.uid).set({
-                                                        uid: usr.uid,
-                                                        email: usr.email,
-                                                        createdAt: new Date().toISOString(),
-                                                        isActive: true
-                                                    });
+                                            if (doc.exists) {
+                                                const data = doc.data();
+                                                if (data.isActive === false) {
+                                                    firebase.auth().signOut();
+                                                    alert("تم إيقاف حسابك من قبل الإدارة. يرجى التواصل لتفعيل الحساب.");
+                                                    setUser(null);
+                                                } else {
+                                                    // Check Trial Period
+                                                    if (data.trialEndsAt) {
+                                                        const trialEnd = new Date(data.trialEndsAt);
+                                                        if (new Date() > trialEnd) {
+                                                             firebase.firestore().collection('subscribers').doc(usr.uid).update({ isActive: false });
+                                                             firebase.auth().signOut();
+                                                             alert("انتهت الفترة التجريبية المجانية. يرجى التواصل مع الإدارة لتفعيل حسابك.");
+                                                             setUser(null);
+                                                        } else {
+                                                             const daysLeft = Math.ceil((trialEnd - new Date()) / (1000 * 60 * 60 * 24));
+                                                             setTrialInfo(`الحساب في الفترة التجريبية. متبقي ${daysLeft} أيام.`);
+                                                             setUser(usr);
+                                                        }
+                                                    } else {
+                                                        setUser(usr); // fully active, no trial
+                                                    }
                                                 }
+                                            } else {
+                                                // Fallback if doc missing but somehow logged in
                                                 setUser(usr);
                                             }
                                             setIsCheckingAuth(false);
                                         }).catch(err => {
                                             console.error("Error checking subscriber status", err);
-                                            setUser(usr); // fallback allow
+                                            setUser(usr); 
                                             setIsCheckingAuth(false);
                                         });
                                     }
                                 } else {
                                     setUser(null);
                                     setIsAdmin(false);
+                                    setTrialInfo(null);
                                     setIsCheckingAuth(false);
                                 }
                             });
@@ -492,7 +510,7 @@
           }, []);
 
           useEffect(() => {
-              if (!user || !isFirebaseActive || !window.firebase || isAdmin) return; // Admin has a different view
+              if (!user || !isFirebaseActive || !window.firebase || isAdmin) return; 
               
               const db = firebase.firestore();
               const unsubB = db.collection('users').doc(user.uid).collection('bookings').onSnapshot((snap) => {
@@ -514,8 +532,8 @@
             setTimeout(() => setToast(null), 3000);
           };
 
-          const handleLogout = () => {
-              if (isFirebaseActive && window.firebase) firebase.auth().signOut();
+          const handleLogout = async () => {
+              if (isFirebaseActive && window.firebase) await firebase.auth().signOut();
               else { localStorage.removeItem('mrakby_local_user'); setUser(null); setIsAdmin(false); }
               setCurrentView('dashboard');
           };
@@ -539,9 +557,15 @@
                 </div>
               )}
 
+              {trialInfo && !isAdmin && (
+                  <div className="bg-blue-900/40 text-blue-400 text-center py-2 text-sm font-bold border-b border-blue-500/30">
+                      ℹ️ {trialInfo}
+                  </div>
+              )}
+
               <div className="md:hidden flex items-center justify-between bg-[#111] p-4 border-b border-[#D4AF37]/30">
                 <h1 className="text-[#D4AF37] font-bold text-xl flex items-center gap-2">
-                  <img src={settings.studioLogo || LOGO_URL} alt="Logo" className="w-8 h-8 rounded-full border border-[#D4AF37] object-cover bg-white" /> {settings.studioName || 'Studio'}
+                  <img src={settings.studioLogo || LOGO_URL} alt="Logo" className="w-8 h-8 rounded-full border border-[#D4AF37] object-cover bg-white" /> {settings.studioName || 'اسم الاستوديو'}
                 </h1>
                 <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-[#D4AF37]">
                   {isMobileMenuOpen ? <Icons.X size={28} /> : <Icons.LayoutDashboard size={28} />}
@@ -555,7 +579,7 @@
                         <img src={settings.studioLogo || LOGO_URL} className="w-12 h-12 rounded-full object-cover bg-white" />
                     </div>
                     <div className="overflow-hidden">
-                        <h1 className="text-[#D4AF37] font-bold text-lg leading-tight truncate" title={settings.studioName}>{settings.studioName || 'Studio'}</h1>
+                        <h1 className="text-[#D4AF37] font-bold text-lg leading-tight truncate" title={settings.studioName}>{settings.studioName || 'اسم الاستوديو'}</h1>
                         <p className="text-xs text-gray-400 tracking-widest uppercase">Photography</p>
                     </div>
                   </div>
@@ -578,7 +602,7 @@
                     </button>
                     <div className="p-4 bg-black/50 rounded-xl border border-[#D4AF37]/20 text-center">
                       <p className="text-xs text-gray-500 mb-1">Studio ID</p>
-                      <p className="font-mono text-[#D4AF37] font-bold uppercase">#{settings.studioName?.substring(0,4) || 'STUDIO'}_USER</p>
+                      <p className="font-mono text-[#D4AF37] font-bold uppercase">#{settings.studioName ? settings.studioName.substring(0,4) : 'STUDIO'}_USER</p>
                     </div>
                   </div>
                 </aside>
@@ -606,7 +630,7 @@
         function LoginScreen({ onLogin, isFirebaseActive, showToast, settings }) {
             const [email, setEmail] = useState('');
             const [password, setPassword] = useState('');
-            const [phone, setPhone] = useState(''); // New state for phone number
+            const [phone, setPhone] = useState(''); 
             const [isLoading, setIsLoading] = useState(false);
             const [isRegistering, setIsRegistering] = useState(false);
             
@@ -625,19 +649,21 @@
                         if (isRegistering) {
                             userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
                             
-                            // 1. Add to global subscribers list with Phone Number
+                            const trialEndDate = new Date();
+                            trialEndDate.setDate(trialEndDate.getDate() + 5); // 5 Days Trial
+
                             await firebase.firestore().collection('subscribers').doc(userCredential.user.uid).set({
                                 uid: userCredential.user.uid,
                                 email: userCredential.user.email,
-                                phone: phone, // Save phone number
+                                phone: phone, 
                                 createdAt: new Date().toISOString(),
-                                isActive: true 
+                                isActive: true,
+                                trialEndsAt: trialEndDate.toISOString() // Store trial end date
                             });
                             
-                            // 2. Set default config for new studio
                             await firebase.firestore().collection('users').doc(userCredential.user.uid).collection('settings').doc('config').set(DEFAULT_SETTINGS);
                             
-                            showToast("🎉 شكراً لاشتراكك معنا! تم إنشاء حساب الاستوديو الخاص بك بنجاح.");
+                            showToast("🎉 شكراً لاشتراكك معنا! تم إنشاء حسابك ومنحك 5 أيام تجريبية مجاناً.");
                         } else {
                             userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
                             showToast("تم تسجيل الدخول!");
@@ -665,28 +691,30 @@
                     <div className="absolute inset-0 opacity-5 pointer-events-none flex items-center justify-center">
                          <Icons.Camera size={600} className="text-[#D4AF37]" />
                     </div>
-                    <div className="bg-[#111] p-8 rounded-3xl border border-[#D4AF37]/30 w-full max-w-md shadow-2xl relative z-10">
-                        <div className="text-center mb-8">
-                            <div className="w-24 h-24 bg-white rounded-full mx-auto mb-4 border-2 border-[#D4AF37] flex items-center justify-center overflow-hidden">
+                    <div className="bg-[#111] p-8 rounded-3xl border border-[#D4AF37]/30 w-full max-w-md shadow-2xl relative z-10 mt-8 mb-8">
+                        <div className="text-center mb-6">
+                            <div className="w-24 h-24 bg-white rounded-full mx-auto mb-4 border-2 border-[#D4AF37] flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(212,175,55,0.3)]">
                                 <img src={settings?.studioLogo || LOGO_URL} className="w-full h-full object-cover" />
                             </div>
-                            <h1 className="text-2xl font-bold text-[#D4AF37]">{settings?.studioName || 'نظام إدارة الاستوديو'}</h1>
+                            <h1 className="text-3xl font-bold text-[#D4AF37] tracking-wider">{settings?.studioName || 'نظام إدارة الاستوديو'}</h1>
                             <p className="text-gray-400 text-sm mt-2">
-                                {isRegistering ? 'أدخل بياناتك لإنشاء حساب جديد كاستوديو' : 'قم بتسجيل الدخول للوصول لبياناتك'}
+                                {isRegistering ? 'أنشئ حساباً جديداً وابدأ فترتك التجريبية' : 'مرحباً بعودتك! سجل الدخول للوصول لبياناتك'}
                             </p>
                         </div>
                         
                         {isRegistering && (
-                            <div className="bg-gradient-to-r from-green-900/30 to-emerald-900/30 border border-green-500/40 p-4 rounded-2xl mb-6 text-center shadow-lg">
-                                <h4 className="text-green-400 font-bold text-lg mb-2 flex items-center justify-center gap-2">
-                                    <Icons.CheckCircle size={20} /> اشتراك مدى الحياة
+                            <div className="bg-gradient-to-br from-green-900/40 to-[#111] border border-green-500/50 p-5 rounded-2xl mb-6 text-center shadow-lg relative overflow-hidden">
+                                <div className="absolute -right-4 -top-4 w-16 h-16 bg-green-500/20 rounded-full blur-xl"></div>
+                                <h4 className="text-green-400 font-bold text-lg mb-3 flex items-center justify-center gap-2">
+                                    <Icons.CheckCircle size={22} /> اشتراك النظام
                                 </h4>
-                                <p className="text-sm text-gray-300 leading-relaxed">
-                                    تكلفة الاشتراك <span className="font-bold text-white bg-black/40 px-2 py-0.5 rounded mx-1">150 جنيه</span> فقط للإصدار الحالي.<br/>
-                                    يرجى الدفع عبر <b>إنستاباي (InstaPay)</b> أو <b>فودافون كاش</b> على الرقم:
+                                <p className="text-sm text-gray-300 leading-relaxed mb-3">
+                                    ستحصل فوراً على <span className="font-bold text-white bg-green-600/30 px-2 py-0.5 rounded">5 أيام تجريبية مجاناً</span>.<br/>
+                                    بعدها، تكلفة الاشتراك الدائم هي <span className="font-bold text-white border-b border-green-500">150 جنيه</span> فقط للإصدار الحالي.<br/>
                                 </p>
-                                <div className="text-2xl font-mono text-[#D4AF37] font-black mt-3 bg-black/60 py-2 rounded-xl border border-[#D4AF37]/30 tracking-widest">
-                                    01126810107
+                                <div className="bg-black/50 p-3 rounded-xl border border-gray-700/50 text-xs text-gray-400">
+                                    يرجى الدفع عبر <b>إنستاباي (InstaPay)</b> أو <b>فودافون كاش</b> على الرقم:<br/>
+                                    <span className="text-xl font-mono text-[#D4AF37] font-black block mt-2 tracking-widest bg-black/60 py-1 rounded-lg border border-[#D4AF37]/20">01126810107</span>
                                 </div>
                             </div>
                         )}
@@ -697,8 +725,8 @@
                                 value={email} 
                                 onChange={e => setEmail(e.target.value)} 
                                 required 
-                                className="w-full bg-black border border-[#333] text-white rounded-xl p-3 outline-none focus:border-[#D4AF37]" 
-                                placeholder="البريد الإلكتروني (لتسجيل الدخول)" 
+                                className="w-full bg-black border border-[#333] text-white rounded-xl p-3.5 outline-none focus:border-[#D4AF37] transition-all" 
+                                placeholder="البريد الإلكتروني" 
                             />
                             
                             {isRegistering && (
@@ -707,8 +735,8 @@
                                     value={phone} 
                                     onChange={e => setPhone(e.target.value)} 
                                     required 
-                                    className="w-full bg-black border border-[#333] text-white rounded-xl p-3 outline-none focus:border-[#D4AF37]" 
-                                    placeholder="رقم هاتف الاستوديو للتواصل (إجباري)" 
+                                    className="w-full bg-black border border-[#333] text-white rounded-xl p-3.5 outline-none focus:border-[#D4AF37] transition-all" 
+                                    placeholder="رقم هاتف للتواصل (إجباري)" 
                                 />
                             )}
 
@@ -717,23 +745,25 @@
                                 value={password} 
                                 onChange={e => setPassword(e.target.value)} 
                                 required 
-                                className="w-full bg-black border border-[#333] text-white rounded-xl p-3 outline-none focus:border-[#D4AF37]" 
-                                placeholder="كلمة المرور" 
+                                className="w-full bg-black border border-[#333] text-white rounded-xl p-3.5 outline-none focus:border-[#D4AF37] transition-all" 
+                                placeholder="كلمة المرور (6 أحرف على الأقل)" 
                                 minLength="6" 
                             />
                             
-                            <button type="submit" disabled={isLoading} className="w-full bg-[#D4AF37] text-black font-bold py-3 rounded-xl hover:bg-yellow-500 transition-colors">
-                                {isLoading ? 'جاري التحميل...' : (isRegistering ? 'إنشاء حساب جديد' : 'تسجيل الدخول')}
+                            <button type="submit" disabled={isLoading} className="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8860B] text-black font-bold text-lg py-3.5 rounded-xl hover:opacity-90 transition-opacity shadow-lg mt-2">
+                                {isLoading ? 'جاري التحميل...' : (isRegistering ? 'إنشاء حساب وبدء التجربة' : 'تسجيل الدخول')}
                             </button>
                         </form>
+                        
                         {isFirebaseActive && (
-                            <div className="mt-4 text-center">
+                            <div className="mt-6 text-center border-t border-[#222] pt-4">
                                 <button 
+                                    type="button"
                                     onClick={() => {
                                         setIsRegistering(!isRegistering);
-                                        setPhone(''); // Clear phone when switching modes
+                                        setPhone(''); 
                                     }} 
-                                    className="text-gray-500 text-sm hover:text-[#D4AF37] transition-colors"
+                                    className="text-gray-400 text-sm hover:text-[#D4AF37] transition-colors font-medium"
                                 >
                                     {isRegistering ? 'لديك حساب بالفعل؟ سجل الدخول من هنا' : 'ليس لديك حساب؟ أنشئ حساب جديد لاستوديوهات أخرى'}
                                 </button>
@@ -1538,7 +1568,7 @@
                   <div className="flex items-center gap-3">
                     <img src={settings.studioLogo || LOGO_URL} alt="Logo" className="w-16 h-16 rounded-full border border-gray-300 object-cover" />
                     <div>
-                        <h1 className="text-2xl font-black uppercase tracking-tighter" style={{ color: '#000' }}>{settings.studioName || 'Studio Name'}</h1>
+                        <h1 className="text-2xl font-black uppercase tracking-tighter" style={{ color: '#000' }}>{settings.studioName || 'اسم الاستوديو'}</h1>
                         <p className="text-[10px] font-bold text-gray-500 tracking-[0.2em] uppercase">Official Contract</p>
                     </div>
                   </div>
@@ -1551,7 +1581,7 @@
                 <section className="mb-4">
                   <h3 className="text-lg font-black mb-2 border-r-[3px] border-black pr-2 bg-gray-100 py-1">بيانات التعاقد الأساسية</h3>
                   <ul className="list-none space-y-2 bg-gray-50 p-3 rounded border border-gray-200 font-medium">
-                    <li><span className="font-bold text-gray-700 w-24 inline-block">الاستوديو:</span> <span className="font-black">{settings.studioName || 'الاستوديو'}</span></li>
+                    <li><span className="font-bold text-gray-700 w-24 inline-block">الاستوديو:</span> <span className="font-black">{settings.studioName || 'اسم الاستوديو'}</span></li>
                     <li><span className="font-bold text-gray-700 w-24 inline-block">العميل:</span> <span className="font-black text-lg border-b border-black pb-0.5">{booking.groomName} & {booking.brideName}</span></li>
                     <li><span className="font-bold text-gray-700 w-24 inline-block">رقم الهاتف:</span> <span dir="ltr" className="font-bold">{booking.phone}</span></li>
                   </ul>
@@ -1612,7 +1642,7 @@
                 <footer className="flex justify-between px-12 pt-6 border-t-[2px] border-black">
                   <div className="text-center">
                     <p className="font-bold text-lg mb-8">توقيع الاستوديو</p>
-                    <p className="border-t border-black w-40 pt-1 font-bold text-gray-600 text-sm">{settings.studioName || 'Studio Name'}</p>
+                    <p className="border-t border-black w-40 pt-1 font-bold text-gray-600 text-sm">{settings.studioName || 'اسم الاستوديو'}</p>
                   </div>
                   <div className="text-center">
                     <p className="font-bold text-lg mb-8">توقيع العميل</p>
