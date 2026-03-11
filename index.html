@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Studio Management System</title>
     
+    <!-- الأيقونة الافتراضية للتبويب -->
     <link rel="icon" type="image/png" href="https://placehold.co/600x600/111/D4AF37?text=Studio">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,6 +14,7 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
+    <!-- مكتبة تحويل الـ HTML إلى صورة -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
@@ -137,7 +139,7 @@
 
         let isFirebaseActive = false;
 
-        // الصورة الافتراضية للعملاء الجدد
+        // الصورة الافتراضية المؤقتة
         const LOGO_URL = "https://placehold.co/600x600/111/D4AF37?text=Studio";
 
         // --- Default Settings ---
@@ -528,7 +530,7 @@
                 )}
                 
                 <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                  <h2 className="text-3xl font-bold text-[#D4AF37]">تقويم الحجوزات الكامل</h2>
+                  <h2 className="text-3xl font-bold text-[#D4AF37]">تقويم الحجوزات</h2>
                   <div className="flex items-center gap-4 bg-[#111] px-2 py-1 rounded-xl border border-[#333] shadow-lg">
                       <button onClick={prevMonth} className="p-2 text-gray-400 hover:text-[#D4AF37] hover:bg-[#222] rounded-lg transition-colors" title="الشهر السابق">
                           <Icons.ChevronRight size={24} />
@@ -1125,44 +1127,6 @@
                   />
               </div>
 
-              {/* Calendar Section integrated into Dashboard */}
-              <div className="bg-[#111] rounded-3xl border border-[#333] p-6 shadow-2xl mt-8">
-                <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-                  <div className="flex items-center gap-2">
-                    <Icons.CalendarIcon className="text-[#D4AF37]" size={24} />
-                    <h3 className="text-[#D4AF37] font-bold text-xl">تقويم الحجوزات</h3>
-                  </div>
-                  <div className="flex items-center gap-4 bg-black/50 px-2 py-1 rounded-xl border border-[#333]">
-                      <button onClick={prevMonth} className="p-2 text-gray-400 hover:text-[#D4AF37] hover:bg-[#222] rounded-lg transition-colors" title="الشهر السابق">
-                          <Icons.ChevronRight size={20} />
-                      </button>
-                      <div className="text-lg font-bold min-w-[100px] text-center cursor-pointer hover:text-[#D4AF37] transition-colors" onClick={goToToday} title="العودة للشهر الحالي">
-                          {monthNames[calMonth]} {calYear}
-                      </div>
-                      <button onClick={nextMonth} className="p-2 text-gray-400 hover:text-[#D4AF37] hover:bg-[#222] rounded-lg transition-colors" title="الشهر القادم">
-                          <Icons.ChevronLeft size={20} />
-                      </button>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-7 gap-1 md:gap-2 mb-4 text-center font-bold text-gray-500 text-xs md:text-sm uppercase tracking-wider"><div>الأحد</div><div>الإثنين</div><div>الثلاثاء</div><div>الأربعاء</div><div>الخميس</div><div>الجمعة</div><div>السبت</div></div>
-                <div className="grid grid-cols-7 gap-1 md:gap-2">
-                  {days.map((day, idx) => {
-                    if (!day) return <div key={`empty-${idx}`} className="h-20 md:h-28 bg-black/20 rounded-xl border border-transparent"></div>;
-                    const dateStr = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                    const dayBookings = bookings.filter(b => b.date === dateStr);
-                    return (
-                      <div key={idx} onClick={() => onDayClick(dateStr)} className={`h-20 md:h-28 p-1 md:p-2 rounded-xl border cursor-pointer hover:border-[#D4AF37] transition-all group ${dayBookings.length > 0 ? 'border-[#D4AF37]/40 bg-[#D4AF37]/5' : 'border-[#222] bg-black/40'}`}>
-                        <span className={`text-xs md:text-sm font-bold ${dayBookings.length > 0 ? 'text-[#D4AF37]' : 'text-gray-500'}`}>{day}</span>
-                        <div className="mt-1 space-y-1 overflow-y-auto max-h-[70%] no-scrollbar">
-                          {dayBookings.map((b, i) => (<div key={i} onClick={(e) => { e.stopPropagation(); setSelectedAlertBooking(b); }} className="text-[9px] md:text-[10px] bg-[#D4AF37] text-black px-1.5 py-0.5 rounded font-bold truncate flex items-center gap-1 hover:scale-105 transition-transform"><Icons.Camera size={10} /> {b.groomName}</div>))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
                 {/* Upcoming Queue */}
                 <div className="lg:col-span-2 bg-[#111] p-6 rounded-3xl border border-[#222] shadow-xl">
@@ -1356,41 +1320,20 @@
                         <div className="bg-[#111] p-6 rounded-2xl border border-[#333]">
                           <h3 className="text-xl text-white mb-4 flex items-center gap-2"><Icons.CalendarIcon size={20} className="text-[#D4AF37]"/> تفاصيل المناسبة</h3>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="flex flex-col sm:flex-row gap-2">
-                                <div className="flex-1">
-                                    <SelectField label="نوع السيشن" value={formData.sessionType} onChange={e => setFormData({...formData, sessionType: e.target.value})} options={settings.sessionTypes} />
-                                </div>
-                                {formData.sessionType === 'آخر' && (
-                                    <div className="flex-1">
-                                        <InputField label="تفاصيل نوع السيشن" value={formData.otherSessionType} onChange={e=>setFormData({...formData, otherSessionType: e.target.value})} required />
-                                    </div>
-                                )}
+                            <div>
+                                <SelectField label="نوع السيشن" value={formData.sessionType} onChange={e => setFormData({...formData, sessionType: e.target.value})} options={settings.sessionTypes} />
+                                {formData.sessionType === 'آخر' && <div className="mt-2"><InputField label="تفاصيل نوع السيشن" value={formData.otherSessionType} onChange={e=>setFormData({...formData, otherSessionType: e.target.value})} required /></div>}
                             </div>
-                            
                             <InputField label="تاريخ المناسبة" type="date" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} required />
-                            
-                            <div className="flex flex-col sm:flex-row gap-2">
-                                <div className="flex-1">
-                                    <SelectField label="اللوكيشن الأساسي" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} options={['', ...settings.locations]} />
-                                </div>
-                                {formData.location === 'آخر' && (
-                                    <div className="flex-1">
-                                        <InputField label="تفاصيل اللوكيشن" value={formData.otherLocation} onChange={e=>setFormData({...formData, otherLocation: e.target.value})} required />
-                                    </div>
-                                )}
+                            <div>
+                                <SelectField label="اللوكيشن الأساسي" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} options={['', ...settings.locations]} />
+                                {formData.location === 'آخر' && <div className="mt-2"><InputField label="تفاصيل اللوكيشن" value={formData.otherLocation} onChange={e=>setFormData({...formData, otherLocation: e.target.value})} required /></div>}
                             </div>
-                            
                             {isPhotoBooking && (
                                 <>
-                                    <div className="flex flex-col sm:flex-row gap-2">
-                                        <div className="flex-1">
-                                            <SelectField label="مكان تصوير الكاجوال (اختياري)" value={formData.casualLocation} onChange={e => setFormData({...formData, casualLocation: e.target.value})} options={['', ...settings.casualLocations]} />
-                                        </div>
-                                        {formData.casualLocation === 'آخر' && (
-                                            <div className="flex-1">
-                                                <InputField label="تفاصيل مكان الكاجوال" value={formData.otherCasualLocation} onChange={e=>setFormData({...formData, otherCasualLocation: e.target.value})} required />
-                                            </div>
-                                        )}
+                                    <div>
+                                        <SelectField label="مكان تصوير الكاجوال (اختياري)" value={formData.casualLocation} onChange={e => setFormData({...formData, casualLocation: e.target.value})} options={['', ...settings.casualLocations]} />
+                                        {formData.casualLocation === 'آخر' && <div className="mt-2"><InputField label="تفاصيل مكان الكاجوال" value={formData.otherCasualLocation} onChange={e=>setFormData({...formData, otherCasualLocation: e.target.value})} required /></div>}
                                     </div>
                                     <InputField label="اسم الميك أب" value={formData.makeupArtist} onChange={e => setFormData({...formData, makeupArtist: e.target.value})} />
                                     <InputField label="وقت الخروج من الميك أب" type="time" value={formData.makeupLeaveTime} onChange={e => setFormData({...formData, makeupLeaveTime: e.target.value})} />
@@ -1684,7 +1627,6 @@
                             const ctx = canvas.getContext('2d');
                             ctx.drawImage(img, 0, 0, width, height);
                             
-                            // الحفظ بصيغة PNG للحفاظ على الشفافية وتجنب الخلفية السوداء
                             const dataUrl = canvas.toDataURL('image/png');
                             updateField('studioLogo', dataUrl);
                         };
@@ -1978,3 +1920,4 @@
     </script>
 </body>
 </html>
+
