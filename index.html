@@ -337,6 +337,17 @@
                 }
             };
 
+            const deleteSubscriber = async (uid, email) => {
+                if(window.confirm(`هل أنت متأكد من حذف المشترك (${email}) نهائياً من قاعدة البيانات؟`)) {
+                    try {
+                        await firebase.firestore().collection('subscribers').doc(uid).delete();
+                        showToast("تم حذف المشترك بنجاح");
+                    } catch(e) {
+                        showToast("حدث خطأ أثناء محاولة الحذف", "error");
+                    }
+                }
+            };
+
             return (
                 <div className="animate-fadeIn space-y-6 pb-10">
                     <header className="border-b border-[#222] pb-4">
@@ -349,6 +360,7 @@
                             <thead className="bg-black/40 border-b border-[#222]">
                                 <tr>
                                     <th className="p-4 text-gray-400 font-medium">البريد الإلكتروني</th>
+                                    <th className="p-4 text-gray-400 font-medium">رقم الهاتف</th>
                                     <th className="p-4 text-gray-400 font-medium">تاريخ التسجيل</th>
                                     <th className="p-4 text-gray-400 font-medium">الحالة</th>
                                     <th className="p-4 text-center text-gray-400 font-medium">إجراءات الإدارة</th>
@@ -358,6 +370,7 @@
                                 {subscribers.map(sub => (
                                     <tr key={sub.uid} className="hover:bg-[#1a1a1a] transition-colors">
                                         <td className="p-4 font-mono font-bold text-white">{sub.email}</td>
+                                        <td className="p-4 font-mono text-gray-300">{sub.phone || 'غير مسجل'}</td>
                                         <td className="p-4 text-sm text-gray-400">{new Date(sub.createdAt).toLocaleDateString('ar-EG')}</td>
                                         <td className="p-4">
                                             {sub.isActive ? 
@@ -365,17 +378,24 @@
                                                 <span className="bg-red-500/20 text-red-400 px-3 py-1 rounded-full text-xs font-bold">موقوف</span>
                                             }
                                         </td>
-                                        <td className="p-4 text-center">
+                                        <td className="p-4 text-center flex justify-center gap-2">
                                             <button 
                                                 onClick={() => toggleStatus(sub.uid, sub.isActive)}
-                                                className={`px-4 py-2 rounded-xl font-bold text-sm transition-colors ${sub.isActive ? 'bg-red-900/30 text-red-500 hover:bg-red-600 hover:text-white' : 'bg-green-900/30 text-green-500 hover:bg-green-600 hover:text-white'}`}
+                                                className={`px-4 py-2 rounded-xl font-bold text-sm transition-colors ${sub.isActive ? 'bg-orange-900/30 text-orange-500 hover:bg-orange-600 hover:text-white' : 'bg-green-900/30 text-green-500 hover:bg-green-600 hover:text-white'}`}
                                             >
                                                 {sub.isActive ? 'إيقاف الحساب' : 'تفعيل الحساب'}
+                                            </button>
+                                            <button 
+                                                onClick={() => deleteSubscriber(sub.uid, sub.email)}
+                                                className="px-3 py-2 bg-red-900/30 text-red-500 hover:bg-red-600 hover:text-white rounded-xl transition-colors"
+                                                title="حذف المشترك نهائياً"
+                                            >
+                                                <Icons.Trash2 size={18} />
                                             </button>
                                         </td>
                                     </tr>
                                 ))}
-                                {subscribers.length === 0 && <tr><td colSpan="4" className="text-center p-10 text-gray-500">لا يوجد مشتركون بعد.</td></tr>}
+                                {subscribers.length === 0 && <tr><td colSpan="5" className="text-center p-10 text-gray-500">لا يوجد مشتركون بعد.</td></tr>}
                             </tbody>
                         </table>
                     </div>
@@ -586,11 +606,18 @@
         function LoginScreen({ onLogin, isFirebaseActive, showToast, settings }) {
             const [email, setEmail] = useState('');
             const [password, setPassword] = useState('');
+            const [phone, setPhone] = useState(''); // New state for phone number
             const [isLoading, setIsLoading] = useState(false);
             const [isRegistering, setIsRegistering] = useState(false);
             
             const handleAuth = async (e) => {
                 e.preventDefault(); 
+                
+                if (isRegistering && (!phone || phone.trim() === '')) {
+                     showToast("يرجى إدخال رقم الهاتف الخاص بك للتسجيل.", "error");
+                     return;
+                }
+
                 setIsLoading(true);
                 if (isFirebaseActive && window.firebase) {
                     try {
@@ -598,18 +625,19 @@
                         if (isRegistering) {
                             userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
                             
-                            // 1. Add to global subscribers list
+                            // 1. Add to global subscribers list with Phone Number
                             await firebase.firestore().collection('subscribers').doc(userCredential.user.uid).set({
                                 uid: userCredential.user.uid,
                                 email: userCredential.user.email,
+                                phone: phone, // Save phone number
                                 createdAt: new Date().toISOString(),
-                                isActive: true // Admin can later change this to false
+                                isActive: true 
                             });
                             
                             // 2. Set default config for new studio
                             await firebase.firestore().collection('users').doc(userCredential.user.uid).collection('settings').doc('config').set(DEFAULT_SETTINGS);
                             
-                            showToast("تم إنشاء الحساب بنجاح!");
+                            showToast("🎉 شكراً لاشتراكك معنا! تم إنشاء حساب الاستوديو الخاص بك بنجاح.");
                         } else {
                             userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
                             showToast("تم تسجيل الدخول!");
@@ -643,19 +671,71 @@
                                 <img src={settings?.studioLogo || LOGO_URL} className="w-full h-full object-cover" />
                             </div>
                             <h1 className="text-2xl font-bold text-[#D4AF37]">{settings?.studioName || 'نظام إدارة الاستوديو'}</h1>
-                            <p className="text-gray-400 text-sm mt-2">قم بتسجيل الدخول للوصول لبياناتك</p>
+                            <p className="text-gray-400 text-sm mt-2">
+                                {isRegistering ? 'أدخل بياناتك لإنشاء حساب جديد كاستوديو' : 'قم بتسجيل الدخول للوصول لبياناتك'}
+                            </p>
                         </div>
+                        
+                        {isRegistering && (
+                            <div className="bg-gradient-to-r from-green-900/30 to-emerald-900/30 border border-green-500/40 p-4 rounded-2xl mb-6 text-center shadow-lg">
+                                <h4 className="text-green-400 font-bold text-lg mb-2 flex items-center justify-center gap-2">
+                                    <Icons.CheckCircle size={20} /> اشتراك مدى الحياة
+                                </h4>
+                                <p className="text-sm text-gray-300 leading-relaxed">
+                                    تكلفة الاشتراك <span className="font-bold text-white bg-black/40 px-2 py-0.5 rounded mx-1">150 جنيه</span> فقط للإصدار الحالي.<br/>
+                                    يرجى الدفع عبر <b>إنستاباي (InstaPay)</b> أو <b>فودافون كاش</b> على الرقم:
+                                </p>
+                                <div className="text-2xl font-mono text-[#D4AF37] font-black mt-3 bg-black/60 py-2 rounded-xl border border-[#D4AF37]/30 tracking-widest">
+                                    01126810107
+                                </div>
+                            </div>
+                        )}
+
                         <form onSubmit={handleAuth} className="space-y-4">
-                            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required className="w-full bg-black border border-[#333] text-white rounded-xl p-3 outline-none focus:border-[#D4AF37]" placeholder="البريد الإلكتروني" />
-                            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required className="w-full bg-black border border-[#333] text-white rounded-xl p-3 outline-none focus:border-[#D4AF37]" placeholder="كلمة المرور" minLength="6" />
+                            <input 
+                                type="email" 
+                                value={email} 
+                                onChange={e => setEmail(e.target.value)} 
+                                required 
+                                className="w-full bg-black border border-[#333] text-white rounded-xl p-3 outline-none focus:border-[#D4AF37]" 
+                                placeholder="البريد الإلكتروني (لتسجيل الدخول)" 
+                            />
+                            
+                            {isRegistering && (
+                                <input 
+                                    type="tel" 
+                                    value={phone} 
+                                    onChange={e => setPhone(e.target.value)} 
+                                    required 
+                                    className="w-full bg-black border border-[#333] text-white rounded-xl p-3 outline-none focus:border-[#D4AF37]" 
+                                    placeholder="رقم هاتف الاستوديو للتواصل (إجباري)" 
+                                />
+                            )}
+
+                            <input 
+                                type="password" 
+                                value={password} 
+                                onChange={e => setPassword(e.target.value)} 
+                                required 
+                                className="w-full bg-black border border-[#333] text-white rounded-xl p-3 outline-none focus:border-[#D4AF37]" 
+                                placeholder="كلمة المرور" 
+                                minLength="6" 
+                            />
+                            
                             <button type="submit" disabled={isLoading} className="w-full bg-[#D4AF37] text-black font-bold py-3 rounded-xl hover:bg-yellow-500 transition-colors">
                                 {isLoading ? 'جاري التحميل...' : (isRegistering ? 'إنشاء حساب جديد' : 'تسجيل الدخول')}
                             </button>
                         </form>
                         {isFirebaseActive && (
                             <div className="mt-4 text-center">
-                                <button onClick={() => setIsRegistering(!isRegistering)} className="text-gray-500 text-sm hover:text-[#D4AF37] transition-colors">
-                                    {isRegistering ? 'لديك حساب؟ سجل الدخول' : 'ليس لديك حساب؟ أنشئ حساب جديد'}
+                                <button 
+                                    onClick={() => {
+                                        setIsRegistering(!isRegistering);
+                                        setPhone(''); // Clear phone when switching modes
+                                    }} 
+                                    className="text-gray-500 text-sm hover:text-[#D4AF37] transition-colors"
+                                >
+                                    {isRegistering ? 'لديك حساب بالفعل؟ سجل الدخول من هنا' : 'ليس لديك حساب؟ أنشئ حساب جديد لاستوديوهات أخرى'}
                                 </button>
                             </div>
                         )}
