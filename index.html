@@ -6,13 +6,16 @@
     <title>Studio Management System</title>
     
     <!-- الأيقونة الجديدة للتبويب -->
-    <link rel="icon" type="image/png" href="https://messages-prod.27c852f3500f38c1e7786e2c9ff9e48f.r2.cloudflarestorage.com/019c32e5-b2a2-717c-932f-e2bfcdd426dd/1773251968197-019cde0d-1c4f-7e08-be43-ba5de3e0701c.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=75514238966d6677c3874ef9149f1398%2F20260311%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260311T175928Z&X-Amz-Expires=3600&X-Amz-Signature=c5c38dab2f155957d1f36be1e1c5c098fac9ea4654073b58a5462d0b2beceeaa&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject">
+    <link rel="icon" type="image/png" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhQKni80xTpbel7KoC02ERsBCqwsvtC-Ua75S2z4XaDzt6B6XT3jfyOXN-gvjNDhzz_xWwO7n2hVqE4AAItwCN2u5uoQb_N6RglYpymqNuBBZvFG6H2ZqCNPV-LQsx0RhfsN_N9AnnqM6ApioUohuOQpcLOZ2iuuIWMFK3gvc5UbFe6S2FQVWr9OU1zq_w/w640-h640/ChatGPT%20Image%20Mar%2011,%202026,%2008_24_10%20PM.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
     
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- مكتبة تحويل الـ HTML إلى صورة -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
@@ -78,7 +81,7 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo } = React;
 
-        // ⚠️ إيميل المدير العام (Super Admin) - قم بتغييره إلى إيميلك الشخصي
+        // ⚠️ إيميل المدير العام (Super Admin)
         const ADMIN_EMAIL = "mrakbyph@gmail.com";
 
         // --- Mock Lucide Icons ---
@@ -117,7 +120,9 @@
             ChevronRight: (props) => <Icon path="<path d='m9 18 6-6-6-6'/>" {...props}/>,
             ChevronLeft: (props) => <Icon path="<path d='m15 18-6-6 6-6'/>" {...props}/>,
             ClockIcon: (props) => <Icon path="<circle cx='12' cy='12' r='10'/><polyline points='12 6 12 12 16 14'/>" {...props}/>,
-            Shield: (props) => <Icon path="<path d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/>" {...props}/>
+            Shield: (props) => <Icon path="<path d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/>" {...props}/>,
+            ImageIcon: (props) => <Icon path="<rect width='18' height='18' x='3' y='3' rx='2' ry='2'/><circle cx='9' cy='9' r='2'/><path d='m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21'/>" {...props}/>,
+            Copy: (props) => <Icon path="<rect width='14' height='14' x='8' y='8' rx='2' ry='2'/><path d='M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2'/>" {...props}/>
         };
 
         // --- Firebase Configuration ---
@@ -133,13 +138,13 @@
 
         let isFirebaseActive = false;
 
-        // الصورة الجديدة التي تم اختيارها للاستخدام كأيقونة واسم افتراضي للصورة الشخصية
-        const LOGO_URL = "https://messages-prod.27c852f3500f38c1e7786e2c9ff9e48f.r2.cloudflarestorage.com/019c32e5-b2a2-717c-932f-e2bfcdd426dd/1773251968197-019cde0d-1c4f-7e08-be43-ba5de3e0701c.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=75514238966d6677c3874ef9149f1398%2F20260311%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260311T175928Z&X-Amz-Expires=3600&X-Amz-Signature=c5c38dab2f155957d1f36be1e1c5c098fac9ea4654073b58a5462d0b2beceeaa&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject";
+        // الصورة الصحيحة الجديدة
+        const LOGO_URL = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhQKni80xTpbel7KoC02ERsBCqwsvtC-Ua75S2z4XaDzt6B6XT3jfyOXN-gvjNDhzz_xWwO7n2hVqE4AAItwCN2u5uoQb_N6RglYpymqNuBBZvFG6H2ZqCNPV-LQsx0RhfsN_N9AnnqM6ApioUohuOQpcLOZ2iuuIWMFK3gvc5UbFe6S2FQVWr9OU1zq_w/w640-h640/ChatGPT%20Image%20Mar%2011,%202026,%2008_24_10%20PM.png";
 
         // --- Default Settings ---
         const DEFAULT_SETTINGS = {
-          studioName: "", // اسم الاستوديو فارغ لكي يقوم المشترك بملئه
-          studioLogo: "", // فارغ أيضاً، وفي حال كان فارغاً يتم استخدام LOGO_URL كصورة افتراضية
+          studioName: "", 
+          studioLogo: LOGO_URL, 
           packages: [
             { id: 'p1', name: 'Wedding Basic', price: 5000 },
             { id: 'p2', name: 'Wedding Premium', price: 10000 },
@@ -175,7 +180,6 @@
           ]
         };
 
-        // Helper to generate Google Calendar Link
         const generateGoogleCalendarLink = (booking, studioName) => {
             const dateObj = new Date(booking.date);
             if (isNaN(dateObj)) return "";
@@ -225,7 +229,6 @@
             return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startStr}/${endStr}&details=${encodeURIComponent(desc)}&location=${encodeURIComponent(loc || '')}`;
         };
 
-        // --- Shared Helper Components ---
         function InputField({ label, type = "text", value, onChange, placeholder, required }) {
           return (
             <div className="flex flex-col w-full">
@@ -263,7 +266,6 @@
           );
         }
 
-        // --- Carousel Component for Alerts ---
         function AnimatedAlertBox({ alerts, title, icon, onClick, type }) {
             const [index, setIndex] = useState(0);
 
@@ -318,9 +320,10 @@
             );
         }
 
-        // --- Admin Components ---
         function AdminDashboard({ showToast }) {
             const [subscribers, setSubscribers] = useState([]);
+            const [editingSub, setEditingSub] = useState(null);
+            const [editForm, setEditForm] = useState({ email: '', phone: '', addDays: 0 });
             
             useEffect(() => {
                 if(!window.firebase) return;
@@ -340,7 +343,7 @@
             };
 
             const deleteSubscriber = async (uid, email) => {
-                if(window.confirm(`هل أنت متأكد من حذف المشترك (${email}) نهائياً من قاعدة البيانات؟`)) {
+                if(window.confirm(`هل أنت متأكد من حذف المشترك (${email || 'بدون إيميل'}) نهائياً من قاعدة البيانات؟`)) {
                     try {
                         await firebase.firestore().collection('subscribers').doc(uid).delete();
                         showToast("تم حذف المشترك بنجاح");
@@ -350,8 +353,54 @@
                 }
             };
 
+            const openEdit = (sub) => {
+                setEditingSub(sub);
+                setEditForm({ email: sub.email || '', phone: sub.phone || '', addDays: 0 });
+            };
+
+            const saveEdit = async () => {
+                if (!editingSub) return;
+                try {
+                    let updateData = { email: editForm.email, phone: editForm.phone };
+                    if (editForm.addDays > 0) {
+                        const currentEnd = editingSub.trialEndsAt ? new Date(editingSub.trialEndsAt) : new Date();
+                        currentEnd.setDate(currentEnd.getDate() + Number(editForm.addDays));
+                        updateData.trialEndsAt = currentEnd.toISOString();
+                        updateData.isActive = true; 
+                    }
+                    await firebase.firestore().collection('subscribers').doc(editingSub.uid).update(updateData);
+                    showToast("تم تحديث بيانات المشترك بنجاح!");
+                    setEditingSub(null);
+                } catch(e) {
+                    showToast("خطأ في تحديث البيانات", "error");
+                }
+            };
+
             return (
-                <div className="animate-fadeIn space-y-6 pb-10">
+                <div className="animate-fadeIn space-y-6 pb-10 relative">
+                    
+                    {editingSub && (
+                        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[80] p-4 animate-fadeIn">
+                            <div className="bg-[#111] border border-[#D4AF37]/30 p-6 rounded-3xl w-full max-w-md shadow-2xl">
+                                <h3 className="text-xl font-bold text-[#D4AF37] mb-6 flex items-center gap-2">
+                                    <Icons.Edit size={20} /> تعديل بيانات المشترك
+                                </h3>
+                                <div className="space-y-4">
+                                    <InputField label="البريد الإلكتروني" value={editForm.email} onChange={e => setEditForm({...editForm, email: e.target.value})} />
+                                    <InputField label="رقم الهاتف" value={editForm.phone} onChange={e => setEditForm({...editForm, phone: e.target.value})} />
+                                    <div className="border-t border-[#333] pt-4 mt-4">
+                                        <InputField label="تمديد الفترة التجريبية (إضافة أيام)" type="number" placeholder="مثال: 5" value={editForm.addDays} onChange={e => setEditForm({...editForm, addDays: e.target.value})} />
+                                        <p className="text-xs text-gray-500 mt-1">تنبيه: الإيميل يتحدث في قاعدة البيانات كمرجع لك، لا يغير بيانات الدخول الخاصة بـ Firebase للمستخدم القديم.</p>
+                                    </div>
+                                    <div className="flex gap-4 pt-4">
+                                        <button onClick={() => setEditingSub(null)} className="flex-1 py-3 bg-[#222] hover:bg-[#333] text-white rounded-xl transition-colors font-bold">إلغاء</button>
+                                        <button onClick={saveEdit} className="flex-1 py-3 bg-[#D4AF37] hover:bg-yellow-500 text-black rounded-xl transition-colors font-bold">حفظ التعديلات</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     <header className="border-b border-[#222] pb-4">
                         <h2 className="text-3xl font-bold text-[#D4AF37] flex items-center gap-2"><Icons.Shield size={30} /> لوحة تحكم الإدارة العليا</h2>
                         <p className="text-gray-400 mt-1">إدارة الاستوديوهات والمصورين المشتركين في النظام.</p>
@@ -361,8 +410,7 @@
                         <table className="w-full text-right">
                             <thead className="bg-black/40 border-b border-[#222]">
                                 <tr>
-                                    <th className="p-4 text-gray-400 font-medium">البريد الإلكتروني</th>
-                                    <th className="p-4 text-gray-400 font-medium">رقم الهاتف</th>
+                                    <th className="p-4 text-gray-400 font-medium">البريد الإلكتروني / الهاتف</th>
                                     <th className="p-4 text-gray-400 font-medium">تاريخ التسجيل</th>
                                     <th className="p-4 text-gray-400 font-medium">الحالة</th>
                                     <th className="p-4 text-center text-gray-400 font-medium">إجراءات الإدارة</th>
@@ -377,19 +425,28 @@
 
                                     return (
                                         <tr key={sub.uid} className="hover:bg-[#1a1a1a] transition-colors">
-                                            <td className="p-4 font-mono font-bold text-white">{sub.email}</td>
-                                            <td className="p-4 font-mono text-gray-300">{sub.phone || 'غير مسجل'}</td>
+                                            <td className="p-4">
+                                                <p className="font-mono font-bold text-white text-sm">{sub.phone || '---'}</p>
+                                                <p className="text-xs text-gray-500 mt-1">{sub.email || '---'}</p>
+                                            </td>
                                             <td className="p-4 text-sm text-gray-400">{new Date(sub.createdAt).toLocaleDateString('ar-EG')}</td>
                                             <td className="p-4">{statusDisplay}</td>
                                             <td className="p-4 text-center flex justify-center gap-2">
                                                 <button 
+                                                    onClick={() => openEdit(sub)}
+                                                    className="px-3 py-2 bg-blue-900/30 text-blue-500 hover:bg-blue-600 hover:text-white rounded-xl transition-colors"
+                                                    title="تعديل البيانات وتمديد التجربة"
+                                                >
+                                                    <Icons.Edit size={18} />
+                                                </button>
+                                                <button 
                                                     onClick={() => toggleStatus(sub.uid, sub.isActive)}
                                                     className={`px-4 py-2 rounded-xl font-bold text-sm transition-colors ${sub.isActive ? 'bg-orange-900/30 text-orange-500 hover:bg-orange-600 hover:text-white' : 'bg-green-900/30 text-green-500 hover:bg-green-600 hover:text-white'}`}
                                                 >
-                                                    {sub.isActive ? 'إيقاف الحساب' : 'تفعيل الحساب'}
+                                                    {sub.isActive ? 'إيقاف' : 'تفعيل'}
                                                 </button>
                                                 <button 
-                                                    onClick={() => deleteSubscriber(sub.uid, sub.email)}
+                                                    onClick={() => deleteSubscriber(sub.uid, sub.email || sub.phone)}
                                                     className="px-3 py-2 bg-red-900/30 text-red-500 hover:bg-red-600 hover:text-white rounded-xl transition-colors"
                                                     title="حذف المشترك نهائياً"
                                                 >
@@ -399,7 +456,7 @@
                                         </tr>
                                     );
                                 })}
-                                {subscribers.length === 0 && <tr><td colSpan="5" className="text-center p-10 text-gray-500">لا يوجد مشتركون بعد.</td></tr>}
+                                {subscribers.length === 0 && <tr><td colSpan="4" className="text-center p-10 text-gray-500">لا يوجد مشتركون بعد.</td></tr>}
                             </tbody>
                         </table>
                     </div>
@@ -421,8 +478,17 @@
           });
           const [settings, setSettings] = useState(() => {
               const saved = localStorage.getItem('mrakby_settings');
-              return saved ? JSON.parse(saved) : DEFAULT_SETTINGS;
+              if (saved) {
+                  let parsed = JSON.parse(saved);
+                  // Clean up old broken cache links
+                  if (parsed.studioLogo && (parsed.studioLogo.includes('Gemini_Generated_Image') || parsed.studioLogo.includes('messages-prod'))) {
+                      parsed.studioLogo = LOGO_URL;
+                  }
+                  return parsed;
+              }
+              return DEFAULT_SETTINGS;
           });
+          
           const [currentView, setCurrentView] = useState('dashboard');
           const [contractToPrint, setContractToPrint] = useState(null);
           const [toast, setToast] = useState(null);
@@ -454,7 +520,6 @@
                                                     alert("تم إيقاف حسابك من قبل الإدارة. يرجى التواصل لتفعيل الحساب.");
                                                     setUser(null);
                                                 } else {
-                                                    // Check Trial Period
                                                     if (data.trialEndsAt) {
                                                         const trialEnd = new Date(data.trialEndsAt);
                                                         if (new Date() > trialEnd) {
@@ -468,11 +533,10 @@
                                                              setUser(usr);
                                                         }
                                                     } else {
-                                                        setUser(usr); // fully active, no trial
+                                                        setUser(usr); 
                                                     }
                                                 }
                                             } else {
-                                                // Fallback if doc missing but somehow logged in
                                                 setUser(usr);
                                             }
                                             setIsCheckingAuth(false);
@@ -565,7 +629,7 @@
 
               <div className="md:hidden flex items-center justify-between bg-[#111] p-4 border-b border-[#D4AF37]/30">
                 <h1 className="text-[#D4AF37] font-bold text-xl flex items-center gap-2">
-                  <img src={settings.studioLogo || LOGO_URL} alt="Logo" className="w-8 h-8 rounded-full border border-[#D4AF37] object-cover bg-white" /> {settings.studioName || 'اسم الاستوديو'}
+                  <img src={settings?.studioLogo || LOGO_URL} onError={(e) => { e.target.onerror = null; e.target.src = LOGO_URL; }} alt="Logo" crossOrigin="anonymous" className="w-8 h-8 rounded-full border border-[#D4AF37] object-cover bg-white" /> {settings?.studioName || 'اسم الاستوديو'}
                 </h1>
                 <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-[#D4AF37]">
                   {isMobileMenuOpen ? <Icons.X size={28} /> : <Icons.LayoutDashboard size={28} />}
@@ -576,10 +640,10 @@
                 <aside className={`${isMobileMenuOpen ? 'block' : 'hidden'} md:block w-full md:w-64 bg-[#111] border-l border-[#222] p-6 flex-shrink-0 transition-all flex flex-col`}>
                   <div className="hidden md:flex items-center gap-3 mb-10">
                     <div className="p-1 rounded-full border-2 border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.2)]">
-                        <img src={settings.studioLogo || LOGO_URL} className="w-12 h-12 rounded-full object-cover bg-white" />
+                        <img src={settings?.studioLogo || LOGO_URL} onError={(e) => { e.target.onerror = null; e.target.src = LOGO_URL; }} crossOrigin="anonymous" className="w-12 h-12 rounded-full object-cover bg-white" />
                     </div>
                     <div className="overflow-hidden">
-                        <h1 className="text-[#D4AF37] font-bold text-lg leading-tight truncate" title={settings.studioName}>{settings.studioName || 'اسم الاستوديو'}</h1>
+                        <h1 className="text-[#D4AF37] font-bold text-lg leading-tight truncate" title={settings?.studioName}>{settings?.studioName || 'اسم الاستوديو'}</h1>
                         <p className="text-xs text-gray-400 tracking-widest uppercase">Photography</p>
                     </div>
                   </div>
@@ -589,7 +653,6 @@
                             <NavItem icon={<Icons.LayoutDashboard />} label="الرئيسية" active={currentView === 'dashboard'} onClick={() => {setCurrentView('dashboard'); setIsMobileMenuOpen(false);}} />
                             <NavItem icon={<Icons.PlusCircle />} label="حجز جديد" active={currentView === 'new'} onClick={() => navigateToNewBooking('')} />
                             <NavItem icon={<Icons.Users />} label="العملاء" active={currentView === 'clients'} onClick={() => {setCurrentView('clients'); setIsMobileMenuOpen(false);}} />
-                            <NavItem icon={<Icons.CalendarIcon />} label="التقويم" active={currentView === 'calendar'} onClick={() => {setCurrentView('calendar'); setIsMobileMenuOpen(false);}} />
                             <NavItem icon={<Icons.Settings />} label="الإعدادات" active={currentView === 'settings'} onClick={() => {setCurrentView('settings'); setIsMobileMenuOpen(false);}} />
                         </>
                     ) : (
@@ -602,23 +665,29 @@
                     </button>
                     <div className="p-4 bg-black/50 rounded-xl border border-[#D4AF37]/20 text-center">
                       <p className="text-xs text-gray-500 mb-1">Studio ID</p>
-                      <p className="font-mono text-[#D4AF37] font-bold uppercase">#{settings.studioName ? settings.studioName.substring(0,4) : 'STUDIO'}_USER</p>
+                      <p className="font-mono text-[#D4AF37] font-bold uppercase">#{settings?.studioName ? settings.studioName.substring(0,4) : 'STUDIO'}_USER</p>
                     </div>
                   </div>
                 </aside>
 
-                <main className="flex-1 p-4 md:p-8 overflow-y-auto">
-                  {isAdmin ? (
-                      <AdminDashboard showToast={showToast} />
-                  ) : (
-                      <>
-                          {currentView === 'dashboard' && <Dashboard bookings={bookings} settings={settings} />}
-                          {currentView === 'new' && <NewBooking settings={settings} initialDate={initialBookingDate} user={user} isFirebaseActive={isFirebaseActiveState} onSuccess={(newB) => { if(!isFirebaseActiveState) setBookings([newB, ...bookings].sort((a, b) => new Date(b.date) - new Date(a.date))); setCurrentView('clients'); }} showToast={showToast} />}
-                          {currentView === 'clients' && <ClientsList bookings={bookings} settings={settings} onPrint={setContractToPrint} showToast={showToast} user={user} isFirebaseActive={isFirebaseActiveState} onLocalDelete={(id) => setBookings(bookings.filter(b => b.id !== id))} />}
-                          {currentView === 'calendar' && <CalendarView bookings={bookings} onDayClick={navigateToNewBooking} settings={settings} showToast={showToast} />}
-                          {currentView === 'settings' && <SettingsView settings={settings} user={user} isFirebaseActive={isFirebaseActiveState} onLocalSave={(s) => setSettings(s)} showToast={showToast} />}
-                      </>
-                  )}
+                <main className="flex-1 p-4 md:p-8 overflow-y-auto flex flex-col">
+                  <div className="flex-1">
+                      {isAdmin ? (
+                          <AdminDashboard showToast={showToast} />
+                      ) : (
+                          <>
+                              {currentView === 'dashboard' && <Dashboard bookings={bookings} settings={settings} onDayClick={navigateToNewBooking} />}
+                              {currentView === 'new' && <NewBooking settings={settings} initialDate={initialBookingDate} user={user} isFirebaseActive={isFirebaseActiveState} onSuccess={(newB) => { if(!isFirebaseActiveState) setBookings([newB, ...bookings].sort((a, b) => new Date(b.date) - new Date(a.date))); setCurrentView('clients'); }} showToast={showToast} />}
+                              {currentView === 'clients' && <ClientsList bookings={bookings} settings={settings} onPrint={setContractToPrint} showToast={showToast} user={user} isFirebaseActive={isFirebaseActiveState} onLocalDelete={(id) => setBookings(bookings.filter(b => b.id !== id))} />}
+                              {currentView === 'settings' && <SettingsView settings={settings} user={user} isFirebaseActive={isFirebaseActiveState} onLocalSave={(s) => setSettings(s)} showToast={showToast} />}
+                          </>
+                      )}
+                  </div>
+                  
+                  {/* تذييل الموقع (Footer) */}
+                  <footer className="mt-12 pt-6 border-t border-[#222] text-center text-gray-500 text-xs font-mono">
+                      Programmer: mrakby | Contact: 01097576073
+                  </footer>
                 </main>
               </div>
             </div>
@@ -628,7 +697,7 @@
         // --- Screens ---
 
         function LoginScreen({ onLogin, isFirebaseActive, showToast, settings }) {
-            const [email, setEmail] = useState('');
+            const [identifier, setIdentifier] = useState('');
             const [password, setPassword] = useState('');
             const [phone, setPhone] = useState(''); 
             const [isLoading, setIsLoading] = useState(false);
@@ -637,45 +706,50 @@
             const handleAuth = async (e) => {
                 e.preventDefault(); 
                 
-                if (isRegistering && (!phone || phone.trim() === '')) {
-                     showToast("يرجى إدخال رقم الهاتف الخاص بك للتسجيل.", "error");
+                if (!identifier.trim()) {
+                     showToast("يرجى إدخال رقم الهاتف أو البريد الإلكتروني.", "error");
                      return;
                 }
 
                 setIsLoading(true);
+
+                const authEmail = identifier.includes('@') ? identifier : `${identifier}@studio.system`;
+
                 if (isFirebaseActive && window.firebase) {
                     try {
                         let userCredential;
                         if (isRegistering) {
-                            userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+                            userCredential = await firebase.auth().createUserWithEmailAndPassword(authEmail, password);
                             
                             const trialEndDate = new Date();
                             trialEndDate.setDate(trialEndDate.getDate() + 5); // 5 Days Trial
+                            
+                            const isPhone = !identifier.includes('@');
 
                             await firebase.firestore().collection('subscribers').doc(userCredential.user.uid).set({
                                 uid: userCredential.user.uid,
-                                email: userCredential.user.email,
-                                phone: phone, 
+                                email: isPhone ? '' : identifier,
+                                phone: isPhone ? identifier : '', 
                                 createdAt: new Date().toISOString(),
                                 isActive: true,
-                                trialEndsAt: trialEndDate.toISOString() // Store trial end date
+                                trialEndsAt: trialEndDate.toISOString() 
                             });
                             
                             await firebase.firestore().collection('users').doc(userCredential.user.uid).collection('settings').doc('config').set(DEFAULT_SETTINGS);
                             
                             showToast("🎉 شكراً لاشتراكك معنا! تم إنشاء حسابك ومنحك 5 أيام تجريبية مجاناً.");
                         } else {
-                            userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+                            userCredential = await firebase.auth().signInWithEmailAndPassword(authEmail, password);
                             showToast("تم تسجيل الدخول!");
                         }
                         onLogin(userCredential.user);
                     } catch (error) {
-                        let msg = error.code === 'auth/email-already-in-use' ? "هذا الإيميل مسجل مسبقاً!" : "بيانات الدخول غير صحيحة!";
+                        let msg = error.code === 'auth/email-already-in-use' ? "هذا الحساب مسجل مسبقاً!" : "بيانات الدخول غير صحيحة!";
                         showToast(msg, "error");
                     }
                 } else {
-                    if(email && password) { 
-                        const usr = { uid: 'local_admin', email }; 
+                    if(identifier && password) { 
+                        const usr = { uid: 'local_admin', email: authEmail }; 
                         localStorage.setItem('mrakby_local_user', JSON.stringify(usr)); 
                         onLogin(usr); 
                         showToast("تم الدخول للوضع المحلي");
@@ -686,6 +760,16 @@
                 setIsLoading(false);
             };
 
+            const handleCopyPhone = () => {
+                const el = document.createElement('textarea');
+                el.value = '01126810107';
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
+                showToast("تم النسخ اذهب لطريقة الدفع وقوم بلصق رقم الهاتف");
+            };
+
             return (
                 <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4 relative overflow-hidden" dir="rtl">
                     <div className="absolute inset-0 opacity-5 pointer-events-none flex items-center justify-center">
@@ -694,7 +778,7 @@
                     <div className="bg-[#111] p-8 rounded-3xl border border-[#D4AF37]/30 w-full max-w-md shadow-2xl relative z-10 mt-8 mb-8">
                         <div className="text-center mb-6">
                             <div className="w-24 h-24 bg-white rounded-full mx-auto mb-4 border-2 border-[#D4AF37] flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(212,175,55,0.3)]">
-                                <img src={settings?.studioLogo || LOGO_URL} className="w-full h-full object-cover" />
+                                <img src={settings?.studioLogo || LOGO_URL} onError={(e) => { e.target.onerror = null; e.target.src = LOGO_URL; }} crossOrigin="anonymous" className="w-full h-full object-cover" />
                             </div>
                             <h1 className="text-3xl font-bold text-[#D4AF37] tracking-wider">{settings?.studioName || 'نظام إدارة الاستوديو'}</h1>
                             <p className="text-gray-400 text-sm mt-2">
@@ -713,33 +797,24 @@
                                     بعدها، تكلفة الاشتراك الدائم هي <span className="font-bold text-white border-b border-green-500">150 جنيه</span> فقط للإصدار الحالي.<br/>
                                 </p>
                                 <div className="bg-black/50 p-3 rounded-xl border border-gray-700/50 text-xs text-gray-400">
-                                    يرجى الدفع عبر <b>إنستاباي (InstaPay)</b> أو <b>فودافون كاش</b> على الرقم:<br/>
-                                    <span className="text-xl font-mono text-[#D4AF37] font-black block mt-2 tracking-widest bg-black/60 py-1 rounded-lg border border-[#D4AF37]/20">01126810107</span>
+                                    يرجى الدفع عبر <b>إنستاباي (InstaPay)</b> أو <b>فودافون كاش</b>
+                                    <button type="button" onClick={handleCopyPhone} className="w-full flex items-center justify-center gap-2 text-base font-mono text-black font-black mt-3 bg-[#D4AF37] py-2.5 rounded-xl border border-[#D4AF37]/30 hover:bg-yellow-500 transition-colors">
+                                        <Icons.Copy size={18} /> نسخ رقم الدفع
+                                    </button>
                                 </div>
                             </div>
                         )}
 
                         <form onSubmit={handleAuth} className="space-y-4">
                             <input 
-                                type="email" 
-                                value={email} 
-                                onChange={e => setEmail(e.target.value)} 
+                                type="text" 
+                                value={identifier} 
+                                onChange={e => setIdentifier(e.target.value)} 
                                 required 
                                 className="w-full bg-black border border-[#333] text-white rounded-xl p-3.5 outline-none focus:border-[#D4AF37] transition-all" 
-                                placeholder="البريد الإلكتروني" 
+                                placeholder="رقم الهاتف أو البريد الإلكتروني" 
                             />
                             
-                            {isRegistering && (
-                                <input 
-                                    type="tel" 
-                                    value={phone} 
-                                    onChange={e => setPhone(e.target.value)} 
-                                    required 
-                                    className="w-full bg-black border border-[#333] text-white rounded-xl p-3.5 outline-none focus:border-[#D4AF37] transition-all" 
-                                    placeholder="رقم هاتف للتواصل (إجباري)" 
-                                />
-                            )}
-
                             <input 
                                 type="password" 
                                 value={password} 
@@ -761,7 +836,7 @@
                                     type="button"
                                     onClick={() => {
                                         setIsRegistering(!isRegistering);
-                                        setPhone(''); 
+                                        setIdentifier(''); 
                                     }} 
                                     className="text-gray-400 text-sm hover:text-[#D4AF37] transition-colors font-medium"
                                 >
@@ -774,15 +849,9 @@
             );
         }
 
-        function Dashboard({ bookings, settings }) {
+        function Dashboard({ bookings, settings, onDayClick }) {
           const [showAmounts, setShowAmounts] = useState(true);
-          const [currentTime, setCurrentTime] = useState(new Date());
           const [selectedAlertBooking, setSelectedAlertBooking] = useState(null);
-
-          useEffect(() => {
-            const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-            return () => clearInterval(timer);
-          }, []);
 
           const { stats, upcoming, tomorrowAlerts, casualAlerts } = useMemo(() => {
             let rev = 0, paid = 0, counts = { 'زفاف': 0, 'خطوبة': 0, 'كاجول': 0, 'حنة': 0, 'كتب كتاب': 0, 'فوتوغرافي': 0 };
@@ -844,6 +913,26 @@
           }, [bookings]);
 
           const formatMoney = (val) => showAmounts ? `${val.toLocaleString()} ج.م` : '••••••';
+          
+          // إعدادات التقويم المدمج
+          const todayDate = new Date();
+          const [calendarDate, setCalendarDate] = useState(new Date(todayDate.getFullYear(), todayDate.getMonth(), 1));
+          
+          const calYear = calendarDate.getFullYear();
+          const calMonth = calendarDate.getMonth(); 
+
+          const nextMonth = () => setCalendarDate(new Date(calYear, calMonth + 1, 1));
+          const prevMonth = () => setCalendarDate(new Date(calYear, calMonth - 1, 1));
+          const goToToday = () => setCalendarDate(new Date(todayDate.getFullYear(), todayDate.getMonth(), 1));
+
+          const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+          const firstDayIndex = new Date(calYear, calMonth, 1).getDay();
+          
+          const days = [];
+          for(let i=0; i<firstDayIndex; i++) days.push(null);
+          for(let i=1; i<=daysInMonth; i++) days.push(i);
+          
+          const monthNames = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
 
           return (
             <div className="space-y-8 animate-fadeIn relative">
@@ -889,22 +978,9 @@
                     <h2 className="text-3xl font-bold">لوحة التحكم 📸</h2>
                     <p className="text-gray-500 mt-1">مرحباً بك في {settings.studioName || 'الاستوديو'}</p>
                 </div>
-                <div className="flex items-center gap-4">
-                    {/* Elegant Digital Clock */}
-                    <div className="flex items-center gap-4 bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] p-3 md:px-5 md:py-3 rounded-2xl border border-[#D4AF37]/30 shadow-[0_0_15px_rgba(212,175,55,0.1)]">
-                        <div className="flex flex-col items-end border-l border-[#D4AF37]/30 pl-4">
-                            <p className="text-sm md:text-base font-bold text-white tracking-wide">{currentTime.toLocaleDateString('ar-EG', { weekday: 'long' })}</p>
-                            <p className="text-[10px] md:text-xs text-[#D4AF37]">{currentTime.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                        </div>
-                        <div className="text-2xl md:text-3xl font-black text-[#D4AF37] font-mono tracking-wider drop-shadow-[0_0_8px_rgba(212,175,55,0.3)]">
-                            {currentTime.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}
-                        </div>
-                    </div>
-
-                    <button onClick={() => setShowAmounts(!showAmounts)} className="text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black transition-all p-3 bg-[#111] rounded-xl border border-[#D4AF37]/30 shadow-lg" title={showAmounts ? 'إخفاء المبالغ' : 'إظهار المبالغ'}>
-                        {showAmounts ? <Icons.EyeOff size={24} /> : <Icons.Eye size={24} />}
-                    </button>
-                </div>
+                <button onClick={() => setShowAmounts(!showAmounts)} className="text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black transition-all p-3 bg-[#111] rounded-xl border border-[#D4AF37]/30 shadow-lg" title={showAmounts ? 'إخفاء المبالغ' : 'إظهار المبالغ'}>
+                    {showAmounts ? <Icons.EyeOff size={24} /> : <Icons.Eye size={24} />}
+                </button>
               </header>
 
               {/* Animated Alert Queue Section */}
@@ -966,6 +1042,44 @@
                       <div className="h-2 bg-black rounded-full overflow-hidden"><div className="h-full bg-gradient-to-l from-[#D4AF37] to-[#B8860B] transition-all duration-1000" style={{ width: `${(m.rev / stats.maxMonthlyRev) * 100}%` }}></div></div>
                     </div>
                   )) : <p className="text-gray-500 text-center py-4">لا توجد بيانات متاحة بعد.</p>}</div>
+                </div>
+              </div>
+              
+              {/* Calendar Section integrated into Dashboard */}
+              <div className="bg-[#111] rounded-3xl border border-[#333] p-6 shadow-2xl mt-8">
+                <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                  <div className="flex items-center gap-2">
+                    <Icons.CalendarIcon className="text-[#D4AF37]" size={24} />
+                    <h3 className="text-[#D4AF37] font-bold text-xl">تقويم الحجوزات</h3>
+                  </div>
+                  <div className="flex items-center gap-4 bg-black/50 px-2 py-1 rounded-xl border border-[#333]">
+                      <button onClick={prevMonth} className="p-2 text-gray-400 hover:text-[#D4AF37] hover:bg-[#222] rounded-lg transition-colors" title="الشهر السابق">
+                          <Icons.ChevronRight size={20} />
+                      </button>
+                      <div className="text-lg font-bold min-w-[100px] text-center cursor-pointer hover:text-[#D4AF37] transition-colors" onClick={goToToday} title="العودة للشهر الحالي">
+                          {monthNames[calMonth]} {calYear}
+                      </div>
+                      <button onClick={nextMonth} className="p-2 text-gray-400 hover:text-[#D4AF37] hover:bg-[#222] rounded-lg transition-colors" title="الشهر القادم">
+                          <Icons.ChevronLeft size={20} />
+                      </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-7 gap-1 md:gap-2 mb-4 text-center font-bold text-gray-500 text-xs md:text-sm uppercase tracking-wider"><div>الأحد</div><div>الإثنين</div><div>الثلاثاء</div><div>الأربعاء</div><div>الخميس</div><div>الجمعة</div><div>السبت</div></div>
+                <div className="grid grid-cols-7 gap-1 md:gap-2">
+                  {days.map((day, idx) => {
+                    if (!day) return <div key={`empty-${idx}`} className="h-20 md:h-28 bg-black/20 rounded-xl border border-transparent"></div>;
+                    const dateStr = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    const dayBookings = bookings.filter(b => b.date === dateStr);
+                    return (
+                      <div key={idx} onClick={() => onDayClick(dateStr)} className={`h-20 md:h-28 p-1 md:p-2 rounded-xl border cursor-pointer hover:border-[#D4AF37] transition-all group ${dayBookings.length > 0 ? 'border-[#D4AF37]/40 bg-[#D4AF37]/5' : 'border-[#222] bg-black/40'}`}>
+                        <span className={`text-xs md:text-sm font-bold ${dayBookings.length > 0 ? 'text-[#D4AF37]' : 'text-gray-500'}`}>{day}</span>
+                        <div className="mt-1 space-y-1 overflow-y-auto max-h-[70%] no-scrollbar">
+                          {dayBookings.map((b, i) => (<div key={i} onClick={(e) => { e.stopPropagation(); setSelectedAlertBooking(b); }} className="text-[9px] md:text-[10px] bg-[#D4AF37] text-black px-1.5 py-0.5 rounded font-bold truncate flex items-center gap-1 hover:scale-105 transition-transform"><Icons.Camera size={10} /> {b.groomName}</div>))}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -1318,107 +1432,6 @@
             );
         }
 
-        function CalendarView({ bookings, onDayClick, settings, showToast }) {
-          const [selectedBooking, setSelectedBooking] = useState(null);
-          
-          const today = new Date();
-          const [currentDate, setCurrentDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
-
-          const year = currentDate.getFullYear();
-          const month = currentDate.getMonth(); 
-
-          const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
-          const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
-          const goToToday = () => setCurrentDate(new Date(today.getFullYear(), today.getMonth(), 1));
-
-          const daysInMonth = new Date(year, month + 1, 0).getDate();
-          const firstDayIndex = new Date(year, month, 1).getDay();
-          
-          const days = [];
-          for(let i=0; i<firstDayIndex; i++) days.push(null);
-          for(let i=1; i<=daysInMonth; i++) days.push(i);
-          const monthNames = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
-
-          return (
-            <div className="animate-fadeIn max-w-5xl mx-auto pb-10 relative">
-              {selectedBooking && (
-                <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[60] p-4 animate-fadeIn">
-                  <div className="bg-[#111] border border-[#D4AF37]/30 p-6 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl">
-                    <div className="flex justify-between items-center mb-6 border-b border-[#222] pb-4">
-                      <h3 className="text-2xl font-bold text-[#D4AF37]">بيانات الحجز التفصيلية</h3>
-                      <button onClick={() => setSelectedBooking(null)} className="text-gray-400 hover:text-white"><Icons.X size={30} /></button>
-                    </div>
-                    <div className="space-y-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <DetailRow label="العريس" value={selectedBooking.groomName} />
-                        <DetailRow label="العروسة" value={selectedBooking.brideName} />
-                        <DetailRow label="الهاتف" value={selectedBooking.phone} isMono />
-                        <DetailRow label="التاريخ" value={selectedBooking.date} />
-                        <DetailRow label="نوع السيشن" value={selectedBooking.sessionType === 'آخر' ? selectedBooking.otherSessionType : selectedBooking.sessionType} />
-                        <DetailRow label="اللوكيشن" value={selectedBooking.location === 'آخر' ? selectedBooking.otherLocation : selectedBooking.location} />
-                        <DetailRow label="الميك أب" value={selectedBooking.makeupArtist || 'غير محدد'} />
-                        <DetailRow label="خروج ميك أب" value={selectedBooking.makeupLeaveTime || '--:--'} />
-                        <DetailRow label="العنوان" value={selectedBooking.address || 'غير محدد'} />
-                      </div>
-                      
-                      {selectedBooking.notes && (
-                         <div className="bg-black/40 p-4 rounded-2xl border border-[#222]">
-                            <h4 className="text-[#D4AF37] font-bold mb-2 flex items-center gap-2"><Icons.FileText size={18} /> ملاحظات إضافية</h4>
-                            <p className="text-sm text-gray-300 whitespace-pre-wrap">{selectedBooking.notes}</p>
-                         </div>
-                      )}
-
-                      <div className="bg-black/40 p-4 rounded-2xl border border-[#222]">
-                        <h4 className="text-[#D4AF37] font-bold mb-2 flex items-center gap-2"><Icons.Camera size={18} /> الباكيج والإضافات</h4>
-                        <p className="text-sm">الباكيدج: {selectedBooking.snapshotPackage?.name} ({selectedBooking.snapshotPackage?.price} ج.م)</p>
-                      </div>
-                      <div className="bg-[#D4AF37]/10 p-4 rounded-2xl border border-[#D4AF37]/30 flex justify-between items-center shadow-lg">
-                        <div><p className="text-xs text-gray-400 uppercase">إجمالي الحساب</p><p className="text-2xl font-bold text-white">{selectedBooking.totalPrice} ج.م</p></div>
-                        <div className="text-left border-r border-[#D4AF37]/20 pr-4"><p className="text-xs text-gray-400 uppercase">المبلغ المتبقي</p><p className="text-2xl font-bold text-red-500">{selectedBooking.remaining} ج.م</p></div>
-                      </div>
-                    </div>
-                    <a href={generateGoogleCalendarLink(selectedBooking, settings.studioName)} target="_blank" className="w-full mt-6 bg-[#4285F4] text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-blue-600 transition-colors shadow-md"><Icons.CalendarPlus size={20} /> مزامنة مع تقويم جوجل</a>
-                  </div>
-                </div>
-              )}
-              
-              <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                <h2 className="text-3xl font-bold text-[#D4AF37]">تقويم الحجوزات</h2>
-                <div className="flex items-center gap-4 bg-[#111] px-2 py-1 rounded-xl border border-[#333] shadow-lg">
-                    <button onClick={prevMonth} className="p-2 text-gray-400 hover:text-[#D4AF37] hover:bg-[#222] rounded-lg transition-colors" title="الشهر السابق">
-                        <Icons.ChevronRight size={24} />
-                    </button>
-                    <div className="text-xl font-bold min-w-[120px] text-center cursor-pointer hover:text-[#D4AF37] transition-colors" onClick={goToToday} title="العودة للشهر الحالي">
-                        {monthNames[month]} {year}
-                    </div>
-                    <button onClick={nextMonth} className="p-2 text-gray-400 hover:text-[#D4AF37] hover:bg-[#222] rounded-lg transition-colors" title="الشهر القادم">
-                        <Icons.ChevronLeft size={24} />
-                    </button>
-                </div>
-              </div>
-
-              <div className="bg-[#111] rounded-3xl border border-[#333] p-6 shadow-2xl">
-                <div className="grid grid-cols-7 gap-1 md:gap-2 mb-4 text-center font-bold text-gray-500 text-sm md:text-base uppercase tracking-wider"><div>الأحد</div><div>الإثنين</div><div>الثلاثاء</div><div>الأربعاء</div><div>الخميس</div><div>الجمعة</div><div>السبت</div></div>
-                <div className="grid grid-cols-7 gap-1 md:gap-3">
-                  {days.map((day, idx) => {
-                    if (!day) return <div key={`empty-${idx}`} className="h-24 md:h-36 bg-black/20 rounded-2xl border border-transparent"></div>;
-                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                    const dayBookings = bookings.filter(b => b.date === dateStr);
-                    return (
-                      <div key={idx} onClick={() => onDayClick(dateStr)} className={`h-24 md:h-36 p-1 md:p-3 rounded-2xl border cursor-pointer hover:border-[#D4AF37] transition-all group ${dayBookings.length > 0 ? 'border-[#D4AF37]/40 bg-[#D4AF37]/5' : 'border-[#222] bg-black/40'}`}>
-                        <span className={`text-xs md:text-sm font-bold ${dayBookings.length > 0 ? 'text-[#D4AF37]' : 'text-gray-500'}`}>{day}</span>
-                        <div className="mt-2 space-y-1.5 overflow-y-auto max-h-[70%] no-scrollbar">
-                          {dayBookings.map((b, i) => (<div key={i} onClick={(e) => { e.stopPropagation(); setSelectedBooking(b); }} className="text-[9px] md:text-[11px] bg-[#D4AF37] text-black px-2 py-1 rounded-lg font-bold truncate flex items-center gap-1 hover:scale-105 transition-transform"><Icons.Camera size={10} /> {b.groomName}</div>))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          );
-        }
-
         function SettingsView({ settings, user, isFirebaseActive, onLocalSave, showToast }) {
             const [localSettings, setLocalSettings] = useState(() => ({ ...DEFAULT_SETTINGS, ...settings }));
             const [isSaving, setIsSaving] = useState(false);
@@ -1552,21 +1565,46 @@
           const videoName = booking.snapshotVideoService?.name || settings.videoServices.find(v => v.id === booking.videoServiceId)?.name;
           const videoPrice = booking.snapshotVideoService?.price || booking.videoServicePrice;
           
+          const handleDownloadImage = async () => {
+              const element = document.getElementById('contract-content');
+              if (!element) return;
+              try {
+                  const canvas = await window.html2canvas(element, { 
+                      scale: 2, 
+                      useCORS: true,
+                      backgroundColor: "#ffffff"
+                  });
+                  const dataUrl = canvas.toDataURL('image/png');
+                  const link = document.createElement('a');
+                  link.download = `عقد_${booking.groomName}_${booking.date}.png`;
+                  link.href = dataUrl;
+                  link.click();
+              } catch (err) {
+                  console.error("Error saving image", err);
+                  alert("حدث خطأ أثناء محاولة حفظ الصورة.");
+              }
+          };
+
           return (
             <div className="min-h-screen bg-white text-black font-sans print-container" dir="rtl">
               <div className="print:hidden flex justify-between items-center mb-4 bg-gray-100 p-4 rounded-xl shadow-sm border max-w-3xl mx-auto mt-4">
                   <p className="text-red-600 font-bold">جاهز للطباعة (مقاس ورق A4)</p>
                   <div className="flex gap-4">
-                      <button onClick={() => window.print()} className="bg-black text-white px-6 py-2 rounded-xl font-bold flex items-center gap-2 hover:bg-gray-800"><Icons.Printer size={18} /> طباعة العقد</button>
+                      <button onClick={handleDownloadImage} className="bg-blue-600 text-white px-6 py-2 rounded-xl font-bold flex items-center gap-2 hover:bg-blue-700">
+                          <Icons.ImageIcon size={18} /> حفظ كصورة
+                      </button>
+                      <button onClick={() => window.print()} className="bg-black text-white px-6 py-2 rounded-xl font-bold flex items-center gap-2 hover:bg-gray-800">
+                          <Icons.Printer size={18} /> طباعة العقد
+                      </button>
                       <button onClick={onClose} className="bg-gray-300 text-black px-6 py-2 rounded-xl font-bold hover:bg-gray-400">إلغاء</button>
                   </div>
               </div>
               
-              <div className="max-w-3xl mx-auto border-[2px] border-black p-6 relative bg-white contract-print-container">
+              <div id="contract-content" className="max-w-3xl mx-auto border-[2px] border-black p-6 relative bg-white contract-print-container">
                 
                 <header className="flex items-center justify-between mb-4 border-b-[3px] border-black pb-4">
                   <div className="flex items-center gap-3">
-                    <img src={settings.studioLogo || LOGO_URL} alt="Logo" className="w-16 h-16 rounded-full border border-gray-300 object-cover" />
+                    <img src={settings.studioLogo || LOGO_URL} alt="Logo" crossOrigin="anonymous" className="w-16 h-16 rounded-full border border-gray-300 object-cover" />
                     <div>
                         <h1 className="text-2xl font-black uppercase tracking-tighter" style={{ color: '#000' }}>{settings.studioName || 'اسم الاستوديو'}</h1>
                         <p className="text-[10px] font-bold text-gray-500 tracking-[0.2em] uppercase">Official Contract</p>
