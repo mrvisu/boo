@@ -123,7 +123,8 @@
             Shield: (props) => <Icon path="<path d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/>" {...props}/>,
             ImageIcon: (props) => <Icon path="<rect width='18' height='18' x='3' y='3' rx='2' ry='2'/><circle cx='9' cy='9' r='2'/><path d='m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21'/>" {...props}/>,
             Copy: (props) => <Icon path="<rect width='14' height='14' x='8' y='8' rx='2' ry='2'/><path d='M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2'/>" {...props}/>,
-            Share: (props) => <Icon path="<circle cx='18' cy='5' r='3'/><circle cx='6' cy='12' r='3'/><circle cx='18' cy='19' r='3'/><line x1='8.59' x2='15.42' y1='13.51' y2='17.49'/><line x1='15.41' x2='8.59' y1='6.51' y2='10.49'/>" {...props}/>
+            Share: (props) => <Icon path="<circle cx='18' cy='5' r='3'/><circle cx='6' cy='12' r='3'/><circle cx='18' cy='19' r='3'/><line x1='8.59' x2='15.42' y1='13.51' y2='17.49'/><line x1='15.41' x2='8.59' y1='6.51' y2='10.49'/>" {...props}/>,
+            Receipt: (props) => <Icon path="<path d='M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z'/><path d='M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8'/><path d='M12 17V7'/>" {...props}/>
         };
 
         // --- Firebase Configuration ---
@@ -173,11 +174,19 @@
           locations: ['Wave', 'Amazon', 'River', 'Green Land', 'Vibes', 'Atlantis', 'آخر'],
           casualLocations: ['Wave', 'Amazon', 'River', 'Green Land', 'Vibes', 'Atlantis', 'المنصورة الجديدة', 'آخر'],
           sessionTypes: ['زفاف', 'خطوبة', 'كاجول', 'حنة', 'كتب كتاب', 'فوتوغرافي', 'آخر'],
+          expenseTemplates: [
+            { id: 'et1', name: 'ألبوم 5 صفحات', price: 100 },
+            { id: 'et2', name: 'ألبوم 10 صفحات', price: 200 },
+            { id: 'et3', name: 'برواز خشب 50x70', price: 150 },
+            { id: 'et4', name: 'طباعة كروت دعوة (100 كارت)', price: 50 }
+          ],
           quickMessages: [
             { id: 'qm1', title: 'تذكير بموعد التصوير', text: 'أهلاً بك أستاذ/ة [الاسم]،\nنود تذكيركم بموعد التصوير الخاص بكم غداً بتاريخ [التاريخ].\nنرجو الالتزام بالمواعيد المحددة للحصول على أفضل نتيجة.\nفي انتظاركم! 📸✨' },
             { id: 'qm2', title: 'تذكير بالمبلغ المتبقي', text: 'أهلاً بك أستاذ/ة [الاسم]،\nنأمل أن تكونوا بخير.\nنود تذكيركم بأن المبلغ المتبقي لحسابكم هو [المتبقي] ج.م.\nيمكنكم التواصل معنا لأي استفسار.' },
-            { id: 'qm3', title: 'استلام الشغل', text: 'أهلاً بك أستاذ/ة [الاسم]،\nيسعدنا إبلاغكم أن الصور والفيديو الخاص بمناسبتكم السعيدة جاهز للاستلام الآن! 🎉\nيمكنكم تشريفنا في الاستوديو لاستلامه.' },
-            { id: 'qm4', title: 'طلب تقييم (فيد باك)', text: 'أهلاً بك أستاذ/ة [الاسم]،\nكان من دواعي سرورنا توثيق لحظاتكم السعيدة. 📸\nرأيكم يهمنا جداً لتطوير خدماتنا، يسعدنا أن تشاركونا تقييمكم لتجربتكم معنا. 🙏' }
+            { id: 'qm3', title: 'استلام الشغل (فوتوغرافيا)', text: 'أهلاً بك أستاذ/ة [الاسم]،\nيسعدنا إبلاغكم أن الصور الخاصة بمناسبتكم السعيدة جاهزة للاستلام الآن! 🎉\nيمكنكم تشريفنا في الاستوديو لاستلامها.' },
+            { id: 'qm4', title: 'طلب تقييم (فيد باك)', text: 'أهلاً بك أستاذ/ة [الاسم]،\nكان من دواعي سرورنا توثيق لحظاتكم السعيدة. 📸\nرأيكم يهمنا جداً لتطوير خدماتنا، يسعدنا أن تشاركونا تقييمكم لتجربتكم معنا. 🙏' },
+            { id: 'qm5', title: 'تأكيد حجز الفيديو (بالتفاصيل المالية)', text: 'أهلاً بك أستاذ/ة [الاسم]،\nتم تأكيد حجز خدمة تصوير الفيديو الخاص بكم بتاريخ [التاريخ].\nإجمالي الحساب: [الاجمالي] ج.م\nالمدفوع: [المدفوع] ج.م\nالمتبقي: [المتبقي] ج.م\nنحن في انتظاركم لتوثيق أجمل اللحظات! 🎥✨' },
+            { id: 'qm6', title: 'استلام شغل الفيديو (الفلاشة)', text: 'أهلاً بك أستاذ/ة [الاسم]،\nشغل الفيديو الخاص بمناسبتكم السعيدة جاهز الآن وتم نقله بجودة عالية على الفلاشة! 🎞️\nيمكنكم تشريفنا في الاستوديو لاستلامه.\n(تنبيه هام: نرجو عمل نسخة احتياطية للفيديو على جهازكم الشخصي فور الاستلام للحفاظ عليه)' }
           ]
         };
 
@@ -569,6 +578,234 @@
             );
         }
 
+        // --- Expenses View Component ---
+        function ExpensesView({ bookings, settings, isFirebaseActive, user, showToast, setBookings, onUpdateSettings }) {
+            const [search, setSearch] = useState('');
+            const [selectedBooking, setSelectedBooking] = useState(null);
+            const [expenseForm, setExpenseForm] = useState({ name: '', unitPrice: '', quantity: 1 });
+            const [currentExpenses, setCurrentExpenses] = useState([]);
+            const [isSaving, setIsSaving] = useState(false);
+
+            const filtered = bookings.filter(b => b.groomName?.includes(search) || b.phone?.includes(search));
+
+            const openManager = (b) => {
+                setSelectedBooking(b);
+                setCurrentExpenses(b.expenses || []);
+            };
+
+            const closeManager = () => {
+                setSelectedBooking(null);
+                setCurrentExpenses([]);
+                setExpenseForm({ name: '', unitPrice: '', quantity: 1 });
+            };
+
+            const handleAddExpense = () => {
+                if (!expenseForm.name || !expenseForm.unitPrice || expenseForm.quantity <= 0) {
+                    showToast("يرجى إدخال اسم البند والسعر والكمية", "error");
+                    return;
+                }
+                const newItem = {
+                    id: 'exp_' + Date.now(),
+                    name: expenseForm.name,
+                    unitPrice: Number(expenseForm.unitPrice),
+                    quantity: Number(expenseForm.quantity),
+                    total: Number(expenseForm.unitPrice) * Number(expenseForm.quantity)
+                };
+                setCurrentExpenses([...currentExpenses, newItem]);
+                setExpenseForm({ name: '', unitPrice: '', quantity: 1 });
+            };
+
+            const handleRemoveExpense = (id) => {
+                setCurrentExpenses(currentExpenses.filter(e => e.id !== id));
+            };
+
+            const handleSaveTemplate = () => {
+                if (!expenseForm.name || !expenseForm.unitPrice) {
+                    showToast("يرجى إدخال اسم البند والسعر أولاً لحفظه كقالب", "error");
+                    return;
+                }
+                const newTemplate = { id: 'et_' + Date.now(), name: expenseForm.name, price: Number(expenseForm.unitPrice) };
+                const newTemplates = [...(settings.expenseTemplates || []), newTemplate];
+                onUpdateSettings({ ...settings, expenseTemplates: newTemplates });
+                showToast("تم حفظ القالب بنجاح");
+            };
+
+            const handleDeleteTemplate = (id, e) => {
+                e.stopPropagation();
+                if(window.confirm("هل أنت متأكد من حذف هذا القالب؟")) {
+                    const newTemplates = (settings.expenseTemplates || []).filter(t => t.id !== id);
+                    onUpdateSettings({ ...settings, expenseTemplates: newTemplates });
+                }
+            };
+
+            const saveExpenses = async () => {
+                setIsSaving(true);
+                if (isFirebaseActive && user && window.firebase) {
+                    try {
+                        await firebase.firestore().collection('users').doc(user.uid).collection('bookings').doc(selectedBooking.id).update({ expenses: currentExpenses });
+                        showToast("تم الحفظ بنجاح");
+                        closeManager();
+                    } catch(e) {
+                        showToast("خطأ في الحفظ", "error");
+                    }
+                } else {
+                    const updatedBooking = { ...selectedBooking, expenses: currentExpenses };
+                    setBookings(prev => prev.map(b => b.id === updatedBooking.id ? updatedBooking : b));
+                    showToast("تم الحفظ محلياً");
+                    closeManager();
+                }
+                setIsSaving(false);
+            };
+
+            const calcTotalExp = (exps) => (exps || []).reduce((sum, e) => sum + (e.total || 0), 0);
+
+            return (
+                <div className="space-y-6 animate-fadeIn pb-10">
+                    {/* Expenses Modal */}
+                    {selectedBooking && (
+                        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[70] p-4 animate-fadeIn">
+                            <div className="bg-[#111] border border-[#D4AF37]/30 p-6 rounded-3xl w-full max-w-3xl shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar flex flex-col">
+                                <div className="flex justify-between items-center mb-6 border-b border-[#222] pb-4">
+                                    <h3 className="text-2xl font-bold text-[#D4AF37] flex items-center gap-2">
+                                        <Icons.Receipt size={24}/> مصروفات وهدايا العميل: {selectedBooking.groomName}
+                                    </h3>
+                                    <button onClick={closeManager} className="text-gray-400 hover:text-white"><Icons.X size={24} /></button>
+                                </div>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 bg-black/40 p-4 rounded-xl border border-[#222]">
+                                    <div className="md:col-span-4 mb-2">
+                                        <label className="text-sm text-gray-400 mb-2 block">القوالب السريعة (اضغط للاختيار أو الحذف)</label>
+                                        <div className="flex flex-wrap gap-2 p-2 bg-black/50 border border-[#333] rounded-xl min-h-[50px] items-center">
+                                            {settings.expenseTemplates?.map(t => (
+                                                <div key={t.id} onClick={() => setExpenseForm({...expenseForm, name: t.name, unitPrice: t.price})} className="bg-[#222] hover:bg-[#333] border border-[#444] hover:border-[#D4AF37] text-white px-3 py-1.5 rounded-lg cursor-pointer flex items-center gap-2 text-sm transition-all group">
+                                                    <span>{t.name} ({t.price} ج.م)</span>
+                                                    <button onClick={(e) => handleDeleteTemplate(t.id, e)} className="text-gray-500 hover:text-red-500 hover:bg-red-500/10 p-1 rounded transition-colors" title="حذف القالب">
+                                                        <Icons.X size={14} />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                            {(!settings.expenseTemplates || settings.expenseTemplates.length === 0) && <span className="text-xs text-gray-500 ml-2">لا توجد قوالب محفوظة. يمكنك إضافة قالب جديد.</span>}
+                                        </div>
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <InputField label="اسم البند (الطباعة / الهدية)" value={expenseForm.name} onChange={e => setExpenseForm({...expenseForm, name: e.target.value})} placeholder="مثال: برواز 50x70" />
+                                    </div>
+                                    <div className="md:col-span-1">
+                                        <InputField label="سعر الوحدة" type="number" value={expenseForm.unitPrice} onChange={e => setExpenseForm({...expenseForm, unitPrice: e.target.value})} placeholder="السعر" />
+                                    </div>
+                                    <div className="md:col-span-1">
+                                        <InputField label="الكمية" type="number" value={expenseForm.quantity} onChange={e => setExpenseForm({...expenseForm, quantity: e.target.value})} placeholder="الكمية" />
+                                    </div>
+                                    <div className="md:col-span-4 flex flex-col sm:flex-row justify-between items-center mt-2 pt-4 border-t border-[#333] gap-4">
+                                        <p className="text-gray-400 font-bold">الإجمالي: <span className="text-white text-xl">{(Number(expenseForm.unitPrice || 0) * Number(expenseForm.quantity || 1))} ج.م</span></p>
+                                        <div className="flex gap-2 w-full sm:w-auto">
+                                            <button onClick={handleSaveTemplate} className="flex-1 sm:flex-none bg-[#222] text-gray-300 px-4 py-2 rounded-xl font-bold hover:bg-[#333] hover:text-white transition-colors flex items-center justify-center gap-2 text-sm border border-[#444]">
+                                                <Icons.Save size={16} /> حفظ كقالب
+                                            </button>
+                                            <button onClick={handleAddExpense} className="flex-1 sm:flex-none bg-[#D4AF37]/20 text-[#D4AF37] px-6 py-2 rounded-xl font-bold hover:bg-[#D4AF37] hover:text-black transition-colors flex items-center justify-center gap-2">
+                                                <Icons.Plus size={18} /> إضافة للقائمة
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex-1 overflow-y-auto min-h-[200px] mb-6 border border-[#222] rounded-xl bg-black">
+                                    <table className="w-full text-right">
+                                        <thead className="bg-[#1a1a1a] border-b border-[#333]">
+                                            <tr>
+                                                <th className="p-3 text-gray-400 font-medium">البند</th>
+                                                <th className="p-3 text-gray-400 font-medium text-center">السعر</th>
+                                                <th className="p-3 text-gray-400 font-medium text-center">الكمية</th>
+                                                <th className="p-3 text-gray-400 font-medium text-center">الإجمالي</th>
+                                                <th className="p-3"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-[#222]">
+                                            {currentExpenses.map(exp => (
+                                                <tr key={exp.id} className="hover:bg-[#111] transition-colors">
+                                                    <td className="p-3 text-white font-bold">{exp.name}</td>
+                                                    <td className="p-3 text-center text-gray-300">{exp.unitPrice}</td>
+                                                    <td className="p-3 text-center text-gray-300">{exp.quantity}</td>
+                                                    <td className="p-3 text-center text-[#D4AF37] font-bold">{exp.total}</td>
+                                                    <td className="p-3 text-left">
+                                                        <button onClick={() => handleRemoveExpense(exp.id)} className="text-red-500 bg-red-500/10 p-2 rounded-lg hover:bg-red-500 hover:text-white transition-colors"><Icons.Trash2 size={16}/></button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                            {currentExpenses.length === 0 && <tr><td colSpan="5" className="text-center p-8 text-gray-500">لا توجد مصروفات مسجلة لهذا العميل.</td></tr>}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div className="border-t border-[#333] pt-4 flex flex-col md:flex-row justify-between items-center gap-4">
+                                    <div className="bg-[#D4AF37]/10 border border-[#D4AF37]/30 px-6 py-3 rounded-2xl">
+                                        <p className="text-gray-400 text-sm">إجمالي المصروفات</p>
+                                        <p className="text-3xl font-black text-[#D4AF37]">{calcTotalExp(currentExpenses)} ج.م</p>
+                                    </div>
+                                    <div className="flex gap-3 w-full md:w-auto">
+                                        <button onClick={closeManager} className="flex-1 md:flex-none px-6 py-3 bg-[#222] text-white rounded-xl hover:bg-[#333] font-bold transition-colors">إلغاء</button>
+                                        <button onClick={saveExpenses} disabled={isSaving} className="flex-1 md:flex-none px-8 py-3 bg-[#D4AF37] text-black rounded-xl hover:bg-yellow-500 font-bold transition-colors flex items-center justify-center gap-2">
+                                            <Icons.Save size={20}/> {isSaving ? 'جاري الحفظ...' : 'حفظ التعديلات'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div>
+                            <h2 className="text-3xl font-bold text-[#D4AF37]">المصروفات والطباعة</h2>
+                            <p className="text-gray-400 mt-1">إدارة تكاليف الطباعة والهدايا الإضافية الخاصة بكل عميل.</p>
+                        </div>
+                        <div className="relative w-full md:w-80">
+                            <Icons.Search className="absolute right-4 top-3.5 text-gray-500" size={20}/>
+                            <input type="text" placeholder="ابحث باسم العريس..." value={search} onChange={e => setSearch(e.target.value)} className="w-full bg-[#111] border border-[#333] p-3 pr-12 rounded-2xl outline-none focus:border-[#D4AF37] text-white"/>
+                        </div>
+                    </div>
+
+                    <div className="bg-[#111] rounded-3xl border border-[#333] overflow-x-auto shadow-xl">
+                        <table className="w-full text-right">
+                            <thead className="bg-black/40 border-b border-[#222]">
+                                <tr>
+                                    <th className="p-4 text-gray-400 font-medium">العميل</th>
+                                    <th className="p-4 text-gray-400 font-medium">تاريخ المناسبة</th>
+                                    <th className="p-4 text-gray-400 font-medium text-center">إجمالي الحجز</th>
+                                    <th className="p-4 text-red-400 font-medium text-center">إجمالي المصروفات</th>
+                                    <th className="p-4 text-green-400 font-medium text-center">الصافي (أرباح)</th>
+                                    <th className="p-4 text-center text-gray-400 font-medium">إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-[#222]">
+                                {filtered.map(b => {
+                                    const totalExp = calcTotalExp(b.expenses);
+                                    const netProfit = (b.totalPrice || 0) - totalExp;
+                                    return (
+                                        <tr key={b.id} className="hover:bg-[#1a1a1a] transition-colors">
+                                            <td className="p-4">
+                                                <p className="font-bold text-white text-lg">{b.groomName}</p>
+                                                <p className="text-xs text-gray-500 font-mono">{b.phone}</p>
+                                            </td>
+                                            <td className="p-4 text-sm text-gray-300">{b.date}</td>
+                                            <td className="p-4 text-center font-bold text-white">{b.totalPrice || 0}</td>
+                                            <td className="p-4 text-center font-bold text-red-500">{totalExp}</td>
+                                            <td className="p-4 text-center font-bold text-green-500">{netProfit}</td>
+                                            <td className="p-4 text-center">
+                                                <button onClick={() => openManager(b)} className="px-4 py-2 bg-blue-500/10 text-blue-500 hover:bg-blue-500 hover:text-white rounded-xl transition-colors text-sm font-bold flex items-center justify-center gap-2 mx-auto">
+                                                    <Icons.Edit size={16}/> إدارة وتعديل
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                                {filtered.length === 0 && <tr><td colSpan="6" className="text-center p-10 text-gray-500">لا توجد نتائج.</td></tr>}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            );
+        }
+
         // --- Main App Component ---
         function App() {
           const [user, setUser] = useState(null);
@@ -604,6 +841,17 @@
           const [toast, setToast] = useState(null);
           const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
           const [initialBookingDate, setInitialBookingDate] = useState('');
+
+          const saveSettingsGlobal = async (newSettings) => {
+              setSettings(newSettings);
+              if (isFirebaseActiveState && user && window.firebase) {
+                  try {
+                      await firebase.firestore().collection('users').doc(user.uid).collection('settings').doc('config').set(newSettings);
+                  } catch(e) {
+                      console.error("Error saving settings", e);
+                  }
+              }
+          };
 
           useEffect(() => {
               if (firebaseConfig.apiKey && window.firebase) {
@@ -776,7 +1024,7 @@
               </div>
 
               <div className="flex flex-col md:flex-row min-h-screen">
-                <aside className={`${isMobileMenuOpen ? 'block' : 'hidden'} md:block w-full md:w-64 bg-[#111] border-l border-[#222] p-6 flex-shrink-0 transition-all flex flex-col`}>
+                <aside className={`${isMobileMenuOpen ? 'block' : 'hidden'} md:block w-full md:w-64 bg-[#111] border-l border-[#222] p-6 flex-shrink-0 transition-all flex flex-col z-40`}>
                   <div className="hidden md:flex items-center gap-3 mb-10">
                     <div className="p-1 rounded-full border-2 border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.2)]">
                         <img 
@@ -799,6 +1047,7 @@
                             <NavItem icon={<Icons.PlusCircle />} label="حجز جديد" active={currentView === 'new'} onClick={() => navigateToNewBooking('')} />
                             <NavItem icon={<Icons.Users />} label="العملاء" active={currentView === 'clients'} onClick={() => {setCurrentView('clients'); setIsMobileMenuOpen(false);}} />
                             <NavItem icon={<Icons.CalendarIcon />} label="التقويم" active={currentView === 'calendar'} onClick={() => {setCurrentView('calendar'); setIsMobileMenuOpen(false);}} />
+                            <NavItem icon={<Icons.Receipt />} label="المصروفات والطباعة" active={currentView === 'expenses'} onClick={() => {setCurrentView('expenses'); setIsMobileMenuOpen(false);}} />
                             <NavItem icon={<Icons.Settings />} label="الإعدادات" active={currentView === 'settings'} onClick={() => {setCurrentView('settings'); setIsMobileMenuOpen(false);}} />
                         </>
                     ) : (
@@ -816,7 +1065,7 @@
                   </div>
                 </aside>
 
-                <main className="flex-1 p-4 md:p-8 overflow-y-auto flex flex-col">
+                <main className="flex-1 p-4 md:p-8 overflow-y-auto flex flex-col h-screen">
                   <div className="flex-1">
                       {isAdmin ? (
                           <AdminDashboard showToast={showToast} />
@@ -826,6 +1075,7 @@
                               {currentView === 'new' && <NewBooking settings={settings} initialDate={initialBookingDate} user={user} bookingToEdit={bookingToEdit} isFirebaseActive={isFirebaseActiveState} onSuccess={(newB, isUpdate) => { if(!isFirebaseActiveState) { if (isUpdate) setBookings(prev => prev.map(b => b.id === newB.id ? newB : b).sort((a, b) => new Date(b.date) - new Date(a.date))); else setBookings([newB, ...bookings].sort((a, b) => new Date(b.date) - new Date(a.date))); } setCurrentView('clients'); setBookingToEdit(null); }} showToast={showToast} />}
                               {currentView === 'clients' && <ClientsList bookings={bookings} settings={settings} onPrint={setContractToPrint} onEdit={navigateToEditBooking} showToast={showToast} user={user} isFirebaseActive={isFirebaseActiveState} onLocalDelete={(id) => setBookings(bookings.filter(b => b.id !== id))} />}
                               {currentView === 'calendar' && <CalendarView bookings={bookings} settings={settings} onDayClick={navigateToNewBooking} />}
+                              {currentView === 'expenses' && <ExpensesView bookings={bookings} settings={settings} isFirebaseActive={isFirebaseActiveState} user={user} showToast={showToast} setBookings={setBookings} onUpdateSettings={saveSettingsGlobal} />}
                               {currentView === 'settings' && <SettingsView settings={settings} user={user} isFirebaseActive={isFirebaseActiveState} onLocalSave={(s) => setSettings(s)} showToast={showToast} />}
                           </>
                       )}
@@ -846,7 +1096,6 @@
         function LoginScreen({ onLogin, isFirebaseActive, showToast, settings }) {
             const [identifier, setIdentifier] = useState('');
             const [password, setPassword] = useState('');
-            const [phone, setPhone] = useState(''); 
             const [isLoading, setIsLoading] = useState(false);
             const [isRegistering, setIsRegistering] = useState(false);
             
@@ -920,7 +1169,7 @@
             return (
                 <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4 relative overflow-hidden" dir="rtl">
                     <div className="absolute inset-0 opacity-5 pointer-events-none flex items-center justify-center">
-                         <Icons.Camera size={600} className="text-[#D4AF37]" />
+                          <Icons.Camera size={600} className="text-[#D4AF37]" />
                     </div>
                     <div className="bg-[#111] p-8 rounded-3xl border border-[#D4AF37]/30 w-full max-w-md shadow-2xl relative z-10 mt-8 mb-8">
                         <div className="text-center mb-6">
@@ -1005,7 +1254,7 @@
           const [selectedAlertBooking, setSelectedAlertBooking] = useState(null);
 
           const { stats, upcoming, tomorrowAlerts, casualAlerts } = useMemo(() => {
-            let rev = 0, paid = 0, counts = { 'زفاف': 0, 'خطوبة': 0, 'كاجول': 0, 'حنة': 0, 'كتب كتاب': 0, 'فوتوغرافي': 0 };
+            let rev = 0, paid = 0, totalExpenses = 0, counts = { 'زفاف': 0, 'خطوبة': 0, 'كاجول': 0, 'حنة': 0, 'كتب كتاب': 0, 'فوتوغرافي': 0 };
             const monthly = {};
             const monthNames = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
             
@@ -1022,7 +1271,14 @@
             let casualList = [];
 
             bookings.forEach(b => {
-              const bRev = Number(b.totalPrice) || 0; const bPaid = Number(b.paid) || 0; rev += bRev; paid += bPaid;
+              const bRev = Number(b.totalPrice) || 0; 
+              const bPaid = Number(b.paid) || 0; 
+              const bExp = (b.expenses || []).reduce((sum, e) => sum + (Number(e.total) || 0), 0);
+              
+              rev += bRev; 
+              paid += bPaid; 
+              totalExpenses += bExp;
+
               const type = b.sessionType === 'آخر' ? b.otherSessionType : b.sessionType;
               if (counts[type] !== undefined) counts[type]++; else counts[type] = 1;
               
@@ -1056,7 +1312,17 @@
             const maxMonthlyRev = Math.max(...sortedMonths.map(m => m.rev), 1);
             
             return { 
-                stats: { total: bookings.length, rev, paid, outstanding: rev - paid, counts, sortedMonths, maxMonthlyRev },
+                stats: { 
+                    total: bookings.length, 
+                    rev, 
+                    paid, 
+                    outstanding: rev - paid, 
+                    totalExpenses, 
+                    netProfit: rev - totalExpenses,
+                    counts, 
+                    sortedMonths, 
+                    maxMonthlyRev 
+                },
                 upcoming: upcomingList,
                 tomorrowAlerts: tmrwAlerts,
                 casualAlerts: casualList
@@ -1156,31 +1422,43 @@
                   </div>
                 </div>
 
-                {/* Monthly Stats Summary */}
-                <div className="bg-[#111] p-6 rounded-3xl border border-[#222] shadow-xl">
-                  <div className="flex items-center gap-2 mb-6"><Icons.TrendingUp className="text-[#D4AF37]" size={20} /><h3 className="text-[#D4AF37] font-bold text-xl">إحصائيات الشهور</h3></div>
-                  <div className="space-y-6 max-h-80 overflow-y-auto pr-2 no-scrollbar">{stats.sortedMonths.length > 0 ? stats.sortedMonths.map((m, i) => (
-                    <div key={i} className="space-y-2">
-                      <div className="flex justify-between items-end"><div><p className="text-white font-bold">{m.label}</p><p className="text-xs text-gray-500">{m.count} حجوزات</p></div><p className="text-[#D4AF37] font-bold">{formatMoney(m.rev)}</p></div>
-                      <div className="h-2 bg-black rounded-full overflow-hidden"><div className="h-full bg-gradient-to-l from-[#D4AF37] to-[#B8860B] transition-all duration-1000" style={{ width: `${(m.rev / stats.maxMonthlyRev) * 100}%` }}></div></div>
-                    </div>
-                  )) : <p className="text-gray-500 text-center py-4">لا توجد بيانات متاحة بعد.</p>}</div>
+                <div className="space-y-6">
+                  {/* Total Bookings moved here */}
+                  <StatCard title="إجمالي الحجوزات" value={stats.total} subtitle="حجز مسجل" />
+
+                  {/* Monthly Stats Summary */}
+                  <div className="bg-[#111] p-6 rounded-3xl border border-[#222] shadow-xl">
+                    <div className="flex items-center gap-2 mb-6"><Icons.TrendingUp className="text-[#D4AF37]" size={20} /><h3 className="text-[#D4AF37] font-bold text-xl">إحصائيات الشهور</h3></div>
+                    <div className="space-y-6 max-h-80 overflow-y-auto pr-2 no-scrollbar">{stats.sortedMonths.length > 0 ? stats.sortedMonths.map((m, i) => (
+                      <div key={i} className="space-y-2">
+                        <div className="flex justify-between items-end"><div><p className="text-white font-bold">{m.label}</p><p className="text-xs text-gray-500">{m.count} حجوزات</p></div><p className="text-[#D4AF37] font-bold">{formatMoney(m.rev)}</p></div>
+                        <div className="h-2 bg-black rounded-full overflow-hidden"><div className="h-full bg-gradient-to-l from-[#D4AF37] to-[#B8860B] transition-all duration-1000" style={{ width: `${(m.rev / stats.maxMonthlyRev) * 100}%` }}></div></div>
+                      </div>
+                    )) : <p className="text-gray-500 text-center py-4">لا توجد بيانات متاحة بعد.</p>}</div>
+                  </div>
                 </div>
               </div>
 
               {/* Stats moved to the bottom */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-                <StatCard title="إجمالي الحجوزات" value={stats.total} subtitle="حجز مسجل" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
                 <StatCard title="إجمالي الإيرادات" value={formatMoney(stats.rev)} highlight subtitle={`المدفوع: ${stats.paid.toLocaleString()} ج.م`} />
                 <StatCard title="المبالغ المتبقية" value={formatMoney(stats.outstanding)} alert={stats.outstanding > 0} subtitle="مستحقات لدى العملاء" />
+                <StatCard title="إجمالي المصروفات" value={formatMoney(stats.totalExpenses)} alert={stats.totalExpenses > 0} subtitle="تكاليف الطباعة والهدايا" />
+                <StatCard title="صافي الأرباح" value={formatMoney(stats.netProfit)} success={stats.netProfit > 0} highlight subtitle="الإيرادات بعد خصم المصروفات" />
               </div>
               
             </div>
           );
         }
 
-        function StatCard({ title, value, subtitle, highlight, alert }) {
-          return (<div className={`p-6 rounded-3xl border ${highlight ? 'bg-gradient-to-br from-[#1a1500] to-[#0a0a0a] border-[#D4AF37]/50 shadow-[0_0_20px_rgba(212,175,55,0.1)]' : 'bg-[#111] border-[#222]'}`}><h3 className="text-gray-500 text-sm mb-1">{title}</h3><p className={`text-4xl font-bold ${alert ? 'text-red-500' : 'text-white'}`}>{value}</p><p className="text-xs text-gray-600 mt-2">{subtitle}</p></div>);
+        function StatCard({ title, value, subtitle, highlight, alert, success }) {
+          return (
+            <div className={`p-6 rounded-3xl border ${highlight ? 'bg-gradient-to-br from-[#1a1500] to-[#0a0a0a] border-[#D4AF37]/50 shadow-[0_0_20px_rgba(212,175,55,0.1)]' : 'bg-[#111] border-[#222]'}`}>
+                <h3 className="text-gray-500 text-sm mb-1">{title}</h3>
+                <p className={`text-4xl font-bold ${alert ? 'text-red-500' : success ? 'text-green-500' : 'text-white'}`}>{value}</p>
+                <p className="text-xs text-gray-600 mt-2">{subtitle}</p>
+            </div>
+          );
         }
 
         function NavItem({ icon, label, active, onClick }) {
@@ -1194,7 +1472,7 @@
                 groomName: '', brideName: '', phone: '', address: '', date: initialDate || '', location: '', otherLocation: '',
                 sessionType: settings.sessionTypes && settings.sessionTypes.length > 0 ? settings.sessionTypes[0] : 'زفاف', 
                 otherSessionType: '', makeupArtist: '', makeupLeaveTime: '', casualLocation: '', otherCasualLocation: '', packageId: '', addons: [], paid: '',
-                videoServiceId: '', videoServicePrice: '', videoStartTime: '', videoAddons: [], notes: ''
+                videoServiceId: '', videoServicePrice: '', videoStartTime: '', videoAddons: [], notes: '', expenses: []
             };
             const [formData, setFormData] = useState(initialFormState);
             const [isSubmitting, setIsSubmitting] = useState(false);
@@ -1205,7 +1483,8 @@
                         ...bookingToEdit,
                         bookingMainType: bookingToEdit.bookingMainType || 'فوتوغرافي وفيديو',
                         addons: bookingToEdit.addons || [],
-                        videoAddons: bookingToEdit.videoAddons || []
+                        videoAddons: bookingToEdit.videoAddons || [],
+                        expenses: bookingToEdit.expenses || []
                     });
                 } else {
                     setFormData({ ...initialFormState, date: initialDate || '' }); 
@@ -1255,13 +1534,9 @@
 
             const submit = async (e) => {
                 e.preventDefault(); 
-                if (!formData.groomName || !formData.date) return showToast("أكمل البيانات الأساسية", "error");
-                
-                // التأكد من اختيار باكيدج فقط لو كان الحجز فيه فوتوغرافي
-                if (isPhotoBooking && !formData.packageId) return showToast("يرجى اختيار باكيدج التصوير الفوتوغرافي", "error");
-                
-                // التأكد من اختيار خدمة فيديو فقط لو كان الحجز فيه فيديو
-                if (isVideoBooking && !formData.videoServiceId) return showToast("يرجى اختيار خدمة تصوير الفيديو", "error");
+                if (!formData.groomName || !formData.brideName || !formData.phone || !formData.date || !formData.address) {
+                    return showToast("يرجى إكمال البيانات الأساسية (الأسماء، الهاتف، التاريخ، العنوان)", "error");
+                }
                 
                 setIsSubmitting(true);
                 const snapData = {
@@ -1306,7 +1581,7 @@
                             <InputField label="اسم العريس" value={formData.groomName} onChange={e => setFormData({...formData, groomName: e.target.value})} required />
                             <InputField label="اسم العروسة" value={formData.brideName} onChange={e => setFormData({...formData, brideName: e.target.value})} required />
                             <InputField label="رقم الهاتف" type="tel" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} required />
-                            <InputField label="العنوان" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} />
+                            <InputField label="العنوان" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} required />
                           </div>
                         </div>
 
@@ -1331,7 +1606,7 @@
                                 </div>
                                 {formData.sessionType === 'آخر' && (
                                     <div className="flex-1">
-                                        <InputField label="تفاصيل نوع السيشن" value={formData.otherSessionType} onChange={e=>setFormData({...formData, otherSessionType: e.target.value})} required />
+                                        <InputField label="تفاصيل نوع السيشن" value={formData.otherSessionType} onChange={e=>setFormData({...formData, otherSessionType: e.target.value})} />
                                     </div>
                                 )}
                             </div>
@@ -1344,7 +1619,7 @@
                                 </div>
                                 {formData.location === 'آخر' && (
                                     <div className="flex-1">
-                                        <InputField label="تفاصيل اللوكيشن" value={formData.otherLocation} onChange={e=>setFormData({...formData, otherLocation: e.target.value})} required />
+                                        <InputField label="تفاصيل اللوكيشن" value={formData.otherLocation} onChange={e=>setFormData({...formData, otherLocation: e.target.value})} />
                                     </div>
                                 )}
                             </div>
@@ -1357,7 +1632,7 @@
                                         </div>
                                         {formData.casualLocation === 'آخر' && (
                                             <div className="flex-1">
-                                                <InputField label="تفاصيل مكان الكاجوال" value={formData.otherCasualLocation} onChange={e=>setFormData({...formData, otherCasualLocation: e.target.value})} required />
+                                                <InputField label="تفاصيل مكان الكاجوال" value={formData.otherCasualLocation} onChange={e=>setFormData({...formData, otherCasualLocation: e.target.value})} />
                                             </div>
                                         )}
                                     </div>
@@ -1563,6 +1838,8 @@
                         .replace(/\[الاسم\]/g, booking.groomName)
                         .replace(/\[العروسة\]/g, booking.brideName)
                         .replace(/\[التاريخ\]/g, booking.date)
+                        .replace(/\[الاجمالي\]/g, booking.totalPrice || 0)
+                        .replace(/\[المدفوع\]/g, booking.paid || 0)
                         .replace(/\[المتبقي\]/g, booking.remaining)
                         .replace(/\[اللوكيشن\]/g, booking.location === 'آخر' ? booking.otherLocation : booking.location);
                     setCustomText(txt);
@@ -1583,8 +1860,8 @@
                             <button onClick={onClose} className="text-gray-400 hover:text-white"><Icons.X size={24} /></button>
                         </div>
                         <div className="space-y-4">
-                            <SelectField label="اختر نوع الرسالة" value={selectedTemplate} onChange={e => setSelectedTemplate(e.target.value)} options={messages.map(m => m.id)} />
-                            <div className="flex flex-col w-full -mt-4">
+                            <div className="flex flex-col w-full">
+                                <label className="text-xs text-gray-500 mb-1">اختر نوع الرسالة</label>
                                 <select value={selectedTemplate} onChange={e => setSelectedTemplate(e.target.value)} className="bg-black border border-[#333] text-white rounded-xl p-3 outline-none focus:border-[#D4AF37]">
                                     {messages.map((m) => <option key={m.id} value={m.id}>{m.title}</option>)}
                                 </select>
@@ -1687,7 +1964,7 @@
                     {/* Messages Settings */}
                     <div className="bg-[#111] p-6 rounded-3xl border border-[#222] shadow-xl">
                         <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2"><Icons.MessageSquare size={20} className="text-[#D4AF37]"/> الردود السريعة (واتساب)</h3>
-                        <p className="text-sm text-gray-400 mb-6">الكلمات التي سيتم استبدالها تلقائياً: [الاسم] - [العروسة] - [التاريخ] - [المتبقي] - [اللوكيشن]</p>
+                        <p className="text-sm text-gray-400 mb-6">الكلمات التي سيتم استبدالها تلقائياً: [الاسم] - [العروسة] - [التاريخ] - [الاجمالي] - [المدفوع] - [المتبقي] - [اللوكيشن]</p>
                         
                         <div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -1704,6 +1981,7 @@
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <SettingObjectList title="قوالب المصروفات (بنود الطباعة)" items={localSettings.expenseTemplates || []} onChange={(arr) => updateArray('expenseTemplates', arr)} />
                         <SettingObjectList title="الباكيدجات الأساسية" items={localSettings.packages} onChange={(arr) => updateArray('packages', arr)} />
                         <SettingObjectList title="إضافات الفوتوغرافيا" items={localSettings.addons} onChange={(arr) => updateArray('addons', arr)} />
                         <SettingObjectList title="خدمات الفيديو الأساسية" items={localSettings.videoServices} hasSubtext={true} onChange={(arr) => updateArray('videoServices', arr)} />
