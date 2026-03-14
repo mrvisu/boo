@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Studio Management System</title>
     
-    <!-- الأيقونة الافتراضية للتبويب -->
     <link rel="icon" type="image/png" href="https://placehold.co/600x600/111/D4AF37?text=Studio">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,8 +13,9 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
-    <!-- مكتبة تحويل الـ HTML إلى صورة -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
@@ -2308,6 +2308,48 @@
                 }
             };
 
+            // --- دالة تصدير البيانات إلى Excel الحقيقي ---
+            const handleExportBackup = () => {
+                if (bookings.length === 0) {
+                    return showToast("لا توجد بيانات لتصديرها!", "error");
+                }
+
+                // 1. تحديد عناوين الأعمدة
+                const headers = ['اسم العريس', 'اسم العروسة', 'الهاتف', 'التاريخ', 'نوع السيشن', 'المكان', 'إجمالي الحساب', 'المدفوع', 'المتبقي', 'حالة الطلب'];
+                
+                // 2. تجهيز صفوف البيانات (مصفوفة ثنائية الأبعاد)
+                const data = bookings.map(b => {
+                    const session = b.sessionType === 'آخر' ? b.otherSessionType : b.sessionType;
+                    const loc = b.location === 'آخر' ? b.otherLocation : b.location;
+                    const status = b.status || 'حجز جديد';
+                    
+                    return [
+                        b.groomName || '', 
+                        b.brideName || '', 
+                        b.phone || '', 
+                        b.date || '', 
+                        session || '', 
+                        loc || '', 
+                        b.totalPrice || 0, 
+                        b.paid || 0, 
+                        b.remaining || 0, 
+                        status
+                    ];
+                });
+
+                // 3. إنشاء ملف الـ Excel باستخدام مكتبة xlsx
+                const wb = XLSX.utils.book_new(); // إنشاء كتاب جديد
+                const ws = XLSX.utils.aoa_to_sheet([headers, ...data]); // دمج العناوين مع البيانات
+                
+                // إضافة الشيت إلى الكتاب
+                XLSX.utils.book_append_sheet(wb, ws, "العملاء");
+                
+                // تنزيل الملف بصيغة .xlsx
+                XLSX.writeFile(wb, `MrakbyStudio_Bookings_${new Date().toISOString().split('T')[0]}.xlsx`);
+                
+                showToast("تم تحميل الحجوزات (Excel) بنجاح! ✅");
+            };
+
             return (
                 <div className="space-y-6 animate-fadeIn pb-10">
                     {msgModalBooking && <QuickMessageModal booking={msgModalBooking} settings={settings} onClose={() => setMsgModalBooking(null)} showToast={showToast} />}
@@ -2435,11 +2477,16 @@
                     )}
 
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4 w-full">
-                        <div className="flex items-center gap-4">
+                        <div className="flex flex-wrap items-center gap-2 md:gap-4">
                             <h2 className="text-3xl font-bold text-[#D4AF37]">قاعدة العملاء</h2>
-                            <button onClick={() => setPaymentModalOpen(true)} className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-xl font-bold flex items-center gap-2 transition-colors shadow-lg">
-                                <Icons.PlusCircle size={18} /> سداد دفعة
-                            </button>
+                            <div className="flex gap-2">
+                                <button onClick={() => setPaymentModalOpen(true)} className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-xl font-bold flex items-center gap-2 transition-colors shadow-lg text-sm md:text-base">
+                                    <Icons.PlusCircle size={18} /> سداد دفعة
+                                </button>
+                                <button onClick={handleExportBackup} className="bg-blue-900/40 text-blue-400 border border-blue-500/30 hover:bg-blue-600 hover:text-white px-4 py-2 rounded-xl font-bold flex items-center gap-2 transition-colors shadow-lg text-sm md:text-base">
+                                    <Icons.Save size={18} /> تصدير Excel
+                                </button>
+                            </div>
                         </div>
                         <div className="relative w-full md:w-96"><Icons.Search className="absolute right-4 top-3.5 text-gray-500" size={20}/><input type="text" placeholder="ابحث بالاسم أو رقم الهاتف..." value={search} onChange={e => setSearch(e.target.value)} className="w-full bg-[#111] border border-[#333] p-3 pr-12 rounded-2xl outline-none focus:border-[#D4AF37] text-white"/></div>
                     </div>
@@ -2642,6 +2689,46 @@
 
             const formatMoney = (val) => `${val.toLocaleString()} ج.م`;
 
+            // --- دالة تصدير المصروفات إلى Excel حقيقي ---
+            const handleExportExpenses = () => {
+                if (expenses.length === 0) {
+                    return showToast("لا توجد مصروفات لتصديرها!", "error");
+                }
+
+                // 1. تحديد العناوين
+                const headers = ['التاريخ', 'المبلغ', 'القسم', 'العميل المرتبط', 'الملاحظات'];
+                
+                // 2. تجهيز مصفوفة البيانات
+                const data = expenses.map(e => {
+                    let clientName = 'بدون عميل (عام)';
+                    if (e.bookingId) {
+                        const b = bookings.find(b => b.id === e.bookingId);
+                        if (b) {
+                            clientName = `${b.groomName} و ${b.brideName}`;
+                        }
+                    }
+
+                    return [
+                        e.date || '',
+                        e.amount || 0,
+                        e.category || '',
+                        clientName,
+                        e.notes || ''
+                    ];
+                });
+
+                // 3. إنشاء الكتاب والشيت
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
+                
+                XLSX.utils.book_append_sheet(wb, ws, "المصروفات");
+                
+                // تنزيل الملف بصيغة .xlsx
+                XLSX.writeFile(wb, `MrakbyStudio_Expenses_${new Date().toISOString().split('T')[0]}.xlsx`);
+                
+                showToast("تم تحميل المصروفات (Excel) بنجاح! ✅");
+            };
+
             return (
                 <div className="space-y-6 animate-fadeIn pb-10 relative">
                     
@@ -2785,8 +2872,13 @@
 
                     {/* قائمة المصروفات السابقة */}
                     <div className="bg-[#111] p-6 rounded-3xl border border-[#333] shadow-xl mt-6">
-                        <h3 className="text-xl font-bold text-white mb-6 border-b border-[#222] pb-3 flex justify-between items-center">
-                            <span>سجل المصروفات</span>
+                        <h3 className="text-xl font-bold text-white mb-6 border-b border-[#222] pb-3 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                            <div className="flex items-center gap-3">
+                                <span>سجل المصروفات</span>
+                                <button onClick={handleExportExpenses} className="bg-blue-900/40 text-blue-400 border border-blue-500/30 hover:bg-blue-600 hover:text-white px-3 py-1.5 rounded-lg font-bold flex items-center gap-2 transition-colors text-sm">
+                                    <Icons.Save size={16} /> Excel
+                                </button>
+                            </div>
                             <span className="text-sm bg-red-900/30 text-red-500 px-3 py-1 rounded-lg border border-red-900/50">
                                 إجمالي: {formatMoney(expenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0))}
                             </span>
