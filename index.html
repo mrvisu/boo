@@ -346,6 +346,98 @@
             );
         }
 
+        // --- Onboarding Guide Modal ---
+        function OnboardingGuide({ onClose }) {
+            const [step, setStep] = useState(0);
+            
+            const steps = [
+                {
+                    title: "مرحباً بك في نظام الاستوديو! 👋",
+                    text: "هذا النظام مصمم خصيصاً لتسهيل عملك كصاحب استوديو أو مصور. دعنا نأخذ جولة سريعة للتعرف على أهم الميزات التي ستوفر عليك الكثير من الوقت والجهد.",
+                    icon: <Icons.Camera size={60} className="text-[#D4AF37] mb-6 mx-auto animate-pulse" />
+                },
+                {
+                    title: "📊 الرئيسية والملخص المالي",
+                    text: "هنا تجد نظرة شاملة على عملك: إجمالي الإيرادات، التحصيلات، والمصروفات. كما تظهر لك تنبيهات ذكية بمواعيد التصوير لتكون مستعداً دائماً. (يمكنك إخفاء المبالغ المالية للحفاظ على الخصوصية).",
+                    icon: <Icons.LayoutDashboard size={60} className="text-[#D4AF37] mb-6 mx-auto" />
+                },
+                {
+                    title: "📝 إضافة حجز جديد",
+                    text: "سجل بيانات العريس والعروسة، اختر نوع التصوير (فيديو أو فوتوغرافي)، وحدد الباقات. سيقوم النظام بحساب الإجمالي والمتبقي تلقائياً، ويمكنك طباعة العقد رسمياً أو مشاركته.",
+                    icon: <Icons.PlusCircle size={60} className="text-[#D4AF37] mb-6 mx-auto" />
+                },
+                {
+                    title: "👥 العملاء والتقويم",
+                    text: "قاعدة بيانات كاملة لعملائك تتيح لك البحث السريع والفلترة. كما يمكنك متابعة مواعيدك عبر 'التقويم' المدمج الذي يعرض الحجوزات مرتبة حسب الأيام.",
+                    icon: <Icons.Users size={60} className="text-[#D4AF37] mb-6 mx-auto" />
+                },
+                {
+                    title: "🛒 المصروفات وحاسبة الطباعة",
+                    text: "قسم مبتكر يتيح لك تسجيل المصروفات وربطها بعميل محدد لتعرف 'صافي الربح' الحقيقي منه. ويحتوي على 'حاسبة سريعة' لحساب تكلفة المجات والألبومات بنقرة واحدة.",
+                    icon: <Icons.Wallet size={60} className="text-[#D4AF37] mb-6 mx-auto" />
+                },
+                {
+                    title: "⚙️ الإعدادات والتخصيص",
+                    text: "خصص النظام ليناسب استوديوك! يمكنك تغيير اسم الاستوديو، رفع اللوجو الخاص بك، تعديل أسعار الباقات، إضافة قوالب للحاسبة، وتخصيص رسائل الواتساب الجاهزة.",
+                    icon: <Icons.Settings size={60} className="text-[#D4AF37] mb-6 mx-auto" />
+                }
+            ];
+
+            return (
+                <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[150] p-4 animate-fadeIn">
+                    <div className="bg-[#111] border border-[#D4AF37]/50 p-8 rounded-3xl w-full max-w-lg shadow-2xl relative text-center">
+                        <div className="min-h-[250px] flex flex-col justify-center">
+                            {steps[step].icon}
+                            <h3 className="text-2xl font-bold text-white mb-4">{steps[step].title}</h3>
+                            <p className="text-gray-400 leading-relaxed text-sm md:text-base px-2">{steps[step].text}</p>
+                        </div>
+                        
+                        <div className="flex justify-between items-center mt-8 pt-6 border-t border-[#333]">
+                            <button 
+                                onClick={onClose} 
+                                className="text-gray-500 hover:text-white transition-colors text-sm font-bold"
+                            >
+                                تخطي الشرح
+                            </button>
+                            
+                            <div className="flex gap-3">
+                                {step > 0 && (
+                                    <button 
+                                        onClick={() => setStep(step - 1)} 
+                                        className="px-4 py-2.5 bg-[#222] hover:bg-[#333] text-white rounded-xl transition-colors font-bold text-sm"
+                                    >
+                                        السابق
+                                    </button>
+                                )}
+                                {step < steps.length - 1 ? (
+                                    <button 
+                                        onClick={() => setStep(step + 1)} 
+                                        className="px-6 py-2.5 bg-[#D4AF37] hover:bg-yellow-500 text-black rounded-xl transition-colors font-bold text-sm shadow-lg shadow-[#D4AF37]/20"
+                                    >
+                                        التالي
+                                    </button>
+                                ) : (
+                                    <button 
+                                        onClick={onClose} 
+                                        className="px-6 py-2.5 bg-green-600 hover:bg-green-500 text-white rounded-xl transition-colors font-bold text-sm shadow-lg shadow-green-600/20"
+                                    >
+                                        ابدأ العمل الآن!
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                        
+                        {/* Progress dots */}
+                        <div className="flex justify-center gap-2 mt-6">
+                            {steps.map((_, i) => (
+                                <div key={i} className={`w-2 h-2 rounded-full transition-all ${i === step ? 'bg-[#D4AF37] w-6' : 'bg-gray-700'}`}></div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
         // --- Admin Components ---
         function AdminDashboard({ showToast }) {
             const [subscribers, setSubscribers] = useState([]);
@@ -704,6 +796,19 @@
           const [trialInfo, setTrialInfo] = useState(null);
           const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
           
+          // Onboarding Tutorial State
+          const [showGuide, setShowGuide] = useState(() => {
+              try {
+                  const seen = localStorage.getItem('mrakby_guide_seen');
+                  return seen !== 'true'; // Show if not previously seen
+              } catch(e) { return false; }
+          });
+          
+          const closeGuide = () => {
+              localStorage.setItem('mrakby_guide_seen', 'true');
+              setShowGuide(false);
+          };
+
           const [bookings, setBookings] = useState(() => {
               try {
                   const saved = localStorage.getItem('mrakby_bookings');
@@ -1014,6 +1119,11 @@
                 </div>
               )}
 
+              {/* Onboarding Guide Modal */}
+              {showGuide && !isAdmin && (
+                  <OnboardingGuide onClose={closeGuide} />
+              )}
+
               {/* Custom Logout Modal */}
               {showLogoutConfirm && (
                  <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 animate-fadeIn p-4">
@@ -1068,7 +1178,7 @@
               </div>
 
               <div className="flex flex-col md:flex-row min-h-screen">
-                <aside className={`${isMobileMenuOpen ? 'block' : 'hidden'} md:block w-full md:w-64 bg-[#111] border-l border-[#222] p-6 flex-shrink-0 transition-all flex flex-col`}>
+                <aside className={`${isMobileMenuOpen ? 'block' : 'hidden'} md:block w-full md:w-64 bg-[#111] border-l border-[#222] p-6 flex-shrink-0 transition-all flex flex-col z-10`}>
                   <div className="hidden md:flex items-center gap-3 mb-10">
                     <div className="p-1 rounded-full border-2 border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.2)]">
                         <img 
@@ -1102,13 +1212,18 @@
                         <NavItem icon={<Icons.Shield />} label="إدارة المشتركين" active={currentView === 'admin'} onClick={() => {setCurrentView('admin'); setIsMobileMenuOpen(false);}} />
                     )}
                   </nav>
-                  <div className="mt-auto pt-10 space-y-4">
-                    <button onClick={handleLogoutClick} className="w-full flex items-center justify-center gap-2 bg-red-900/20 text-red-500 py-2 rounded-xl border border-red-900/50 hover:bg-red-900/40 transition-colors">
-                        <Icons.LogOut size={18} /> تسجيل الخروج
+                  <div className="mt-auto pt-8 space-y-3">
+                    {!isAdmin && (
+                        <button onClick={() => { setShowGuide(true); setIsMobileMenuOpen(false); }} className="w-full flex items-center justify-center gap-2 bg-[#D4AF37]/10 text-[#D4AF37] py-2 rounded-xl border border-[#D4AF37]/30 hover:bg-[#D4AF37] hover:text-black transition-colors font-bold text-sm">
+                            <Icons.Info size={16} /> دليل استخدام البرنامج
+                        </button>
+                    )}
+                    <button onClick={handleLogoutClick} className="w-full flex items-center justify-center gap-2 bg-red-900/20 text-red-500 py-2 rounded-xl border border-red-900/50 hover:bg-red-900/40 transition-colors font-bold text-sm">
+                        <Icons.LogOut size={16} /> تسجيل الخروج
                     </button>
-                    <div className="p-4 bg-black/50 rounded-xl border border-[#D4AF37]/20 text-center">
-                      <p className="text-xs text-gray-500 mb-1">Studio ID</p>
-                      <p className="font-mono text-[#D4AF37] font-bold uppercase">#{settings?.studioName ? settings.studioName.substring(0,4) : 'STUDIO'}_USER</p>
+                    <div className="p-3 bg-black/50 rounded-xl border border-[#D4AF37]/20 text-center">
+                      <p className="text-[10px] text-gray-500 mb-1">Studio ID</p>
+                      <p className="font-mono text-[#D4AF37] font-bold uppercase text-xs">#{settings?.studioName ? settings.studioName.substring(0,4) : 'STUDIO'}_USER</p>
                     </div>
                   </div>
                 </aside>
@@ -2681,7 +2796,6 @@
                                 <thead className="bg-black/40 border-b border-[#222]">
                                     <tr>
                                         <th className="p-3 text-gray-400 font-medium whitespace-nowrap">التاريخ</th>
-                                        <th className="p-3 text-gray-400 font-medium whitespace-nowrap">القسم</th>
                                         <th className="p-3 text-gray-400 font-medium whitespace-nowrap">المبلغ</th>
                                         <th className="p-3 text-gray-400 font-medium">العميل المرتبط والملاحظات</th>
                                         <th className="p-3 text-center text-gray-400 font-medium">إجراءات</th>
@@ -2691,7 +2805,6 @@
                                     {expenses.map(e => (
                                         <tr key={e.id} className="hover:bg-[#1a1a1a] transition-colors">
                                             <td className="p-3 text-sm font-mono text-gray-300 whitespace-nowrap">{e.date}</td>
-                                            <td className="p-3 text-sm text-[#D4AF37] font-bold whitespace-nowrap">{e.category}</td>
                                             <td className="p-3 text-sm font-bold text-red-400 whitespace-nowrap">{e.amount} ج.م</td>
                                             <td className="p-3 text-xs text-gray-400 max-w-xs break-words">
                                                 {e.bookingId && bookings.find(b => b.id === e.bookingId) ? (
