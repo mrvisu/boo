@@ -101,6 +101,7 @@
             LayoutDashboard: (props) => <Icon path="<rect width='7' height='9' x='3' y='3' rx='1'/><rect width='7' height='5' x='14' y='3' rx='1'/><rect width='7' height='9' x='14' y='12' rx='1'/><rect width='7' height='5' x='3' y='16' rx='1'/>" {...props}/>,
             CalendarIcon: (props) => <Icon path="<rect width='18' height='18' x='3' y='4' rx='2' ry='2'/><line x1='16' x2='16' y1='2' y2='6'/><line x1='8' x2='8' y1='2' y2='6'/><line x1='3' x2='21' y1='10' y2='10'/>" {...props}/>,
             Users: (props) => <Icon path="<path d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2'/><circle cx='9' cy='7' r='4'/><path d='M22 21v-2a4 4 0 0 0-3-3.87'/><path d='M16 3.13a4 4 0 0 1 0 7.75'/>" {...props}/>,
+            BookOpen: (props) => <Icon path="<path d='M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z'/><path d='M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z'/>" {...props}/>,
             PlusCircle: (props) => <Icon path="<circle cx='12' cy='12' r='10'/><path d='M8 12h8'/><path d='M12 8v8'/>" {...props}/>,
             Settings: (props) => <Icon path="<path d='M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z'/><circle cx='12' cy='12' r='3'/>" {...props}/>,
             Printer: (props) => <Icon path="<polyline points='6 9 6 2 18 2 18 9'/><path d='M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2'/><rect width='12' height='8' x='6' y='14'/>" {...props}/>,
@@ -158,14 +159,19 @@
             studioName: "", 
             studioLogo: LOGO_URL, 
             hideFinancials: false,
+            privacyPassword: "0000",
             videoContractTerm: "تصوير الفيديو Full HD ويُسلم على فلاشة. (لا يمكن الرجوع للاستوديو لاسترجاع البيانات بعد مرور ٣ أشهر).",
-            expenseCategories: ['طباعة ألبوم', 'براويز', 'هدايا', 'مواصلات', 'أجرة مصور إضافي', 'معدات وإيجار', 'كهرباء', 'نت', 'بنزين', 'أخرى'],
             printingItems: [
                 { id: 'pr1', name: 'مج مطبوع', price: 50, subtext: '' },
                 { id: 'pr2', name: 'برواز خشب 30x40', price: 100, subtext: '' },
                 { id: 'pr3', name: 'ألبوم 10 صفحات', price: 500, subtext: '' },
                 { id: 'pr4', name: 'مواصلات', price: 50, subtext: '' },
                 { id: 'pr5', name: 'أجرة صنايعي إضافي', price: 300, subtext: '' }
+            ],
+            videoExpenseItems: [
+                { id: 've1', name: 'أجرة مصور فيديو', price: 500, subtext: '' },
+                { id: 've2', name: 'مونتاج', price: 300, subtext: '' },
+                { id: 've3', name: 'إيجار معدات (كرين/درون)', price: 400, subtext: '' }
             ],
             packages: [
                 { id: 'p1', name: 'Wedding Basic', price: 5000, subtext: '' },
@@ -548,7 +554,7 @@
                         </div>
                     )}
 
-                    <header className="border-b border-[#222] pb-4">
+                    <header className="sticky top-[73px] md:top-0 z-30 bg-[#0a0a0a]/95 backdrop-blur-md -mt-4 md:-mt-8 -mx-4 md:-mx-8 px-4 md:px-8 pt-4 md:pt-8 pb-4 mb-6 border-b border-[#222] shadow-[0_4px_20px_-10px_rgba(0,0,0,0.8)]">
                         <h2 className="text-3xl font-bold text-[#D4AF37] flex items-center gap-2"><Icons.Shield size={30} /> لوحة تحكم الإدارة العليا</h2>
                         <p className="text-gray-400 mt-1">إدارة الاستوديوهات والمصورين المشتركين في النظام.</p>
                     </header>
@@ -672,6 +678,7 @@
                           <DetailRow label="العروسة" value={selectedBooking.brideName} />
                           <DetailRow label="الهاتف" value={selectedBooking.phone} isMono />
                           <DetailRow label="التاريخ" value={selectedBooking.date} />
+                          <DetailRow label="نوع الحجز" value={selectedBooking.bookingMainType || 'فوتوغرافي وفيديو'} />
                           <DetailRow label="نوع السيشن" value={selectedBooking.sessionType === 'آخر' ? selectedBooking.otherSessionType : selectedBooking.sessionType} />
                           <DetailRow label="اللوكيشن" value={selectedBooking.location === 'آخر' ? selectedBooking.otherLocation : selectedBooking.location} />
                           <DetailRow label="الميك أب" value={selectedBooking.makeupArtist || 'غير محدد'} />
@@ -719,7 +726,7 @@
                                  <p className="text-lg font-bold text-red-500">{totalCost} ج.م</p>
                             </div>
                             <div className="bg-green-900/10 p-3 rounded-2xl border border-green-900/30 flex flex-col justify-center items-center text-center shadow-inner">
-                                 <p className="text-xs text-green-400 mb-1">صافي الربح (المتوقع)</p>
+                                 <p className="text-xs text-green-400 mb-1">صاف الربح (المتوقع)</p>
                                  <p className="text-lg font-bold text-green-500">{netProfit} ج.م</p>
                             </div>
                         </div>
@@ -747,7 +754,7 @@
                   </div>
                 )}
                 
-                <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                <div className="sticky top-[73px] md:top-0 z-30 bg-[#0a0a0a]/95 backdrop-blur-md -mt-4 md:-mt-8 -mx-4 md:-mx-8 px-4 md:px-8 pt-4 md:pt-8 pb-4 mb-8 border-b border-[#222] shadow-[0_4px_20px_-10px_rgba(0,0,0,0.8)] flex flex-col md:flex-row justify-between items-center gap-4">
                   <div>
                     <h2 className="text-3xl font-bold text-[#D4AF37]">التقويم</h2>
                     <p className="text-gray-400 mt-2 text-sm">اضغط على أي يوم لإضافة حجز جديد، أو لمعاينة حجوزاتك السابقة.</p>
@@ -816,10 +823,24 @@
               } catch(e) { return []; }
           });
 
-          // إضافة حالة المصروفات
+          // إضافة حالة المصروفات واليوميات
           const [expenses, setExpenses] = useState(() => {
               try {
                   const saved = localStorage.getItem('mrakby_expenses');
+                  return saved ? JSON.parse(saved) : [];
+              } catch(e) { return []; }
+          });
+
+          const [dailyLogs, setDailyLogs] = useState(() => {
+              try {
+                  const saved = localStorage.getItem('mrakby_daily_logs');
+                  return saved ? JSON.parse(saved) : [];
+              } catch(e) { return []; }
+          });
+
+          const [dailyExpenses, setDailyExpenses] = useState(() => {
+              try {
+                  const saved = localStorage.getItem('mrakby_daily_expenses');
                   return saved ? JSON.parse(saved) : [];
               } catch(e) { return []; }
           });
@@ -833,6 +854,12 @@
                       if (parsed.studioLogo && (parsed.studioLogo.includes('Gemini_Generated_Image') || parsed.studioLogo.includes('messages-prod') || parsed.studioLogo.includes('blogger.googleusercontent'))) {
                           parsed.studioLogo = LOGO_URL;
                       }
+                      
+                      // التأكد من وجود قسم لمصروفات الفيديو
+                      if (!parsed.videoExpenseItems) {
+                          parsed.videoExpenseItems = DEFAULT_SETTINGS.videoExpenseItems;
+                      }
+
                       return parsed;
                   }
               } catch(e) { console.error(e); }
@@ -928,7 +955,7 @@
               
               const db = firebase.firestore();
               const unsubB = db.collection('users').doc(user.uid).collection('bookings').onSnapshot((snap) => {
-                  const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                  const data = snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
                   
                   // Sorting logic: Future dates ascending, then past dates descending
                   const today = new Date();
@@ -954,19 +981,33 @@
               });
               
               const unsubE = db.collection('users').doc(user.uid).collection('expenses').onSnapshot((snap) => {
-                  const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                  const data = snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
                   data.sort((a, b) => new Date(b.date) - new Date(a.date));
                   setExpenses(data);
+              });
+
+              const unsubDL = db.collection('users').doc(user.uid).collection('daily_logs').onSnapshot((snap) => {
+                  const data = snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+                  data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                  setDailyLogs(data);
+              });
+
+              const unsubDE = db.collection('users').doc(user.uid).collection('daily_expenses').onSnapshot((snap) => {
+                  const data = snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+                  data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                  setDailyExpenses(data);
               });
 
               const unsubS = db.collection('users').doc(user.uid).collection('settings').doc('config').onSnapshot((snap) => {
                   if(snap.exists) setSettings({ ...DEFAULT_SETTINGS, ...snap.data() });
               });
-              return () => { unsubB(); unsubE(); unsubS(); };
+              return () => { unsubB(); unsubE(); unsubDL(); unsubDE(); unsubS(); };
           }, [user, isFirebaseActiveState, isAdmin]);
 
           useEffect(() => { localStorage.setItem('mrakby_bookings', JSON.stringify(bookings)); }, [bookings]);
           useEffect(() => { localStorage.setItem('mrakby_expenses', JSON.stringify(expenses)); }, [expenses]);
+          useEffect(() => { localStorage.setItem('mrakby_daily_logs', JSON.stringify(dailyLogs)); }, [dailyLogs]);
+          useEffect(() => { localStorage.setItem('mrakby_daily_expenses', JSON.stringify(dailyExpenses)); }, [dailyExpenses]);
           useEffect(() => { localStorage.setItem('mrakby_settings', JSON.stringify(settings)); }, [settings]);
 
           // إضافة رسالة تأكيد عند محاولة إغلاق الموقع أو التبويب
@@ -1093,6 +1134,29 @@
               }
           };
 
+          const handleToggleHide = () => {
+              if (localHideFinancials) {
+                  setShowPasswordPrompt(true);
+              } else {
+                  setLocalHideFinancials(true);
+              }
+          };
+
+          const [showPasswordPrompt, setShowPasswordPrompt] = useState(false);
+          const [passwordInput, setPasswordInput] = useState('');
+
+          const verifyPassword = () => {
+              const correctPass = settings.privacyPassword || '0000';
+              if (passwordInput === correctPass) {
+                  setLocalHideFinancials(false);
+                  setShowPasswordPrompt(false);
+                  setPasswordInput('');
+                  showToast("تم إظهار المبالغ بنجاح", "success");
+              } else {
+                  showToast("كلمة المرور غير صحيحة!", "error");
+              }
+          };
+
           if (isCheckingAuth) return (
               <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-4">
                   <div className="w-24 h-24 bg-white rounded-full mx-auto mb-6 border-2 border-[#D4AF37] flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(212,175,55,0.4)] animate-pulse">
@@ -1117,6 +1181,30 @@
                   <Icons.CheckCircle size={20} />
                   <span className="font-bold">{toast.message}</span>
                 </div>
+              )}
+
+              {/* Password Prompt Modal */}
+              {showPasswordPrompt && (
+                  <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[110] p-4 animate-fadeIn">
+                      <div className="bg-[#111] border border-[#D4AF37]/30 p-6 rounded-3xl w-full max-w-sm shadow-2xl text-center">
+                          <Icons.Shield className="mx-auto text-[#D4AF37] mb-4" size={48} />
+                          <h3 className="text-xl font-bold text-white mb-4">كلمة مرور الخصوصية</h3>
+                          <p className="text-gray-400 text-sm mb-6">يرجى إدخال كلمة المرور لإظهار المبالغ المالية</p>
+                          <input 
+                              type="password" 
+                              value={passwordInput} 
+                              onChange={e => setPasswordInput(e.target.value)} 
+                              onKeyDown={e => e.key === 'Enter' && verifyPassword()}
+                              placeholder="كلمة المرور..." 
+                              className="w-full bg-black border border-[#333] text-white rounded-xl p-3 mb-6 focus:outline-none focus:border-[#D4AF37] text-center tracking-widest text-lg" 
+                              autoFocus 
+                          />
+                          <div className="flex gap-3">
+                              <button onClick={() => {setShowPasswordPrompt(false); setPasswordInput('');}} className="flex-1 py-3 bg-[#222] hover:bg-[#333] text-white rounded-xl font-bold transition-colors">إلغاء</button>
+                              <button onClick={verifyPassword} className="flex-1 py-3 bg-[#D4AF37] hover:bg-yellow-500 text-black rounded-xl font-bold transition-colors">تأكيد</button>
+                          </div>
+                      </div>
+                  </div>
               )}
 
               {/* Onboarding Guide Modal */}
@@ -1162,7 +1250,7 @@
                   </div>
               )}
 
-              <div className="md:hidden flex items-center justify-between bg-[#111] p-4 border-b border-[#D4AF37]/30">
+              <div className="md:hidden flex items-center justify-between bg-[#111] p-4 border-b border-[#D4AF37]/30 sticky top-0 z-50">
                 <h1 className="text-[#D4AF37] font-bold text-xl flex items-center gap-2">
                   <img 
                       src={settings?.studioLogo || LOGO_URL} 
@@ -1177,8 +1265,8 @@
                 </button>
               </div>
 
-              <div className="flex flex-col md:flex-row min-h-screen">
-                <aside className={`${isMobileMenuOpen ? 'block' : 'hidden'} md:block w-full md:w-64 bg-[#111] border-l border-[#222] p-6 flex-shrink-0 transition-all flex flex-col z-10`}>
+              <div className="flex flex-col md:flex-row min-h-screen relative">
+                <aside className={`${isMobileMenuOpen ? 'flex' : 'hidden'} md:flex w-full md:w-64 bg-[#111] border-l border-[#222] p-6 flex-shrink-0 transition-all flex-col z-40 fixed right-0 top-[73px] md:top-0 h-[calc(100vh-73px)] md:h-screen overflow-y-auto`}>
                   <div className="hidden md:flex items-center gap-3 mb-10">
                     <div className="p-1 rounded-full border-2 border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.2)]">
                         <img 
@@ -1205,6 +1293,7 @@
                             }} />
                             <NavItem icon={<Icons.Users />} label="العملاء" active={currentView === 'clients'} onClick={() => {setCurrentView('clients'); setIsMobileMenuOpen(false);}} />
                             <NavItem icon={<Icons.CalendarIcon />} label="التقويم" active={currentView === 'calendar'} onClick={() => {setCurrentView('calendar'); setIsMobileMenuOpen(false);}} />
+                            <NavItem icon={<Icons.BookOpen />} label="اليومية (الدرج)" active={currentView === 'daily'} onClick={() => {setCurrentView('daily'); setIsMobileMenuOpen(false);}} />
                             <NavItem icon={<Icons.Wallet />} label="المصروفات" active={currentView === 'expenses'} onClick={() => {setCurrentView('expenses'); setIsMobileMenuOpen(false);}} />
                             <NavItem icon={<Icons.Settings />} label="الإعدادات" active={currentView === 'settings'} onClick={() => {setCurrentView('settings'); setIsMobileMenuOpen(false);}} />
                         </>
@@ -1228,13 +1317,13 @@
                   </div>
                 </aside>
 
-                <main className="flex-1 p-4 md:p-8 overflow-y-auto flex flex-col">
+                <main className="flex-1 p-4 md:p-8 flex flex-col min-w-0 md:mr-64">
                   <div className="flex-1">
                       {isAdmin ? (
                           <AdminDashboard showToast={showToast} />
                       ) : (
                           <>
-                              {currentView === 'dashboard' && <Dashboard bookings={bookings} expenses={expenses} settings={settings} onDayClick={navigateToNewBooking} onUpdateBooking={handleUpdateBooking} />}
+                              {currentView === 'dashboard' && <Dashboard bookings={bookings} expenses={expenses} settings={settings} onDayClick={navigateToNewBooking} onUpdateBooking={handleUpdateBooking} showToast={showToast} />}
                               {currentView === 'new' && <NewBooking settings={settings} initialDate={initialBookingDate} user={user} bookingToEdit={bookingToEdit} isFirebaseActive={isFirebaseActiveState} onSuccess={(newB, isUpdate) => {
                                   // No need to update local state manually if firebase is active, onSnapshot will handle it.
                                   if(!isFirebaseActiveState) { 
@@ -1265,6 +1354,7 @@
                               }} showToast={showToast} />}
                               {currentView === 'clients' && <ClientsList bookings={bookings} settings={settings} onPrint={setContractToPrint} onEdit={navigateToEditBooking} showToast={showToast} user={user} isFirebaseActive={isFirebaseActiveState} onLocalDelete={(id) => setBookings(bookings.filter(b => b.id !== id))} onUpdateBooking={handleUpdateBooking} />}
                               {currentView === 'calendar' && <CalendarView bookings={bookings} expenses={expenses} settings={settings} onDayClick={navigateToNewBooking} />}
+                              {currentView === 'daily' && <DailyView dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} dailyExpenses={dailyExpenses} setDailyExpenses={setDailyExpenses} user={user} isFirebaseActive={isFirebaseActiveState} showToast={showToast} settings={settings} />}
                               {currentView === 'expenses' && <ExpensesView expenses={expenses} bookings={bookings} settings={settings} onAddExpense={handleAddExpense} onUpdateExpense={handleUpdateExpense} onDeleteExpense={handleDeleteExpense} showToast={showToast} />}
                               {currentView === 'settings' && <SettingsView settings={settings} user={user} isFirebaseActive={isFirebaseActiveState} onLocalSave={(s) => setSettings(s)} showToast={showToast} />}
                           </>
@@ -1437,7 +1527,7 @@
             );
         }
 
-        function Dashboard({ bookings, expenses = [], settings, onDayClick, onUpdateBooking }) {
+        function Dashboard({ bookings, expenses = [], settings, onDayClick, onUpdateBooking, showToast }) {
           const [selectedAlertBooking, setSelectedAlertBooking] = useState(null);
           const [paymentBooking, setPaymentBooking] = useState(null);
           const [paymentAmount, setPaymentAmount] = useState('');
@@ -1479,10 +1569,59 @@
             let totalExpectedRevenue = 0;
             let totalCollected = 0;
 
+            // متغيرات تتبع حسابات الفيديو والفوتو
+            let totalVideoExpected = 0;
+            let totalVideoPaid = 0;
+            let activeVideoCount = 0;
+            let activePhotoCount = 0;
+
             bookings.forEach(b => {
-                totalExpectedRevenue += (Number(b.totalPrice) || 0);
-                totalCollected += (Number(b.paid) || 0);
+                const bRev = Number(b.totalPrice) || 0;
+                const bPaid = Number(b.paid) || 0;
+                
+                totalExpectedRevenue += bRev;
+                totalCollected += bPaid;
+
+                // حساب قيمة الفيديو داخل الحجز
+                let videoPart = 0;
+                if (['تصوير فيديو', 'فوتوغرافي وفيديو'].includes(b.bookingMainType)) {
+                    videoPart += Number(b.videoServicePrice) || 0;
+                    if (b.videoAddons && b.videoAddons.length > 0) {
+                        videoPart += b.videoAddons.reduce((sum, a) => sum + (Number(a.price) || 0), 0);
+                    }
+                }
+
+                // حساب المدفوع للفيديو بنسبة وتناسب إذا كان الحجز مكس (فوتو وفيديو)
+                if (videoPart > 0) {
+                    totalVideoExpected += videoPart;
+                    const ratio = bRev > 0 ? (videoPart / bRev) : 0;
+                    totalVideoPaid += Math.round(bPaid * ratio);
+                }
             });
+
+            // حساب مصروفات الفيديو بدقة وتجميع المصروفات الكلية
+            let totalVideoExpenses = 0;
+            let totalAllExpenses = 0;
+            expenses.forEach(e => {
+                const amt = Number(e.amount) || 0;
+                totalAllExpenses += amt;
+
+                if (e.expenseType === 'فيديو ومونتاج') {
+                    totalVideoExpenses += amt;
+                } else if (!e.expenseType) {
+                    // دعم للبيانات القديمة التي ليس لها تصنيف مسجل
+                    const cat = (e.category || '').toLowerCase();
+                    const notes = (e.notes || '').toLowerCase();
+                    if (cat.includes('فيديو') || cat.includes('مونتاج') || cat.includes('وحدة') || cat.includes('ميكسر') || cat.includes('كرين') || notes.includes('فيديو')) {
+                        totalVideoExpenses += amt;
+                    }
+                }
+            });
+
+            // حسابات الفوتوغرافيا المستنتجة
+            const totalPhotoExpected = totalExpectedRevenue - totalVideoExpected;
+            const totalPhotoPaid = totalCollected - totalVideoPaid;
+            const totalPhotoExpenses = totalAllExpenses - totalVideoExpenses;
 
             const globalOutstanding = totalExpectedRevenue - totalCollected;
 
@@ -1495,6 +1634,9 @@
               const bRev = Number(b.totalPrice) || 0; const bPaid = Number(b.paid) || 0; rev += bRev; paid += bPaid;
               const type = b.sessionType === 'آخر' ? b.otherSessionType : b.sessionType;
               if (counts[type] !== undefined) counts[type]++; else counts[type] = 1;
+              
+              if (['تصوير فيديو', 'فوتوغرافي وفيديو'].includes(b.bookingMainType)) activeVideoCount++;
+              if (['تصوير فوتوغرافي', 'فوتوغرافي وفيديو'].includes(b.bookingMainType)) activePhotoCount++;
               
               const d = new Date(b.date);
               if (!isNaN(d)) {
@@ -1526,18 +1668,47 @@
             const maxMonthlyRev = Math.max(...sortedMonths.map(m => m.rev), 1);
             
             return { 
-                stats: { total: activeBookings.length, rev, paid, outstanding: rev - paid, counts, sortedMonths, maxMonthlyRev, currentMonthNumber, currentMonthTotalBookings, deliveredRev, deliveredCount, totalExpectedRevenue, totalCollected, globalOutstanding },
+                stats: { 
+                    total: activeBookings.length, 
+                    rev, 
+                    paid, 
+                    outstanding: rev - paid, 
+                    counts, 
+                    sortedMonths, 
+                    maxMonthlyRev, 
+                    currentMonthNumber, 
+                    currentMonthTotalBookings, 
+                    deliveredRev, 
+                    deliveredCount, 
+                    totalExpectedRevenue, 
+                    totalCollected, 
+                    totalExpenses: totalAllExpenses,
+                    netProfit: totalCollected - totalAllExpenses,
+                    globalOutstanding,
+                    videoStats: {
+                        count: activeVideoCount,
+                        expected: totalVideoExpected,
+                        paid: totalVideoPaid,
+                        outstanding: totalVideoExpected - totalVideoPaid,
+                        expenses: totalVideoExpenses,
+                        net: totalVideoPaid - totalVideoExpenses
+                    },
+                    photoStats: {
+                        count: activePhotoCount,
+                        expected: totalPhotoExpected,
+                        paid: totalPhotoPaid,
+                        outstanding: totalPhotoExpected - totalPhotoPaid,
+                        expenses: totalPhotoExpenses,
+                        net: totalPhotoPaid - totalPhotoExpenses
+                    }
+                },
                 upcoming: upcomingList,
                 tomorrowAlerts: tmrwAlerts,
                 casualAlerts: casualList
             };
-          }, [bookings]);
+          }, [bookings, expenses]);
 
           const formatMoney = (val) => `${val.toLocaleString()} ج.م`;
-
-          let totalExpenses = 0;
-          expenses.forEach(e => { totalExpenses += (Number(e.amount) || 0); });
-          const netProfit = stats.totalCollected - totalExpenses;
 
           const processPayment = () => {
               const amt = Number(paymentAmount);
@@ -1562,6 +1733,29 @@
 
               setPaymentBooking(null);
               setPaymentAmount('');
+          };
+
+          const handleToggleHide = () => {
+              if (localHideFinancials) {
+                  setShowPasswordPrompt(true);
+              } else {
+                  setLocalHideFinancials(true);
+              }
+          };
+
+          const [showPasswordPrompt, setShowPasswordPrompt] = useState(false);
+          const [passwordInput, setPasswordInput] = useState('');
+
+          const verifyPassword = () => {
+              const correctPass = settings.privacyPassword || '0000';
+              if (passwordInput === correctPass) {
+                  setLocalHideFinancials(false);
+                  setShowPasswordPrompt(false);
+                  setPasswordInput('');
+                  showToast("تم إظهار المبالغ بنجاح", "success");
+              } else {
+                  showToast("كلمة المرور غير صحيحة!", "error");
+              }
           };
 
           // حسابات العميل المحدد في الـ Modal
@@ -1653,6 +1847,7 @@
                         <DetailRow label="العروسة" value={selectedAlertBooking.data.brideName} />
                         <DetailRow label="الهاتف" value={selectedAlertBooking.data.phone} isMono />
                         <DetailRow label="التاريخ" value={selectedAlertBooking.data.date} isRed />
+                        <DetailRow label="نوع الحجز" value={selectedAlertBooking.data.bookingMainType || 'فوتوغرافي وفيديو'} />
                         <DetailRow label="نوع السيشن" value={selectedAlertBooking.data.sessionType === 'آخر' ? selectedAlertBooking.data.otherSessionType : selectedAlertBooking.data.sessionType} />
                         <DetailRow label="اللوكيشن الأساسي" value={selectedAlertBooking.data.location === 'آخر' ? selectedAlertBooking.data.otherLocation : selectedAlertBooking.data.location} />
                         <DetailRow label="الكاجوال" value={selectedAlertBooking.data.casualLocation === 'آخر' ? selectedAlertBooking.data.otherCasualLocation : selectedAlertBooking.data.casualLocation || '---'} />
@@ -1757,13 +1952,15 @@
                 </div>
               )}
 
-              <header className="bg-gradient-to-r from-[#111] to-[#0a0a0a] p-6 rounded-3xl border border-[#333] shadow-lg flex justify-between items-center mb-8 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-32 h-32 bg-[#D4AF37]/10 rounded-full blur-3xl -ml-10 -mt-10 pointer-events-none"></div>
-                <div className="relative z-10">
-                    <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] to-white mb-2">لوحة التحكم 📸</h2>
-                    <p className="text-gray-400 text-sm md:text-base">مرحباً بك في <span className="text-[#D4AF37] font-bold">{settings.studioName || 'الاستوديو'}</span>، إليك ملخص أعمالك.</p>
-                </div>
-              </header>
+              <div className="sticky top-[73px] md:top-0 z-30 bg-[#0a0a0a]/95 backdrop-blur-md -mt-4 md:-mt-8 -mx-4 md:-mx-8 px-4 md:px-8 pt-4 md:pt-8 pb-4 mb-8 border-b border-[#222] shadow-sm">
+                  <header className="bg-gradient-to-r from-[#111] to-[#0a0a0a] p-6 rounded-3xl border border-[#333] shadow-lg flex justify-between items-center relative overflow-hidden">
+                      <div className="absolute top-0 left-0 w-32 h-32 bg-[#D4AF37]/10 rounded-full blur-3xl -ml-10 -mt-10 pointer-events-none"></div>
+                      <div className="relative z-10">
+                          <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] to-white mb-2">لوحة التحكم 📸</h2>
+                          <p className="text-gray-400 text-sm md:text-base">مرحباً بك في <span className="text-[#D4AF37] font-bold">{settings.studioName || 'الاستوديو'}</span>، إليك ملخص أعمالك.</p>
+                      </div>
+                  </header>
+              </div>
 
               {/* Animated Alert Queue Section */}
               <div className="space-y-4">
@@ -1846,21 +2043,67 @@
                 </div>
               </div>
 
-              {/* Stats at the bottom */}
-              <div className="flex justify-between items-center mt-10 mb-4 border-b border-[#222] pb-4">
-                  <h3 className="text-2xl font-bold text-[#D4AF37] flex items-center gap-2">
-                      <Icons.Wallet size={24} /> الملخص المالي الشامل
-                  </h3>
-                  <button onClick={() => setLocalHideFinancials(!localHideFinancials)} className="bg-[#222] hover:bg-[#333] p-2.5 rounded-xl text-gray-400 hover:text-[#D4AF37] transition-colors border border-[#333] shadow-md flex items-center gap-2 text-sm font-bold">
+              {/* زر التحكم في الخصوصية (إخفاء المبالغ) */}
+              <div className="flex justify-end mt-8 mb-2">
+                  <button onClick={handleToggleHide} className="bg-[#222] hover:bg-[#333] px-4 py-2 rounded-xl text-gray-400 hover:text-[#D4AF37] transition-colors border border-[#333] shadow-md flex items-center gap-2 text-sm font-bold">
                       {localHideFinancials ? <><Icons.EyeOff size={18}/> إظهار المبالغ</> : <><Icons.Eye size={18}/> إخفاء المبالغ</>}
                   </button>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                <StatCard title="إجمالي الإيرادات" value={formatMoney(stats.totalExpectedRevenue)} subtitle="قيمة كل الحجوزات" highlight={true} isObscured={localHideFinancials} />
-                <StatCard title="إجمالي التحصيلات" value={formatMoney(stats.totalCollected)} subtitle="ما تم قبضه فعلياً" highlight={true} isObscured={localHideFinancials} />
-                <StatCard title="إجمالي المصروفات" value={formatMoney(totalExpenses)} subtitle="كافة نفقات الاستوديو" alert={true} isObscured={localHideFinancials} />
-                <StatCard title="صافي الربح" value={formatMoney(netProfit)} subtitle="التحصيلات - المصروفات" success={netProfit >= 0} alert={netProfit < 0} isObscured={localHideFinancials} />
-                <StatCard title="مبالغ بالسوق" value={formatMoney(stats.globalOutstanding)} alert={stats.globalOutstanding > 0} subtitle="مستحقات لدى العملاء" isObscured={localHideFinancials} />
+
+              {/* صندوق المحفظة العامة */}
+              <div className="mb-8">
+                  <h3 className="text-2xl font-bold text-green-500 mb-4 flex items-center gap-2 border-b border-[#222] pb-4">
+                      <Icons.Wallet size={28} /> المحفظة العامة الكلية 💰
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="bg-gradient-to-br from-green-900/20 to-black p-5 rounded-3xl border border-green-500/30 shadow-[0_0_15px_rgba(34,197,94,0.1)]">
+                          <h3 className="text-gray-400 text-sm mb-1">إجمالي المدفوع في المحفظة</h3>
+                          <p className="text-3xl font-black text-green-400">{localHideFinancials ? '••••••' : formatMoney(stats.totalCollected)}</p>
+                          <p className="text-xs text-gray-500 mt-2">كافة التحصيلات (فوتو + فيديو)</p>
+                      </div>
+                      <div className="bg-[#111] p-5 rounded-3xl border border-[#333]">
+                          <h3 className="text-gray-400 text-sm mb-1">إجمالي المصروفات الكلية</h3>
+                          <p className="text-3xl font-black text-red-400">{localHideFinancials ? '••••••' : formatMoney(stats.totalExpenses)}</p>
+                          <p className="text-xs text-gray-500 mt-2">كافة المصروفات (فوتو + فيديو)</p>
+                      </div>
+                      <div className="bg-gradient-to-br from-[#1a1500] to-black p-5 rounded-3xl border border-[#D4AF37]/30 shadow-[0_0_15px_rgba(212,175,55,0.1)]">
+                          <h3 className="text-gray-400 text-sm mb-1">صافي الربح الكلي للمكان</h3>
+                          <p className={`text-3xl font-black ${stats.netProfit >= 0 ? 'text-[#D4AF37]' : 'text-red-500'}`}>
+                              {localHideFinancials ? '••••••' : formatMoney(stats.netProfit)}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-2">إجمالي التحصيلات - إجمالي المصروفات</p>
+                      </div>
+                  </div>
+              </div>
+
+              {/* صندوق حسابات الفوتوغرافيا */}
+              <div className="mb-8">
+                  <h3 className="text-2xl font-bold text-[#D4AF37] mb-4 flex items-center gap-2 border-b border-[#222] pb-4">
+                      <Icons.Camera size={28} /> قسم التصوير الفوتوغرافي 📸
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      <StatCard title="إجمالي حجوزات الفوتوغرافيا" value={stats.photoStats.count} subtitle="حجوزات نشطة (غير مسلمة)" highlight={true} isObscured={false} />
+                      <StatCard title="إجمالي تعاقدات الفوتوغرافيا" value={formatMoney(stats.photoStats.expected)} subtitle="قيمة الحجوزات" isObscured={localHideFinancials} />
+                      <StatCard title="المدفوع للفوتوغرافيا" value={formatMoney(stats.photoStats.paid)} subtitle="ما تم تحصيله" success={true} isObscured={localHideFinancials} />
+                      <StatCard title="المتبقي بالسوق (فوتو)" value={formatMoney(stats.photoStats.outstanding)} subtitle="مستحقات متأخرة" alert={stats.photoStats.outstanding > 0} isObscured={localHideFinancials} />
+                      <StatCard title="مصروفات الفوتوغرافيا" value={formatMoney(stats.photoStats.expenses)} subtitle="مصروفات واستوديو" alert={true} isObscured={localHideFinancials} />
+                      <StatCard title="صافي ربح الفوتوغرافيا" value={formatMoney(stats.photoStats.net)} subtitle="المدفوع - المصروفات" success={stats.photoStats.net >= 0} alert={stats.photoStats.net < 0} highlight={true} isObscured={localHideFinancials} />
+                  </div>
+              </div>
+
+              {/* صندوق حسابات الفيديو */}
+              <div className="mb-8">
+                  <h3 className="text-2xl font-bold text-indigo-400 mb-4 flex items-center gap-2 border-b border-[#222] pb-4">
+                      <Icons.Video size={28} /> قسم الفيديو والمونتاج 🎥
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      <StatCard title="إجمالي حجوزات الفيديو" value={stats.videoStats.count} subtitle="حجوزات نشطة (غير مسلمة)" highlight={true} isObscured={false} />
+                      <StatCard title="إجمالي تعاقدات الفيديو" value={formatMoney(stats.videoStats.expected)} subtitle="قيمة خدمات الفيديو" isObscured={localHideFinancials} />
+                      <StatCard title="المدفوع للفيديو" value={formatMoney(stats.videoStats.paid)} subtitle="محصل بنسبة وتناسب" success={true} isObscured={localHideFinancials} />
+                      <StatCard title="المتبقي بالسوق (فيديو)" value={formatMoney(stats.videoStats.outstanding)} subtitle="مستحقات متأخرة" alert={stats.videoStats.outstanding > 0} isObscured={localHideFinancials} />
+                      <StatCard title="مصروفات الفيديو" value={formatMoney(stats.videoStats.expenses)} subtitle="مصروفات ومونتاج" alert={true} isObscured={localHideFinancials} />
+                      <StatCard title="صافي ربح الفيديو" value={formatMoney(stats.videoStats.net)} subtitle="المدفوع - المصروفات" success={stats.videoStats.net >= 0} alert={stats.videoStats.net < 0} isObscured={localHideFinancials} />
+                  </div>
               </div>
               
             </div>
@@ -2012,11 +2255,16 @@
 
             return (
                 <div className="max-w-4xl mx-auto pb-10 animate-fadeIn">
-                    <h2 className="text-3xl font-bold text-[#D4AF37] mb-8 border-b border-[#D4AF37]/30 pb-4">
-                        {bookingToEdit ? '✏️ تعديل بيانات الحجز' : '📝 تسجيل حجز جديد'}
-                    </h2>
+                    <div className="sticky top-[73px] md:top-0 z-30 bg-[#0a0a0a]/95 backdrop-blur-md -mx-4 md:-mx-8 px-4 md:px-8 py-4 border-b border-[#D4AF37]/30 flex flex-col sm:flex-row justify-between items-start sm:items-center shadow-[0_4px_20px_-10px_rgba(0,0,0,0.8)] gap-4">
+                        <h2 className="text-2xl md:text-3xl font-bold text-[#D4AF37]">
+                            {bookingToEdit ? '✏️ تعديل بيانات الحجز' : '📝 تسجيل حجز جديد'}
+                        </h2>
+                        <button form="bookingForm" type="submit" disabled={isSubmitting} className={`w-full sm:w-auto px-8 py-2.5 text-black font-bold rounded-xl transition-all shadow-lg flex justify-center items-center gap-2 ${isSubmitting ? 'bg-yellow-700 cursor-not-allowed opacity-70' : 'bg-[#D4AF37] hover:bg-yellow-500'}`}>
+                            <Icons.Save size={20}/> {isSubmitting ? 'جاري الحفظ...' : 'حفظ الحجز'}
+                        </button>
+                    </div>
                     
-                    <form onSubmit={submit} className="space-y-8">
+                    <form id="bookingForm" onSubmit={submit} className="space-y-8 mt-6">
                         {/* بيانات العميل */}
                         <div className="bg-[#111] p-6 rounded-2xl border border-[#333]">
                           <h3 className="text-xl text-white mb-4 flex items-center gap-2"><Icons.Users size={20} className="text-[#D4AF37]"/> بيانات العميل</h3>
@@ -2228,9 +2476,6 @@
                           </div>
                         </div>
                         
-                        <button type="submit" disabled={isSubmitting} className={`w-full text-black font-bold text-xl py-4 rounded-xl transition-all shadow-[0_0_20px_rgba(212,175,55,0.3)] ${isSubmitting ? 'bg-yellow-700 cursor-not-allowed opacity-70' : 'bg-[#D4AF37] hover:bg-yellow-500'}`}>
-                          {isSubmitting ? 'جاري الحفظ...' : (bookingToEdit ? 'تحديث وحفظ الحجز' : 'تأكيد وحفظ الحجز')}
-                        </button>
                     </form>
                 </div>
             );
@@ -2593,10 +2838,9 @@
 
         // --- Expenses View ---
         function ExpensesView({ expenses, bookings, settings, onAddExpense, onUpdateExpense, onDeleteExpense, showToast }) {
-            const categoriesList = settings.expenseCategories?.length > 0 ? settings.expenseCategories : ['أخرى'];
-            
             const [cart, setCart] = useState([]);
-            const [category, setCategory] = useState(categoriesList[0]);
+            // تحديد نوع المصروف للتحكم في القوالب والفورم
+            const [expenseType, setExpenseType] = useState('فوتوغرافي واستوديو');
             const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
             const [bookingId, setBookingId] = useState('');
             
@@ -2608,13 +2852,11 @@
             const [expenseToDelete, setExpenseToDelete] = useState(null); 
             const [quantities, setQuantities] = useState({});
 
-            useEffect(() => {
-                if (!editingId && categoriesList.length > 0 && !categoriesList.includes(category)) {
-                    setCategory(categoriesList[0]);
-                }
-            }, [categoriesList, category, editingId]);
-
             const cartTotal = cart.reduce((sum, item) => sum + item.total, 0);
+
+            // تصفية العملاء بناءً على النوع لاختيار العميل المرتبط
+            const photoClients = bookings.filter(b => ['تصوير فوتوغرافي', 'فوتوغرافي وفيديو'].includes(b.bookingMainType));
+            const videoClients = bookings.filter(b => ['تصوير فيديو', 'فوتوغرافي وفيديو'].includes(b.bookingMainType));
 
             const handleAddToCart = (item) => {
                 const q = parseInt(quantities[item.id]) || 1;
@@ -2647,7 +2889,8 @@
                     onUpdateExpense({
                         id: editingId,
                         amount: Number(editAmount),
-                        category: category || 'عام',
+                        expenseType: expenseType, 
+                        category: 'عام', 
                         notes: editNotes,
                         date,
                         bookingId
@@ -2662,7 +2905,8 @@
 
                     onAddExpense({
                         amount: cartTotal,
-                        category: category || 'عام',
+                        expenseType: expenseType, 
+                        category: 'عام', 
                         notes,
                         date,
                         bookingId,
@@ -2673,14 +2917,13 @@
                 }
                 
                 setBookingId('');
-                setCategory(categoriesList[0]);
                 setQuantities({});
             };
             
             const handleEdit = (exp) => {
                 setEditingId(exp.id);
                 setEditAmount(exp.amount);
-                setCategory(exp.category);
+                setExpenseType(exp.expenseType || 'فوتوغرافي واستوديو');
                 setEditNotes(exp.notes || '');
                 setDate(exp.date);
                 setBookingId(exp.bookingId || '');
@@ -2695,8 +2938,8 @@
                     return showToast("لا توجد مصروفات لتصديرها!", "error");
                 }
 
-                // 1. تحديد العناوين
-                const headers = ['التاريخ', 'المبلغ', 'القسم', 'العميل المرتبط', 'الملاحظات'];
+                // 1. تحديد العناوين (تم إزالة القسم الفرعي)
+                const headers = ['التاريخ', 'المبلغ', 'نوع المصروف', 'العميل المرتبط', 'الملاحظات'];
                 
                 // 2. تجهيز مصفوفة البيانات
                 const data = expenses.map(e => {
@@ -2711,7 +2954,7 @@
                     return [
                         e.date || '',
                         e.amount || 0,
-                        e.category || '',
+                        e.expenseType || 'فوتوغرافي واستوديو',
                         clientName,
                         e.notes || ''
                     ];
@@ -2728,6 +2971,8 @@
                 
                 showToast("تم تحميل المصروفات (Excel) بنجاح! ✅");
             };
+
+            const displayedTemplates = expenseType === 'فيديو ومونتاج' ? (settings.videoExpenseItems || []) : (settings.printingItems || []);
 
             return (
                 <div className="space-y-6 animate-fadeIn pb-10 relative">
@@ -2756,15 +3001,20 @@
                         {/* حاسبة الطباعة السريعة (قوالب) */}
                         <div className="space-y-4">
                             <div className="bg-[#111] p-6 rounded-3xl border border-[#333] shadow-xl">
-                                <div className="flex justify-between items-center mb-6 border-b border-[#222] pb-3">
+                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b border-[#222] pb-4 gap-4">
                                     <h3 className="text-xl font-bold text-[#D4AF37] flex items-center gap-2">
-                                        <Icons.Calculator size={20} /> قوالب المصروفات السريعة
+                                        <Icons.Calculator size={20} /> 
+                                        {expenseType === 'فيديو ومونتاج' ? 'قوالب مصروفات الفيديو' : 'قوالب مصروفات الفوتوغرافيا'}
                                     </h3>
-                                    <span className="text-xs text-gray-500 hidden sm:inline">اختر الصنف والعدد لإضافته للفاتورة</span>
+                                    
+                                    <select value={expenseType} onChange={e => {setExpenseType(e.target.value); setCart([]); setBookingId('');}} className="bg-black border border-[#444] text-white rounded-xl p-2 text-sm outline-none focus:border-[#D4AF37] font-bold min-w-[200px] shadow-md">
+                                        <option value="فوتوغرافي واستوديو">📸 قسم الفوتوغرافي والاستوديو</option>
+                                        <option value="فيديو ومونتاج">🎥 قسم الفيديو والمونتاج</option>
+                                    </select>
                                 </div>
                                 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                                    {(settings.printingItems || []).map(item => (
+                                    {displayedTemplates.map(item => (
                                         <div key={item.id} className="bg-black border border-[#222] p-4 rounded-2xl hover:border-[#D4AF37]/50 transition-all flex flex-col justify-between">
                                             <div>
                                                 <p className="font-bold text-white text-lg leading-tight">{item.name}</p>
@@ -2790,8 +3040,8 @@
                                             </div>
                                         </div>
                                     ))}
-                                    {(!settings.printingItems || settings.printingItems.length === 0) && (
-                                        <p className="text-gray-500 text-sm col-span-full">يمكنك إضافة قوالب مصاريف (مثل: طباعة، مواصلات، هدايا) من صفحة (الإعدادات).</p>
+                                    {displayedTemplates.length === 0 && (
+                                        <p className="text-gray-500 text-sm col-span-full">يمكنك إضافة قوالب مصاريف من صفحة (الإعدادات).</p>
                                     )}
                                 </div>
                             </div>
@@ -2809,7 +3059,7 @@
                                         {/* Cart Items List */}
                                         <div className="bg-black/50 rounded-xl p-3 border border-[#222] min-h-[100px] max-h-[250px] overflow-y-auto no-scrollbar space-y-2">
                                             {cart.length === 0 ? (
-                                                <p className="text-gray-500 text-center text-sm mt-6 mb-6">الفاتورة فارغة، قم بالإضافة من الحاسبة.</p>
+                                                <p className="text-gray-500 text-center text-sm mt-6 mb-6">الفاتورة فارغة، قم بالإضافة من الحاسبة في الأعلى.</p>
                                             ) : (
                                                 cart.map(item => (
                                                     <div key={item.id} className="flex justify-between items-center text-sm border-b border-[#333] pb-2 last:border-0 last:pb-0">
@@ -2843,23 +3093,54 @@
                                     </>
                                 )}
 
-                                <div className="bg-red-900/10 p-4 rounded-xl border border-red-500/30 mb-4 mt-2">
-                                    <label className="text-sm text-white mb-2 font-bold flex items-center gap-2">
-                                        <Icons.Users size={18} className="text-red-400"/> العميل المرتبط (مطلوب)
+                                {/* القوائم المنفصلة للعميل المرتبط */}
+                                <div className="bg-black/30 p-4 rounded-xl border border-[#333] mb-4 mt-2">
+                                    <label className="text-sm text-white mb-4 font-bold flex items-center gap-2">
+                                        <Icons.Users size={18} className="text-[#D4AF37]"/> العميل المرتبط بالمصروف (اختر من القائمة المناسبة)
                                     </label>
-                                    <select value={bookingId} onChange={e => setBookingId(e.target.value)} className="bg-black border border-red-500/50 text-white rounded-xl p-3 outline-none focus:border-red-500 w-full font-bold">
-                                        <option value="">-- يرجى اختيار عميل أولاً --</option>
-                                        {bookings.map(b => (
-                                            <option key={b.id} value={b.id}>{b.groomName} و {b.brideName} - {b.date}</option>
-                                        ))}
-                                    </select>
+                                    
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {/* قائمة عملاء الفوتوغرافيا */}
+                                        <div className={`p-4 rounded-xl border transition-all ${expenseType === 'فوتوغرافي واستوديو' ? 'border-[#D4AF37] bg-[#D4AF37]/5' : 'border-[#222] bg-black opacity-50 grayscale'}`}>
+                                            <label className="text-xs text-[#D4AF37] mb-2 block font-bold">📸 قائمة عملاء الفوتوغرافيا</label>
+                                            <select 
+                                                disabled={expenseType !== 'فوتوغرافي واستوديو'}
+                                                value={expenseType === 'فوتوغرافي واستوديو' ? bookingId : ''} 
+                                                onChange={e => setBookingId(e.target.value)} 
+                                                className="bg-black border border-[#333] text-white rounded-xl p-3 outline-none focus:border-[#D4AF37] w-full font-bold text-sm"
+                                            >
+                                                <option value="">-- اختر عميل فوتوغرافيا --</option>
+                                                {photoClients.map(b => (
+                                                    <option key={b.id} value={b.id}>{b.groomName} و {b.brideName} - {b.date}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        {/* قائمة عملاء الفيديو */}
+                                        <div className={`p-4 rounded-xl border transition-all ${expenseType === 'فيديو ومونتاج' ? 'border-indigo-500 bg-indigo-900/10' : 'border-[#222] bg-black opacity-50 grayscale'}`}>
+                                            <label className="text-xs text-indigo-400 mb-2 block font-bold">🎥 قائمة عملاء الفيديو</label>
+                                            <select 
+                                                disabled={expenseType !== 'فيديو ومونتاج'}
+                                                value={expenseType === 'فيديو ومونتاج' ? bookingId : ''} 
+                                                onChange={e => setBookingId(e.target.value)} 
+                                                className="bg-black border border-[#333] text-white rounded-xl p-3 outline-none focus:border-indigo-500 w-full font-bold text-sm"
+                                            >
+                                                <option value="">-- اختر عميل فيديو --</option>
+                                                {videoClients.map(b => (
+                                                    <option key={b.id} value={b.id}>{b.groomName} و {b.brideName} - {b.date}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <InputField label="تاريخ الصرف" type="date" value={date} onChange={e => setDate(e.target.value)} required />
+                                <div className="flex flex-col w-full">
+                                    <InputField label="تاريخ الصرف" type="date" value={date} onChange={e => setDate(e.target.value)} required />
+                                </div>
                                 
                                 <div className="flex gap-3 mt-4">
                                     {editingId && (
-                                        <button type="button" onClick={() => {setEditingId(null); setEditAmount(''); setEditNotes(''); setBookingId(''); setCategory(categoriesList[0]);}} className="flex-1 bg-[#222] hover:bg-[#333] text-white font-bold py-3 rounded-xl transition-colors">إلغاء التعديل</button>
+                                        <button type="button" onClick={() => {setEditingId(null); setEditAmount(''); setEditNotes(''); setBookingId(''); setExpenseType('فوتوغرافي واستوديو');}} className="flex-1 bg-[#222] hover:bg-[#333] text-white font-bold py-3 rounded-xl transition-colors">إلغاء التعديل</button>
                                     )}
                                     <button type="submit" disabled={!editingId && cart.length === 0} className={`flex-[2] text-black font-bold py-3 rounded-xl transition-colors shadow-lg flex items-center justify-center gap-2 ${editingId ? 'bg-blue-500 hover:bg-blue-600' : (!editingId && cart.length === 0 ? 'bg-gray-600 cursor-not-allowed' : 'bg-[#D4AF37] hover:bg-yellow-500')}`}>
                                         {editingId ? <Icons.Edit size={20} /> : <Icons.Save size={20} />}
@@ -2900,11 +3181,17 @@
                                             <td className="p-3 text-sm font-bold text-red-400 whitespace-nowrap">{e.amount} ج.م</td>
                                             <td className="p-3 text-xs text-gray-400 max-w-xs break-words">
                                                 {e.bookingId && bookings.find(b => b.id === e.bookingId) ? (
-                                                    <span className="text-white bg-red-900/30 px-2 py-1 rounded font-bold block mb-1 w-fit border border-red-900/50">
+                                                    <span className="text-white bg-red-900/30 px-2 py-1 rounded font-bold block mb-2 w-fit border border-red-900/50">
                                                         عريس: {bookings.find(b => b.id === e.bookingId).groomName}
                                                     </span>
-                                                ) : <span className="text-red-400 font-bold block mb-1">بدون عميل (عام)</span>}
-                                                {e.notes || '---'}
+                                                ) : <span className="text-red-400 font-bold block mb-2">بدون عميل (عام)</span>}
+                                                
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${e.expenseType === 'فيديو ومونتاج' ? 'bg-indigo-900/30 text-indigo-400 border border-indigo-900/50' : 'bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/30'}`}>
+                                                        {e.expenseType === 'فيديو ومونتاج' ? '🎥 فيديو' : '📸 فوتوغرافي/استوديو'}
+                                                    </span>
+                                                </div>
+                                                <span className="block mt-1">{e.notes || '---'}</span>
                                             </td>
                                             <td className="p-3 text-center flex justify-center gap-2">
                                                 <button onClick={() => handleEdit(e)} className="text-blue-500 hover:text-white hover:bg-blue-600 p-2 rounded-lg transition-colors" title="تعديل">
@@ -2916,7 +3203,7 @@
                                             </td>
                                         </tr>
                                     ))}
-                                    {expenses.length === 0 && <tr><td colSpan="5" className="text-center p-10 text-gray-500">لا توجد مصروفات مسجلة بعد.</td></tr>}
+                                    {expenses.length === 0 && <tr><td colSpan="4" className="text-center p-10 text-gray-500">لا توجد مصروفات مسجلة بعد.</td></tr>}
                                 </tbody>
                             </table>
                         </div>
@@ -3001,13 +3288,13 @@
             };
 
             return (
-                <div className="space-y-6 pb-20 animate-fadeIn max-w-5xl mx-auto">
-                    <div className="flex flex-col md:flex-row justify-between items-center border-b border-[#D4AF37]/20 pb-4 gap-4">
+                <div className="space-y-6 pb-20 animate-fadeIn max-w-5xl mx-auto relative">
+                    <div className="sticky top-[73px] md:top-0 z-30 bg-[#0a0a0a]/95 backdrop-blur-md -mx-4 md:-mx-8 px-4 md:px-8 py-4 border-b border-[#D4AF37]/30 flex flex-col md:flex-row justify-between items-center shadow-[0_4px_20px_-10px_rgba(0,0,0,0.8)] gap-4">
                         <div><h2 className="text-3xl font-bold text-[#D4AF37]">إعدادات النظام</h2><p className="text-gray-400 mt-1">تخص الواجهة، الباقات، الرسائل، والأسعار.</p></div>
                         <button onClick={handleSave} disabled={isSaving} className="w-full md:w-auto bg-[#D4AF37] text-black px-8 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-yellow-500 shadow-xl"><Icons.Save size={20} /> {isSaving ? "جاري الحفظ..." : "حفظ التعديلات"}</button>
                     </div>
 
-                    <div className="bg-[#111] p-6 rounded-3xl border border-[#222] shadow-xl relative overflow-hidden">
+                    <div className="bg-[#111] p-6 rounded-3xl border border-[#222] shadow-xl relative overflow-hidden mt-4">
                         <div className="absolute top-0 left-0 w-32 h-32 bg-[#D4AF37]/5 rounded-full blur-3xl -ml-10 -mt-10 pointer-events-none"></div>
                         <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2"><Icons.Camera size={20} className="text-[#D4AF37]"/> تخصيص هوية الاستوديو</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
@@ -3025,13 +3312,29 @@
                     {/* إعدادات الخصوصية */}
                     <div className="bg-[#111] p-6 rounded-3xl border border-[#222] shadow-xl mt-6">
                         <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2"><Icons.Eye size={20} className="text-[#D4AF37]"/> إعدادات الخصوصية</h3>
-                        <label className="flex items-center gap-4 cursor-pointer p-4 bg-black rounded-2xl border border-white/5 hover:border-[#D4AF37]/30 transition-colors">
+                        <label className="flex items-center gap-4 cursor-pointer p-4 bg-black rounded-2xl border border-white/5 hover:border-[#D4AF37]/30 transition-colors mb-4">
                             <input type="checkbox" checked={localSettings.hideFinancials || false} onChange={handlePrivacyToggle} className="w-6 h-6 accent-[#D4AF37] cursor-pointer" />
                             <div>
                                 <span className="text-white font-bold block text-lg">إخفاء المبالغ المالية في الرئيسية (افتراضياً)</span>
                                 <span className="text-sm text-gray-500">يقوم بإخفاء الإيرادات والتحصيلات وصافي الربح بكلمة مرور (نجوم) عند فتح التطبيق، ويمكن إظهارها مؤقتاً من الرئيسية.</span>
                             </div>
                         </label>
+                        
+                        <div className="bg-black p-4 rounded-2xl border border-white/5 flex flex-col md:flex-row gap-4 items-center">
+                            <div className="w-full md:w-1/2">
+                                <label className="text-sm text-gray-400 mb-2 block">كلمة مرور إظهار المبالغ (الافتراضي 0000)</label>
+                                <input 
+                                    type="text" 
+                                    value={localSettings.privacyPassword !== undefined ? localSettings.privacyPassword : '0000'} 
+                                    onChange={e => updateField('privacyPassword', e.target.value)} 
+                                    className="bg-[#111] border border-[#333] text-white rounded-xl p-3 focus:outline-none focus:border-[#D4AF37] transition-all w-full" 
+                                    placeholder="كلمة المرور..."
+                                />
+                            </div>
+                            <div className="w-full md:w-1/2 text-xs text-gray-500 mt-2 md:mt-6">
+                                سيطلب النظام هذه الكلمة عند الضغط على زر "إظهار المبالغ" في لوحة التحكم، لضمان عدم اطلاع أحد عليها بالخطأ.
+                            </div>
+                        </div>
                     </div>
 
                     <div className="bg-[#111] p-6 rounded-3xl border border-[#222] shadow-xl mt-6">
@@ -3065,14 +3368,13 @@
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
-                        <SettingObjectList title="قوالب حاسبة الطباعة والمصروفات" items={localSettings.printingItems || []} hasSubtext={false} onChange={(arr) => updateArray('printingItems', arr)} />
+                        <SettingObjectList title="قوالب حاسبة الطباعة والمصروفات (فوتوغرافيا)" items={localSettings.printingItems || []} hasSubtext={false} onChange={(arr) => updateArray('printingItems', arr)} />
+                        <SettingObjectList title="قوالب مصروفات الفيديو" items={localSettings.videoExpenseItems || []} hasSubtext={false} onChange={(arr) => updateArray('videoExpenseItems', arr)} />
                         
                         <SettingObjectList title="الباكيدجات الأساسية" items={localSettings.packages} hasSubtext={true} onChange={(arr) => updateArray('packages', arr)} />
                         <SettingObjectList title="إضافات الفوتوغرافيا" items={localSettings.addons} hasSubtext={true} onChange={(arr) => updateArray('addons', arr)} />
                         <SettingObjectList title="خدمات الفيديو الأساسية" items={localSettings.videoServices} hasSubtext={true} onChange={(arr) => updateArray('videoServices', arr)} />
                         <SettingObjectList title="إضافات الفيديو" items={localSettings.videoAddons} hasSubtext={true} onChange={(arr) => updateArray('videoAddons', arr)} />
-                        
-                        <SettingStringList title="أقسام المصروفات" items={localSettings.expenseCategories} onChange={(arr) => updateArray('expenseCategories', arr)} />
                         
                         <SettingStringList title="أماكن التصوير الأساسية" items={localSettings.locations} onChange={(arr) => updateArray('locations', arr)} />
                         <SettingStringList title="أماكن تصوير الكاجوال" items={localSettings.casualLocations} onChange={(arr) => updateArray('casualLocations', arr)} />
@@ -3084,20 +3386,56 @@
 
         function SettingObjectList({ title, items = [], hasSubtext, onChange }) {
           const [newItem, setNewItem] = useState({ name: '', price: '', subtext: '' });
+          const [editingId, setEditingId] = useState(null);
+          const [editData, setEditData] = useState({ name: '', price: '', subtext: '' });
+
           const handleAdd = () => {
             if(!newItem.name) return;
             onChange([...items, { id: 'id_' + Date.now(), name: newItem.name, price: Number(newItem.price) || 0, subtext: newItem.subtext || '' }]);
             setNewItem({ name: '', price: '', subtext: '' });
           };
+
           const handleRemove = (id) => { onChange(items.filter(i => i.id !== id)); };
+
+          const startEdit = (item) => {
+            setEditingId(item.id);
+            setEditData({ name: item.name, price: item.price, subtext: item.subtext || '' });
+          };
+
+          const saveEdit = (id) => {
+            if(!editData.name) return;
+            onChange(items.map(i => i.id === id ? { ...i, name: editData.name, price: Number(editData.price) || 0, subtext: editData.subtext || '' } : i));
+            setEditingId(null);
+          };
+
           return (
             <div className="bg-[#111] p-6 rounded-3xl border border-[#222]">
               <h3 className="text-lg font-bold text-white mb-4 border-b border-[#222] pb-3">{title}</h3>
               <div className="space-y-3 mb-6 max-h-48 overflow-y-auto pr-2 no-scrollbar">
                 {items.map(item => (
-                  <div key={item.id} className="flex justify-between items-center bg-black p-3 rounded-2xl border border-white/5">
-                    <div><p className="font-bold text-white text-sm">{item.name} <span className="text-[#D4AF37] ml-2">({item.price} ج.م)</span></p>{hasSubtext && item.subtext && <p className="text-xs text-gray-500 mt-1">{item.subtext}</p>}</div>
-                    <button onClick={() => handleRemove(item.id)} className="text-red-500 hover:text-red-400 bg-red-500/10 p-2 rounded-xl"><Icons.Trash2 size={16}/></button>
+                  <div key={item.id} className="flex flex-col bg-black p-3 rounded-2xl border border-white/5">
+                    {editingId === item.id ? (
+                        <div className="flex flex-col gap-2 w-full animate-fadeIn">
+                            <input value={editData.name} onChange={e => setEditData({...editData, name: e.target.value})} className="bg-[#111] border border-[#444] rounded-lg p-2 text-sm text-white focus:border-[#D4AF37] outline-none" placeholder="الاسم..." />
+                            <input type="number" min="0" value={editData.price} onChange={e => setEditData({...editData, price: e.target.value})} className="bg-[#111] border border-[#444] rounded-lg p-2 text-sm text-white focus:border-[#D4AF37] outline-none" placeholder="السعر..." />
+                            {hasSubtext && <input value={editData.subtext} onChange={e => setEditData({...editData, subtext: e.target.value})} className="bg-[#111] border border-[#444] rounded-lg p-2 text-sm text-white focus:border-[#D4AF37] outline-none" placeholder="ملاحظة..." />}
+                            <div className="flex gap-2 mt-1">
+                                <button onClick={() => saveEdit(item.id)} className="flex-1 bg-green-500/20 text-green-500 hover:bg-green-600 hover:text-white py-1.5 rounded-lg text-xs font-bold transition-colors flex justify-center items-center gap-1"><Icons.Save size={14}/> حفظ</button>
+                                <button onClick={() => setEditingId(null)} className="flex-1 bg-gray-500/20 text-gray-400 hover:bg-gray-600 hover:text-white py-1.5 rounded-lg text-xs font-bold transition-colors">إلغاء</button>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="flex justify-between items-center w-full">
+                            <div>
+                                <p className="font-bold text-white text-sm">{item.name} <span className="text-[#D4AF37] ml-2">({item.price} ج.م)</span></p>
+                                {hasSubtext && item.subtext && <p className="text-xs text-gray-500 mt-1">{item.subtext}</p>}
+                            </div>
+                            <div className="flex gap-2 shrink-0">
+                                <button onClick={() => startEdit(item)} className="text-blue-500 hover:text-blue-400 bg-blue-500/10 p-2 rounded-xl transition-colors"><Icons.Edit size={16} /></button>
+                                <button onClick={() => handleRemove(item.id)} className="text-red-500 hover:text-red-400 bg-red-500/10 p-2 rounded-xl transition-colors"><Icons.Trash2 size={16} /></button>
+                            </div>
+                        </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -3113,17 +3451,356 @@
 
         function SettingStringList({ title, items = [], onChange }) {
           const [newVal, setNewVal] = useState('');
+          const [editingIdx, setEditingIdx] = useState(null);
+          const [editVal, setEditVal] = useState('');
+
           const handleAdd = () => { if(!newVal.trim() || items.includes(newVal.trim())) return; onChange([...items, newVal.trim()]); setNewVal(''); };
           const handleRemove = (valToRemove) => { onChange(items.filter(i => i !== valToRemove)); };
+
+          const startEdit = (idx, val) => {
+            setEditingIdx(idx);
+            setEditVal(val);
+          };
+
+          const saveEdit = (idx) => {
+            if(!editVal.trim()) return;
+            const newArray = [...items];
+            newArray[idx] = editVal.trim();
+            onChange(newArray);
+            setEditingIdx(null);
+          };
+
           return (
             <div className="bg-[#111] p-6 rounded-3xl border border-[#222]">
               <h3 className="text-lg font-bold text-white mb-4 border-b border-[#222] pb-3">{title}</h3>
               <div className="flex flex-wrap gap-2 mb-6 max-h-48 overflow-y-auto no-scrollbar">
-                {items.map((item, idx) => (<div key={idx} className="flex items-center gap-2 bg-black px-3 py-2 rounded-xl border border-white/5"><span className="text-sm text-gray-300">{item}</span><button onClick={() => handleRemove(item)} className="text-red-500 hover:text-red-400 bg-red-500/10 rounded p-1"><Icons.X size={12}/></button></div>))}
+                {items.map((item, idx) => (
+                    <div key={idx} className="flex items-center gap-2 bg-black px-3 py-2 rounded-xl border border-white/5">
+                        {editingIdx === idx ? (
+                            <div className="flex items-center gap-2 animate-fadeIn">
+                                <input value={editVal} onChange={e => setEditVal(e.target.value)} className="bg-[#111] border border-[#444] text-white rounded px-2 py-1 text-sm focus:border-[#D4AF37] outline-none w-24" autoFocus />
+                                <button onClick={() => saveEdit(idx)} className="text-green-500 hover:text-green-400 bg-green-500/10 p-1 rounded"><Icons.CheckCircle size={14}/></button>
+                                <button onClick={() => setEditingIdx(null)} className="text-gray-500 hover:text-gray-400 bg-gray-500/10 p-1 rounded"><Icons.X size={14}/></button>
+                            </div>
+                        ) : (
+                            <>
+                                <span className="text-sm text-gray-300">{item}</span>
+                                <div className="flex gap-1 border-r border-[#333] pr-2 ml-1">
+                                    <button onClick={() => startEdit(idx, item)} className="text-blue-500 hover:text-blue-400 bg-blue-500/10 rounded p-1 transition-colors"><Icons.Edit size={12}/></button>
+                                    <button onClick={() => handleRemove(item)} className="text-red-500 hover:text-red-400 bg-red-500/10 rounded p-1 transition-colors"><Icons.X size={12}/></button>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                ))}
               </div>
               <div className="flex gap-2"><input placeholder="إضافة جديد..." value={newVal} onChange={e => setNewVal(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleAdd()} className="flex-1 bg-black border border-[#333] rounded-xl p-3 text-sm text-white focus:border-[#D4AF37] outline-none" /><button onClick={handleAdd} className="bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/30 rounded-xl px-5 font-bold hover:bg-[#D4AF37] hover:text-black transition-colors">إضافة</button></div>
             </div>
           );
+        }
+
+        // --- Daily View (اليومية) ---
+        function DailyView({ dailyLogs, setDailyLogs, dailyExpenses, setDailyExpenses, user, isFirebaseActive, showToast }) {
+            const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+            
+            // Search / Settle State
+            const [searchQuery, setSearchQuery] = useState('');
+            const [foundLog, setFoundLog] = useState(null);
+            const [settleAmount, setSettleAmount] = useState('');
+
+            // Forms State
+            const [logForm, setLogForm] = useState({ receiptNo: '', photoNo: '', clientName: '', phone: '', notes: '', total: '', paid: '' });
+            const [expForm, setExpForm] = useState({ name: '', amount: '' });
+
+            const currentDayLogs = dailyLogs.filter(l => l.date === selectedDate);
+            const currentDayExps = dailyExpenses.filter(e => e.date === selectedDate);
+
+            const dailyTotalIn = currentDayLogs.reduce((s, l) => s + (Number(l.paid) || 0), 0);
+            const dailyTotalOut = currentDayExps.reduce((s, e) => s + (Number(e.amount) || 0), 0);
+            const dailyNet = dailyTotalIn - dailyTotalOut;
+            const dailyTotalRemaining = currentDayLogs.reduce((s, l) => s + (Number(l.remaining) || 0), 0);
+
+            const handleSearch = (q) => {
+                setSearchQuery(q);
+                if (!q.trim()) { setFoundLog(null); return; }
+                const lowerQ = q.toLowerCase();
+                const found = dailyLogs.find(l => 
+                    l.remaining > 0 && 
+                    (String(l.receiptNo || '').toLowerCase().includes(lowerQ) || 
+                     String(l.photoNo || '').toLowerCase().includes(lowerQ) || 
+                     String(l.clientName || '').toLowerCase().includes(lowerQ))
+                );
+                setFoundLog(found || null);
+            };
+
+            const processSettle = async () => {
+                const amt = Number(settleAmount);
+                if (!amt || amt <= 0 || amt > foundLog.remaining) return showToast('مبلغ غير صحيح', 'error');
+
+                if (foundLog.date === selectedDate) {
+                    // سداد في نفس اليوم: تحديث السجل الأصلي فقط لتجنب التكرار في الحسابات
+                    const updatedLog = { 
+                        ...foundLog, 
+                        paid: Number(foundLog.paid) + amt, 
+                        remaining: foundLog.remaining - amt 
+                    };
+                    
+                    if (isFirebaseActive && user && window.firebase) {
+                        try {
+                            await firebase.firestore().collection('users').doc(user.uid).collection('daily_logs').doc(updatedLog.id).update({
+                                paid: updatedLog.paid,
+                                remaining: updatedLog.remaining
+                            });
+                            showToast('تم السداد وتحديث الدرج بنجاح');
+                        } catch(e) { showToast('حدث خطأ', 'error'); }
+                    } else {
+                        setDailyLogs(prev => prev.map(l => l.id === updatedLog.id ? updatedLog : l));
+                        showToast('تم السداد محلياً');
+                    }
+                } else {
+                    // سداد في يوم مختلف: تقليل المتبقي في السجل القديم وإضافة الدفعة كيومية في اليوم الحالي
+                    const updatedLog = { ...foundLog, remaining: foundLog.remaining - amt };
+                    
+                    const paymentLog = {
+                        id: 'dl_' + Date.now(),
+                        date: selectedDate, // يسجل في يومية التاريخ المحدد حالياً
+                        receiptNo: foundLog.receiptNo || '',
+                        photoNo: foundLog.photoNo || '',
+                        clientName: `سداد متبقي: ${foundLog.clientName}`,
+                        phone: foundLog.phone || '',
+                        notes: `سداد متبقي لصورة/إيصال قديم (من يوم ${foundLog.date})`,
+                        total: amt,
+                        paid: amt,
+                        remaining: 0,
+                        createdAt: new Date().toISOString()
+                    };
+
+                    if (isFirebaseActive && user && window.firebase) {
+                        try {
+                            await firebase.firestore().collection('users').doc(user.uid).collection('daily_logs').doc(updatedLog.id).update({
+                                remaining: updatedLog.remaining
+                            });
+                            await firebase.firestore().collection('users').doc(user.uid).collection('daily_logs').add(paymentLog);
+                            showToast('تم تسجيل السداد وتحديث الدرج بنجاح');
+                        } catch(e) { showToast('حدث خطأ', 'error'); }
+                    } else {
+                        setDailyLogs(prev => {
+                            const filtered = prev.map(l => l.id === updatedLog.id ? updatedLog : l);
+                            return [paymentLog, ...filtered];
+                        });
+                        showToast('تم السداد محلياً');
+                    }
+                }
+                
+                setFoundLog(null);
+                setSettleAmount('');
+                setSearchQuery('');
+            };
+
+            const handleAddLog = async (e) => {
+                e.preventDefault();
+                if(!logForm.clientName) return showToast('اسم العميل مطلوب', 'error');
+                const total = Number(logForm.total) || 0;
+                const paid = Number(logForm.paid) || 0;
+                const newLog = { ...logForm, id: 'dl_' + Date.now(), date: selectedDate, total, paid, remaining: total - paid, createdAt: new Date().toISOString() };
+
+                if (isFirebaseActive && user && window.firebase) {
+                    try {
+                        await firebase.firestore().collection('users').doc(user.uid).collection('daily_logs').add(newLog);
+                        showToast('تم تسجيل بيانات العميل');
+                    } catch(e) { showToast('خطأ بالحفظ', 'error'); }
+                } else {
+                    setDailyLogs(prev => [newLog, ...prev]);
+                    showToast('تم التسجيل محلياً');
+                }
+                setLogForm({ receiptNo: '', photoNo: '', clientName: '', phone: '', notes: '', total: '', paid: '' });
+            };
+
+            const handleAddExpense = async (e) => {
+                e.preventDefault();
+                if(!expForm.name || !expForm.amount) return showToast('البيانات غير مكتملة', 'error');
+                const newExp = { ...expForm, id: 'de_' + Date.now(), date: selectedDate, amount: Number(expForm.amount) || 0, createdAt: new Date().toISOString() };
+
+                if (isFirebaseActive && user && window.firebase) {
+                    try {
+                        await firebase.firestore().collection('users').doc(user.uid).collection('daily_expenses').add(newExp);
+                        showToast('تم تسجيل المصروف');
+                    } catch(e) { showToast('خطأ بالحفظ', 'error'); }
+                } else {
+                    setDailyExpenses(prev => [newExp, ...prev]);
+                    showToast('تم التسجيل محلياً');
+                }
+                setExpForm({ name: '', amount: '' });
+            };
+
+            const deleteLog = async (id) => {
+                if(window.confirm('تأكيد حذف هذا السجل؟')) {
+                    if (isFirebaseActive && user && window.firebase) await firebase.firestore().collection('users').doc(user.uid).collection('daily_logs').doc(id).delete();
+                    else setDailyLogs(prev => prev.filter(l => l.id !== id));
+                    showToast('تم الحذف');
+                }
+            };
+
+            const deleteExp = async (id) => {
+                if(window.confirm('تأكيد حذف المصروف؟')) {
+                    if (isFirebaseActive && user && window.firebase) await firebase.firestore().collection('users').doc(user.uid).collection('daily_expenses').doc(id).delete();
+                    else setDailyExpenses(prev => prev.filter(e => e.id !== id));
+                    showToast('تم الحذف');
+                }
+            };
+
+            return (
+                <div className="space-y-6 pb-20 animate-fadeIn max-w-6xl mx-auto relative">
+                    <header className="sticky top-[73px] md:top-0 z-30 bg-[#0a0a0a]/95 backdrop-blur-md -mx-4 md:-mx-8 px-4 md:px-8 py-4 border-b border-[#D4AF37]/30 flex flex-col md:flex-row justify-between items-center shadow-[0_4px_20px_-10px_rgba(0,0,0,0.8)] gap-4">
+                        <div className="flex items-center gap-3">
+                            <Icons.BookOpen size={32} className="text-[#D4AF37]" />
+                            <div>
+                                <h2 className="text-3xl font-bold text-[#D4AF37]">يومية الاستوديو (الدرج)</h2>
+                                <p className="text-gray-400 mt-1 text-sm">تسجيل الأعمال والمصروفات اليومية السريعة بشكل مستقل.</p>
+                            </div>
+                        </div>
+                        <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} className="bg-[#111] border border-[#333] text-white rounded-xl p-3 focus:outline-none focus:border-[#D4AF37] font-bold" />
+                    </header>
+
+                    {/* Settle Pending Box */}
+                    <div className="bg-[#111] p-6 rounded-3xl border border-green-500/30 shadow-xl relative overflow-hidden mt-6">
+                        <h3 className="text-xl font-bold text-green-500 mb-4 flex items-center gap-2"><Icons.Search size={20}/> استعلام وسداد لعميل يومية (من أي تاريخ)</h3>
+                        <div className="flex flex-col md:flex-row gap-4 items-start md:items-end">
+                            <div className="w-full md:w-1/3">
+                                <label className="text-xs text-gray-400 mb-1 block">رقم الإيصال / الصورة / الاسم</label>
+                                <input type="text" value={searchQuery} onChange={e => handleSearch(e.target.value)} className="w-full bg-black border border-[#444] text-white rounded-xl p-3 focus:outline-none focus:border-green-500" placeholder="ابحث للسداد..." />
+                            </div>
+                            {foundLog && (
+                                <div className="w-full md:flex-1 flex flex-col md:flex-row gap-4 items-center bg-black/50 p-3 rounded-xl border border-green-500/50 animate-fadeIn">
+                                    <div className="flex-1 w-full">
+                                        <p className="text-white font-bold text-sm mb-1">{foundLog.clientName} <span className="text-xs bg-red-900/30 text-red-400 px-2 py-0.5 rounded">متبقي: {foundLog.remaining} ج.م</span></p>
+                                        <p className="text-xs text-gray-500">إيصال: {foundLog.receiptNo || 'لا يوجد'} | صورة: {foundLog.photoNo || 'لا يوجد'}</p>
+                                    </div>
+                                    <div className="flex items-center gap-2 w-full md:w-auto">
+                                        <input type="number" min="1" max={foundLog.remaining} value={settleAmount} onChange={e => setSettleAmount(e.target.value)} className="w-full md:w-32 bg-black border border-[#333] text-white rounded-xl p-2.5 text-sm focus:outline-none focus:border-green-500" placeholder="مبلغ السداد..." />
+                                        <button onClick={processSettle} disabled={!settleAmount || settleAmount <= 0 || settleAmount > foundLog.remaining} className="bg-green-600 disabled:bg-gray-600 hover:bg-green-500 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-colors whitespace-nowrap">تأكيد السداد</button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Summary Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="bg-gradient-to-br from-[#1a1500] to-black p-5 rounded-3xl border border-[#D4AF37]/30">
+                            <h3 className="text-gray-400 text-sm mb-1">صافي درج اليوم</h3>
+                            <p className={`text-3xl font-black ${dailyNet >= 0 ? 'text-[#D4AF37]' : 'text-red-500'}`}>{dailyNet} ج.م</p>
+                        </div>
+                        <div className="bg-red-900/10 p-5 rounded-3xl border border-red-500/30">
+                            <h3 className="text-gray-400 text-sm mb-1">إجمالي المتبقي اليوم</h3>
+                            <p className="text-3xl font-black text-red-500">{dailyTotalRemaining} ج.م</p>
+                        </div>
+                        <div className="bg-[#111] p-5 rounded-3xl border border-[#333]">
+                            <h3 className="text-gray-400 text-sm mb-1">إجمالي المنصرف اليومي</h3>
+                            <p className="text-3xl font-black text-red-400">{dailyTotalOut} ج.م</p>
+                        </div>
+                    </div>
+
+                    <div className="bg-[#111] p-6 rounded-3xl border border-[#333] shadow-xl mt-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:divide-x lg:divide-x-reverse divide-[#333]">
+                            {/* Add Log Form */}
+                            <div className="lg:pl-8">
+                                <h3 className="text-lg font-bold text-[#D4AF37] mb-4 flex items-center gap-2"><Icons.PlusCircle size={20} /> تسجيل عميل يومية</h3>
+                                <form onSubmit={handleAddLog} className="space-y-4">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <InputField label="رقم الإيصال" value={logForm.receiptNo} onChange={e=>setLogForm({...logForm, receiptNo: e.target.value})} />
+                                        <InputField label="رقم الصورة" value={logForm.photoNo} onChange={e=>setLogForm({...logForm, photoNo: e.target.value})} />
+                                    </div>
+                                    <InputField label="اسم العميل" required value={logForm.clientName} onChange={e=>setLogForm({...logForm, clientName: e.target.value})} />
+                                    <InputField label="رقم الهاتف" type="tel" value={logForm.phone} onChange={e=>setLogForm({...logForm, phone: e.target.value})} />
+                                    <div className="flex flex-col w-full">
+                                        <label className="text-xs text-gray-400 mb-1">المطلوب / ملاحظات</label>
+                                        <textarea rows="2" value={logForm.notes} onChange={e=>setLogForm({...logForm, notes: e.target.value})} className="bg-black border border-[#333] text-white rounded-xl p-3 focus:outline-none focus:border-[#D4AF37] w-full" />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <InputField label="الإجمالي" type="number" required value={logForm.total} onChange={e=>setLogForm({...logForm, total: e.target.value})} />
+                                        <InputField label="المدفوع حالياً" type="number" value={logForm.paid} onChange={e=>setLogForm({...logForm, paid: e.target.value})} />
+                                    </div>
+                                    <button type="submit" className="w-full bg-[#D4AF37] text-black font-bold py-3 rounded-xl hover:bg-yellow-500 transition-colors mt-2">إضافة لسجل اليوم</button>
+                                </form>
+                            </div>
+
+                            {/* Add Expense Form */}
+                            <div className="pt-8 lg:pt-0 lg:pr-8 border-t lg:border-t-0 border-[#333]">
+                                <h3 className="text-lg font-bold text-red-400 mb-4 flex items-center gap-2"><Icons.Wallet size={20} /> تسجيل منصرف يومي مباشر</h3>
+                                <form onSubmit={handleAddExpense} className="space-y-4">
+                                    <InputField label="البيان (طباعة، خامات، إلخ)" required value={expForm.name} onChange={e=>setExpForm({...expForm, name: e.target.value})} />
+                                    <InputField label="المبلغ المنصرف" type="number" required value={expForm.amount} onChange={e=>setExpForm({...expForm, amount: e.target.value})} />
+                                    <button type="submit" className="w-full bg-red-900/30 text-red-400 border border-red-900/50 font-bold py-3 rounded-xl hover:bg-red-600 hover:text-white transition-colors mt-2">خصم من الدرج</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Today's Tables */}
+                    <div className="bg-[#111] p-6 rounded-3xl border border-[#333] shadow-xl mt-6">
+                        <h3 className="text-xl font-bold text-white mb-6 border-b border-[#222] pb-3">سجل وجداول اليوم</h3>
+                        
+                        <h4 className="text-[#D4AF37] font-bold mb-3 flex items-center gap-2"><Icons.Users size={18}/> العملاء والإيرادات</h4>
+                        <div className="overflow-x-auto no-scrollbar mb-8">
+                            <table className="w-full text-right text-sm">
+                                <thead className="bg-black/40 border-b border-[#222]">
+                                    <tr>
+                                        <th className="p-3 text-gray-400 font-medium whitespace-nowrap">المرجع</th>
+                                        <th className="p-3 text-gray-400 font-medium whitespace-nowrap">العميل والهاتف</th>
+                                        <th className="p-3 text-gray-400 font-medium">الطلبات</th>
+                                        <th className="p-3 text-gray-400 font-medium whitespace-nowrap">الحساب</th>
+                                        <th className="p-3 text-center text-gray-400 font-medium">إجراء</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-[#222]">
+                                    {currentDayLogs.map(l => (
+                                        <tr key={l.id} className="hover:bg-[#1a1a1a] transition-colors">
+                                            <td className="p-3 whitespace-nowrap"><p className="text-gray-400 text-xs">إيصال: <span className="font-mono text-[#D4AF37] font-bold text-sm">{l.receiptNo||'-'}</span></p><p className="text-gray-400 text-xs mt-1">صورة: <span className="font-mono text-white">{l.photoNo||'-'}</span></p></td>
+                                            <td className="p-3 whitespace-nowrap"><p className="font-bold text-white">{l.clientName}</p><p className="text-xs text-gray-500 font-mono mt-1">{l.phone||'-'}</p></td>
+                                            <td className="p-3 text-gray-300 max-w-[200px] break-words">{l.notes||'---'}</td>
+                                            <td className="p-3 whitespace-nowrap">
+                                                <p className="text-white text-xs">إجمالي: <span className="font-bold">{l.total}</span></p>
+                                                <p className="text-green-500 text-xs mt-1">مدفوع: <span className="font-bold">{l.paid}</span></p>
+                                                {l.remaining > 0 && <p className="text-red-500 text-xs mt-1">متبقي: <span className="font-bold">{l.remaining}</span></p>}
+                                            </td>
+                                            <td className="p-3 text-center">
+                                                <button onClick={() => deleteLog(l.id)} className="text-red-500 hover:text-white hover:bg-red-600 p-2 rounded-lg transition-colors"><Icons.Trash2 size={16} /></button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    {currentDayLogs.length === 0 && <tr><td colSpan="5" className="text-center p-6 text-gray-500">لا توجد حجوزات مسجلة.</td></tr>}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h4 className="text-red-400 font-bold mb-3 flex items-center gap-2"><Icons.Wallet size={18}/> المصروفات اليومية</h4>
+                        <div className="overflow-x-auto no-scrollbar">
+                            <table className="w-full text-right text-sm">
+                                <thead className="bg-black/40 border-b border-[#222]">
+                                    <tr>
+                                        <th className="p-3 text-gray-400 font-medium">البيان</th>
+                                        <th className="p-3 text-gray-400 font-medium">المبلغ</th>
+                                        <th className="p-3 text-center text-gray-400 font-medium">إجراء</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-[#222]">
+                                    {currentDayExps.map(e => (
+                                        <tr key={e.id} className="hover:bg-[#1a1a1a] transition-colors">
+                                            <td className="p-3 text-white font-bold">{e.name}</td>
+                                            <td className="p-3 text-red-400 font-bold">{e.amount} ج.م</td>
+                                            <td className="p-3 text-center">
+                                                <button onClick={() => deleteExp(e.id)} className="text-red-500 hover:text-white hover:bg-red-600 p-2 rounded-lg transition-colors"><Icons.Trash2 size={16} /></button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    {currentDayExps.length === 0 && <tr><td colSpan="3" className="text-center p-6 text-gray-500">لا توجد مصروفات مسجلة.</td></tr>}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            );
         }
 
         function ContractPrintView({ booking, settings, onClose }) {
