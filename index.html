@@ -898,15 +898,19 @@
                                                     setUser(null);
                                                 } else {
                                                     if (data.trialEndsAt) {
-                                                        const trialEnd = new Date(data.trialEndsAt);
-                                                        if (new Date() > trialEnd) {
+                                                        const endDate = new Date(data.trialEndsAt);
+                                                        if (new Date() > endDate) {
                                                              firebase.firestore().collection('subscribers').doc(usr.uid).update({ isActive: false });
                                                              firebase.auth().signOut();
-                                                             alert("انتهت الفترة التجريبية المجانية. يرجى التواصل مع الإدارة لتفعيل حسابك.");
+                                                             alert(data.subscriptionType === 'paid' ? "انتهت مدة اشتراكك. يرجى التواصل مع الإدارة لتجديد الاشتراك." : "انتهت الفترة التجريبية المجانية. يرجى التواصل مع الإدارة لتفعيل حسابك.");
                                                              setUser(null);
                                                         } else {
-                                                             const daysLeft = Math.ceil((trialEnd - new Date()) / (1000 * 60 * 60 * 24));
-                                                             setTrialInfo(`الحساب في الفترة التجريبية. متبقي ${daysLeft} أيام.`);
+                                                             const daysLeft = Math.ceil((endDate - new Date()) / (1000 * 60 * 60 * 24));
+                                                             if (data.subscriptionType !== 'paid') {
+                                                                 setTrialInfo(`الحساب في الفترة التجريبية. متبقي ${daysLeft} أيام.`);
+                                                             } else {
+                                                                 setTrialInfo(null); // إخفاء الشريط في حالة الاشتراك المدفوع
+                                                             }
                                                              setUser(usr);
                                                         }
                                                     } else {
