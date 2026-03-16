@@ -160,6 +160,7 @@
           const [authReady, setAuthReady] = useState(false);
           const [authError, setAuthError] = useState(null);
           const [dataLoaded, setDataLoaded] = useState(false);
+          const [showNotFound, setShowNotFound] = useState(false);
           
           const [transactions, setTransactions] = useState([]);
           const [expenses, setExpenses] = useState([]);
@@ -214,7 +215,6 @@
                     data.waTemplates.tracking = DEFAULT_WA_TEMPLATES.tracking;
                 }
                 
-                // تحديث قالب الفاتورة القديم ليتضمن رابط التتبع والرسالة الترحيبية إذا لم يكن موجوداً
                 if (data.waTemplates.invoice && !data.waTemplates.invoice.includes('{track_url}')) {
                     data.waTemplates.invoice = DEFAULT_WA_TEMPLATES.invoice;
                 }
@@ -252,6 +252,19 @@
             return () => clearTimeout(timer);
           }, [settings, user, isTracking]);
 
+          // فترة سماح لمنع ظهور رسالة الطلب غير موجود قبل اكتمال جلب البيانات
+          useEffect(() => {
+              if (isTracking && dataLoaded) {
+                  const exists = transactions.some(t => t.phone === trackPhone && t.receiptNo.toString() === trackReceipt);
+                  if (!exists) {
+                      const timer = setTimeout(() => setShowNotFound(true), 2500);
+                      return () => clearTimeout(timer);
+                  } else {
+                      setShowNotFound(false);
+                  }
+              }
+          }, [isTracking, dataLoaded, transactions, trackPhone, trackReceipt]);
+
           const formatCurrency = (num) => Number(num || 0).toLocaleString('ar-EG') + ' ج.م';
           const formatDate = (dateStr) => new Date(dateStr).toLocaleString('ar-EG', { dateStyle: 'short', timeStyle: 'short' });
           const formatDateOnly = (dateStr) => new Date(dateStr).toLocaleDateString('ar-EG');
@@ -267,7 +280,6 @@
             msg = msg.replace(/{studio}/g, settings.studioName || 'الاستوديو');
             msg = msg.replace(/{date}/g, formatDateOnly(txn.dateTime));
             
-            // Tracking URL creation using Phone and Receipt
             const trackUrl = window.location.href.split('?')[0] + `?phone=${encodeURIComponent(txn.phone)}&receipt=${encodeURIComponent(txn.receiptNo)}`;
             msg = msg.replace(/{track_url}/g, trackUrl);
             return msg;
@@ -283,7 +295,9 @@
 
           // --- Client Tracking View ---
           if (isTracking && authReady) {
-              if (!dataLoaded) {
+              const txn = transactions.find(t => t.phone === trackPhone && t.receiptNo.toString() === trackReceipt);
+
+              if (!dataLoaded || (!txn && !showNotFound)) {
                   return (
                       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-100 p-6 text-center">
                           <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
@@ -292,10 +306,8 @@
                       </div>
                   );
               }
-
-              const txn = transactions.find(t => t.phone === trackPhone && t.receiptNo.toString() === trackReceipt);
               
-              if (!txn) return (
+              if (!txn && showNotFound) return (
                   <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-400 p-6 text-center">
                       <i className="ph ph-magnifying-glass text-6xl mb-4 text-slate-600"></i>
                       <h2 className="text-2xl font-bold mb-2 text-white">الطلب غير موجود</h2>
@@ -308,14 +320,12 @@
 
               return (
                   <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-6 flex flex-col items-center">
-                      {/* Studio Header */}
                       <div className="flex flex-col items-center gap-3 mb-8 mt-6">
                           {settings.studioLogo ? <img src={settings.studioLogo} className="w-24 h-24 rounded-2xl object-cover shadow-lg shadow-blue-900/20 border border-slate-800" /> : <i className="ph ph-camera text-6xl text-blue-500"></i>}
                           <h1 className="text-2xl font-black">{settings.studioName}</h1>
                           <p className="text-slate-400 text-sm">تتبع حالة الطلب الخاص بك</p>
                       </div>
 
-                      {/* Receipt Info */}
                       <div className="bg-slate-900 w-full max-w-md p-6 rounded-3xl shadow-xl border border-slate-800 mb-8 relative overflow-hidden">
                           <div className="absolute top-0 right-0 w-2 h-full bg-blue-500"></div>
                           <div className="flex justify-between items-center mb-4 pb-4 border-b border-slate-800">
@@ -338,12 +348,10 @@
                           </div>
                       </div>
 
-                      {/* Timeline */}
                       <div className="w-full max-w-md bg-slate-900 p-6 sm:p-8 rounded-3xl shadow-xl border border-slate-800 mb-8">
                           <h3 className="font-bold text-lg mb-8 flex items-center gap-2 border-b border-slate-800 pb-4"><i className="ph ph-clock-counter-clockwise text-blue-500"></i> مراحل تجهيز الطلب:</h3>
                           
                           <div className="relative pl-4 space-y-8 pr-4">
-                              {/* Vertical Line */}
                               <div className="absolute right-[31px] top-6 bottom-6 w-[2px] bg-slate-800"></div>
 
                               {ORDER_STATUSES.map((s, index) => {
@@ -399,7 +407,6 @@
                     </div>
                   </div>
                   
-                  {/* Mobile Navigation */}
                   <div className="lg:hidden pb-4 overflow-x-auto hide-scrollbar">
                     <div className="flex items-center gap-2 min-w-max">
                       {navItems.map(btn => (
@@ -471,7 +478,7 @@
                 total: total,
                 paid: paid,
                 remaining: total - paid,
-                status: 0, // 0 = تم التسجيل
+                status: 0,
                 month: new Date().getMonth() + 1,
                 year: new Date().getFullYear()
               };
@@ -786,11 +793,10 @@
             );
           };
 
-          // --- Marketing & Bulk Messaging Tab ---
           const MarketingTab = () => {
             const [promoMessage, setPromoMessage] = useState("أهلاً بك أ. {name} 👋\nكل عام وأنتم بخير! 🎉\nنتمنى لكم أوقاتاً سعيدة مع من تحبون.\n\nشرفتنا في {studio} 📸✨");
             const [searchTerm, setSearchTerm] = useState('');
-            const [copyText, setCopyText] = useState('نسخ جميع الأرقام');
+            const [copyText, setCopyText] = useState('نسخ جميع الأرقام لعمل قائمة بث');
             const [customNumbersInput, setCustomNumbersInput] = useState('');
 
             // Extract unique clients by phone number from DB
@@ -809,36 +815,26 @@
             // Process custom pasted numbers
             const customClients = useMemo(() => {
               if (!customNumbersInput.trim()) return [];
-              // Split by comma (English or Arabic) or newline
               const numbers = customNumbersInput.split(/[,،\n]/).map(n => n.trim()).filter(n => n.length >= 8);
               const uniqueNums = [...new Set(numbers)];
-              
-              // Filter out phones that already exist in DB clients
               const existingPhones = new Set(uniqueClients.map(c => c.phone));
               const newUniqueNums = uniqueNums.filter(n => !existingPhones.has(n));
-              
               return newUniqueNums.map(n => ({ clientName: 'عميل (رقم خارجي)', phone: n, isCustom: true }));
             }, [customNumbersInput, uniqueClients]);
 
-            // Combine both lists
             const allClients = [...uniqueClients, ...customClients];
-            
-            // Apply search filter
             const filteredClients = allClients.filter(c => c.clientName.includes(searchTerm) || c.phone.includes(searchTerm));
 
             const handleCopyNumbers = () => {
               const numbersList = allClients.map(c => c.phone).join('\n');
-              
-              // Fallback copy method for iframes
               const el = document.createElement('textarea');
               el.value = numbersList;
               document.body.appendChild(el);
               el.select();
               document.execCommand('copy');
               document.body.removeChild(el);
-              
               setCopyText('تم النسخ بنجاح ✓');
-              setTimeout(() => setCopyText('نسخ جميع الأرقام'), 3000);
+              setTimeout(() => setCopyText('نسخ جميع الأرقام لعمل قائمة بث'), 3000);
             };
 
             const handleSendPromo = (client) => {
@@ -869,7 +865,7 @@
                      {/* Textarea for custom numbers */}
                      <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
                         <label className="block text-sm font-bold mb-3 text-blue-400">
-                            <i className="ph ph-list-plus text-lg ml-1 align-middle"></i> إضافة أرقام خارجية (اختياري) <br/>
+                            <i className="ph ph-list-plus text-lg ml-1 align-middle"></i> إضافة أرقام خارجية (مفصولة بفاصلة) <br/>
                             <span className="text-xs font-normal text-slate-500 mt-1 block">الصق الأرقام هنا مفصولة بفاصلة (,) أو كل رقم في سطر جديد. سيتم إضافتها فوراً للقائمة بالأسفل.</span>
                         </label>
                         <textarea 
@@ -886,7 +882,7 @@
                           <i className={copyText.includes('✓') ? "ph ph-check text-green-400 text-xl" : "ph ph-copy text-xl"}></i> {copyText} ({allClients.length})
                         </button>
                         <p className="text-xs text-slate-400 flex-1 leading-relaxed text-center sm:text-right">
-                          <strong className="text-slate-300">ملاحظة هامة:</strong> لتسهيل الإرسال الجماعي، يمكنك نسخ جميع الأرقام من الزر وتكوين "قائمة رسائل جماعية" (Broadcast List) في تطبيق WhatsApp Business على هاتفك لإرسال العرض للجميع بضغطة زر واحدة. أو استخدم زر الإرسال بجوار كل عميل بالأسفل.
+                          <strong className="text-slate-300">طريقة الإرسال الجماعي:</strong> قم بنسخ جميع الأرقام من الزر، ثم اذهب لتطبيق WhatsApp Business في هاتفك وقم بإنشاء "رسالة جماعية جديدة" (Broadcast List) والصق الأرقام لإرسال العرض للجميع بضغطة واحدة!
                         </p>
                      </div>
                   </div>
