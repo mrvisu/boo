@@ -1003,38 +1003,23 @@
               });
 
               const unsubS = db.collection('users').doc(user.uid).collection('settings').doc('config').onSnapshot((snap) => {
-                  if(snap.exists) setSettings({ ...DEFAULT_SETTINGS, ...snap.data() });
-              });
-              return () => { unsubB(); unsubE(); unsubDL(); unsubDE(); unsubS(); };
-          }, [user, isFirebaseActiveState, isAdmin]);
+              if(snap.exists) setSettings({ ...DEFAULT_SETTINGS, ...snap.data() });
+          });
+          return () => { unsubB(); unsubE(); unsubDL(); unsubDE(); unsubS(); };
+      }, [user, isFirebaseActiveState, isAdmin]);
 
-          useEffect(() => { localStorage.setItem('mrakby_bookings', JSON.stringify(bookings)); }, [bookings]);
-          useEffect(() => { localStorage.setItem('mrakby_expenses', JSON.stringify(expenses)); }, [expenses]);
-          useEffect(() => { localStorage.setItem('mrakby_daily_logs', JSON.stringify(dailyLogs)); }, [dailyLogs]);
-          useEffect(() => { localStorage.setItem('mrakby_daily_expenses', JSON.stringify(dailyExpenses)); }, [dailyExpenses]);
-          useEffect(() => { localStorage.setItem('mrakby_settings', JSON.stringify(settings)); }, [settings]);
+      useEffect(() => { localStorage.setItem('mrakby_bookings', JSON.stringify(bookings)); }, [bookings]);
+      useEffect(() => { localStorage.setItem('mrakby_expenses', JSON.stringify(expenses)); }, [expenses]);
+      useEffect(() => { localStorage.setItem('mrakby_daily_logs', JSON.stringify(dailyLogs)); }, [dailyLogs]);
+      useEffect(() => { localStorage.setItem('mrakby_daily_expenses', JSON.stringify(dailyExpenses)); }, [dailyExpenses]);
+      useEffect(() => { localStorage.setItem('mrakby_settings', JSON.stringify(settings)); }, [settings]);
 
-          // إضافة رسالة تأكيد عند محاولة إغلاق الموقع أو التبويب
-          useEffect(() => {
-              const handleBeforeUnload = (e) => {
-                  e.preventDefault();
-                  // المتصفحات الحديثة تتطلب هذا السطر ولكنها ستعرض رسالتها الافتراضية
-                  e.returnValue = ''; 
-              };
+      const showToast = (message, type = 'success') => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 3000);
+      };
 
-              window.addEventListener('beforeunload', handleBeforeUnload);
-
-              return () => {
-                  window.removeEventListener('beforeunload', handleBeforeUnload);
-              };
-          }, []);
-
-          const showToast = (message, type = 'success') => {
-            setToast({ message, type });
-            setTimeout(() => setToast(null), 3000);
-          };
-
-          const handleLogoutClick = () => {
+      const handleLogoutClick = () => {
               setShowLogoutConfirm(true);
           };
 
