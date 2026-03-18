@@ -1479,9 +1479,6 @@
           // Upcoming Clients Filter State
           const [upcomingFilter, setUpcomingFilter] = useState('all');
 
-          // Month Details State
-          const [selectedMonthStats, setSelectedMonthStats] = useState(null);
-
           // الخصوصية
           const [localHideFinancials, setLocalHideFinancials] = useState(settings.hideFinancials || false);
           
@@ -1564,10 +1561,8 @@
               const d = new Date(b.date);
               if (!isNaN(d)) {
                   const mKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-                  if (!monthly[mKey]) monthly[mKey] = { label: `${monthNames[d.getMonth()]} ${d.getFullYear()}`, rev: 0, count: 0, bookings: [] };
-                  monthly[mKey].rev += bRev; 
-                  monthly[mKey].count += 1;
-                  monthly[mKey].bookings.push(b); // إضافة بيانات الحجز لهذا الشهر
+                  if (!monthly[mKey]) monthly[mKey] = { label: `${monthNames[d.getMonth()]} ${d.getFullYear()}`, rev: 0, count: 0 };
+                  monthly[mKey].rev += bRev; monthly[mKey].count += 1;
                   
                   if (d.getMonth() === currentMonthIndex && d.getFullYear() === today.getFullYear()) {
                       currentMonthTotalBookings++;
@@ -1757,38 +1752,6 @@
                 </div>
               )}
 
-              {/* Month Details Modal */}
-              {selectedMonthStats && (
-                <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[90] p-4 animate-fadeIn">
-                    <div className="bg-[#111] border border-[#D4AF37]/30 p-6 rounded-3xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl">
-                        <div className="flex justify-between items-start mb-4 border-b border-[#222] pb-4 shrink-0">
-                            <div>
-                                <h3 className="text-xl font-bold text-[#D4AF37] flex items-center gap-2">
-                                    <Icons.CalendarIcon size={20}/> تفاصيل شهر {selectedMonthStats.label}
-                                </h3>
-                                <p className="text-sm text-gray-400 mt-2">إجمالي العملاء: <span className="text-white font-bold">{selectedMonthStats.count}</span> | الإيرادات الكلية: <span className="text-green-500 font-bold">{localHideFinancials ? '••••••' : formatMoney(selectedMonthStats.rev)}</span></p>
-                            </div>
-                            <button onClick={() => setSelectedMonthStats(null)} className="text-gray-400 hover:text-white"><Icons.X size={24} /></button>
-                        </div>
-                        
-                        <div className="flex-1 overflow-y-auto pr-2 no-scrollbar space-y-3">
-                            {selectedMonthStats.bookings.map((b, idx) => (
-                                <div key={idx} className="bg-[#1a1a1a] p-4 rounded-xl border border-[#333] hover:border-[#D4AF37]/50 transition-colors flex justify-between items-center">
-                                    <div>
-                                        <p className="font-bold text-white text-sm md:text-base">{b.groomName} & {b.brideName}</p>
-                                        <p className="text-xs text-gray-400 mt-1">{b.date} | {b.sessionType === 'آخر' ? b.otherSessionType : b.sessionType}</p>
-                                    </div>
-                                    <div className="text-left bg-black p-2 rounded-lg border border-[#222]">
-                                        <p className="text-[10px] text-gray-500 mb-0.5">الإجمالي</p>
-                                        <p className="text-[#D4AF37] font-bold text-xs md:text-sm">{localHideFinancials ? '••••••' : formatMoney(b.totalPrice)}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-              )}
-
               {/* Detail Modal for General Alerts */}
               {selectedAlertBooking && selectedAlertBooking.type === 'general' && (
                 <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[80] p-4 animate-fadeIn">
@@ -1875,10 +1838,9 @@
               {/* شريط الإيرادات الشهرية الأفقي */}
               <div className="flex gap-3 overflow-x-auto no-scrollbar mb-6 pb-2">
                   {stats.sortedMonths.length > 0 ? stats.sortedMonths.map((m, i) => (
-                      <div key={i} onClick={() => setSelectedMonthStats(m)} className="cursor-pointer bg-gradient-to-b from-[#111] to-black border border-[#333] px-5 py-3 rounded-2xl flex-shrink-0 flex flex-col items-center justify-center min-w-[140px] shadow-lg hover:border-[#D4AF37]/50 transition-colors group">
-                          <span className="text-gray-400 text-xs font-bold mb-1 group-hover:text-white transition-colors">{m.label}</span>
+                      <div key={i} className="bg-gradient-to-b from-[#111] to-black border border-[#333] px-5 py-3 rounded-2xl flex-shrink-0 flex flex-col items-center justify-center min-w-[140px] shadow-lg hover:border-[#D4AF37]/50 transition-colors">
+                          <span className="text-gray-400 text-xs font-bold mb-1">{m.label}</span>
                           <span className="text-[#D4AF37] font-black text-sm">{localHideFinancials ? '••••••' : formatMoney(m.rev)}</span>
-                          <span className="text-[10px] text-gray-500 mt-1.5 bg-[#222] px-2 py-0.5 rounded-full border border-[#333]">{m.count} عملاء</span>
                       </div>
                   )) : (
                       <div className="text-gray-500 text-sm">لا توجد إيرادات مسجلة بعد.</div>
@@ -2699,7 +2661,7 @@
             const [statusFilter, setStatusFilter] = useState('all');
             const [bookingToDelete, setBookingToDelete] = useState(null);
             const [msgModalBooking, setMsgModalBooking] = useState(null);
-            const [detailModalBooking, setDetailModalBooking] = useState(null); // نافذة التفاصيل الشاملة
+            const [detailModalBooking, setDetailModalBooking] = useState(null); 
             
             // Payment Modal States
             const [paymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -2751,7 +2713,7 @@
             const updateBookingStatus = (booking, newStatus) => {
                 if (newStatus === 'تم التسليم' && Number(booking.remaining) > 0) {
                     showToast("عذراً، لا يمكن تغيير الحالة إلى 'تم التسليم' لوجود مبلغ متبقي على العميل!", "error");
-                    return; // إيقاف العملية وعدم تغيير الحالة
+                    return; 
                 }
                 onUpdateBooking({ ...booking, status: newStatus });
             };
@@ -2767,16 +2729,46 @@
                 }
             };
 
+            // دالة إرسال الفاتورة ورابط التتبع عبر الواتساب
+            const sendInvoice = (b) => {
+                let msg = `أهلاً بك أستاذ/ة ${b.groomName}،\n`;
+                msg += `إليك تفاصيل الحجز والفاتورة الخاصة بك لدى ${settings.studioName || 'الاستوديو'}:\n\n`;
+                
+                msg += `📅 التاريخ: ${b.date}\n`;
+                msg += `📍 المكان: ${(b.location === 'آخر' ? b.otherLocation : b.location) || '---'}\n`;
+                msg += `✨ المناسبة: ${b.sessionType === 'آخر' ? b.otherSessionType : b.sessionType}\n\n`;
+                
+                msg += `📦 الخدمات المطلوبة:\n`;
+                if (b.snapshotPackages?.length > 0) b.snapshotPackages.forEach(p => msg += `- فوتوغرافيا: ${p.name} (${p.price} ج.م)\n`);
+                if (b.snapshotVideoServices?.length > 0) b.snapshotVideoServices.forEach(v => msg += `- فيديو: ${v.name} (${v.price} ج.م)\n`);
+                
+                if (b.hasSecondEvent && b.date2) {
+                     msg += `\n📅 المناسبة الإضافية: ${b.date2} (${b.sessionType2})\n`;
+                     if (b.snapshotPackages2?.length > 0) b.snapshotPackages2.forEach(p => msg += `- فوتو (إضافي): ${p.name} (${p.price} ج.م)\n`);
+                     if (b.snapshotVideoServices2?.length > 0) b.snapshotVideoServices2.forEach(v => msg += `- فيديو (إضافي): ${v.name} (${v.price} ج.م)\n`);
+                }
+                
+                msg += `\n💰 الملخص المالي:\n`;
+                msg += `الإجمالي: ${b.totalPrice} ج.م\n`;
+                msg += `المدفوع: ${b.paid || 0} ج.م\n`;
+                msg += `المتبقي: ${b.remaining} ج.م\n\n`;
+                
+                msg += `🔗 لمتابعة حالة حجزك (في الريتاتش، الطباعة، الاستلام):\n`;
+                msg += `https://studio-system.web.app/track?id=${b.id}\n\n`;
+                
+                msg += `شكراً لثقتكم بنا! 🙏`;
+                
+                window.open(`https://wa.me/2${b.phone}?text=${encodeURIComponent(msg)}`, '_blank');
+            };
+
             // --- دالة تصدير البيانات إلى Excel الحقيقي ---
             const handleExportBackup = () => {
                 if (bookings.length === 0) {
                     return showToast("لا توجد بيانات لتصديرها!", "error");
                 }
 
-                // 1. تحديد عناوين الأعمدة
                 const headers = ['اسم العريس', 'اسم العروسة', 'الهاتف', 'التاريخ', 'نوع السيشن', 'المكان', 'إجمالي الحساب', 'المدفوع', 'المتبقي', 'حالة الطلب'];
                 
-                // 2. تجهيز صفوف البيانات (مصفوفة ثنائية الأبعاد)
                 const data = bookings.map(b => {
                     const session = b.sessionType === 'آخر' ? b.otherSessionType : b.sessionType;
                     const loc = b.location === 'آخر' ? b.otherLocation : b.location;
@@ -2796,14 +2788,11 @@
                     ];
                 });
 
-                // 3. إنشاء ملف الـ Excel باستخدام مكتبة xlsx
-                const wb = XLSX.utils.book_new(); // إنشاء كتاب جديد
-                const ws = XLSX.utils.aoa_to_sheet([headers, ...data]); // دمج العناوين مع البيانات
+                const wb = XLSX.utils.book_new(); 
+                const ws = XLSX.utils.aoa_to_sheet([headers, ...data]); 
                 
-                // إضافة الشيت إلى الكتاب
                 XLSX.utils.book_append_sheet(wb, ws, "العملاء");
                 
-                // تنزيل الملف بصيغة .xlsx
                 XLSX.writeFile(wb, `MrakbyStudio_Bookings_${new Date().toISOString().split('T')[0]}.xlsx`);
                 
                 showToast("تم تحميل الحجوزات (Excel) بنجاح! ✅");
@@ -2823,14 +2812,12 @@
                               </div>
 
                               <div className="space-y-6">
-                                  {/* بيانات العميل الأساسية */}
                                   <div className="bg-black/50 p-4 rounded-xl border border-white/5 grid grid-cols-2 gap-4">
                                       <div><p className="text-xs text-gray-500 mb-1">العروسين</p><p className="text-white font-bold">{detailModalBooking.groomName} & {detailModalBooking.brideName}</p></div>
                                       <div><p className="text-xs text-gray-500 mb-1">رقم الهاتف</p><p className="text-white font-bold font-mono text-left">{detailModalBooking.phone}</p></div>
                                       <div className="col-span-2"><p className="text-xs text-gray-500 mb-1">العنوان</p><p className="text-white font-bold">{detailModalBooking.address || '---'}</p></div>
                                   </div>
 
-                                  {/* تفاصيل المناسبات */}
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                       <div className="bg-gray-900/30 p-4 rounded-xl border border-gray-600/30">
                                           <h4 className="text-gray-300 font-bold mb-3 border-b border-gray-700/50 pb-2">المناسبة الأساسية</h4>
@@ -2850,11 +2837,9 @@
                                       )}
                                   </div>
 
-                                  {/* الخدمات المطلوبة */}
                                   <div className="bg-black/50 p-4 rounded-xl border border-white/5 space-y-3">
                                       <h4 className="text-[#D4AF37] font-bold mb-2">الخدمات المختارة والأسعار</h4>
                                       
-                                      {/* خدمات المناسبة الأولى */}
                                       {detailModalBooking.snapshotPackages?.length > 0 && (
                                           <div><p className="text-sm text-gray-400">فوتوغرافيا أساسية:</p> {detailModalBooking.snapshotPackages.map((p, i) => <p key={i} className="text-sm font-bold text-white pr-4">- {p.name} ({p.price} ج.م)</p>)}</div>
                                       )}
@@ -2862,7 +2847,6 @@
                                           <div className="mt-2"><p className="text-sm text-gray-400">فيديو أساسي:</p> {detailModalBooking.snapshotVideoServices.map((v, i) => <p key={i} className="text-sm font-bold text-white pr-4">- {v.name} ({v.price} ج.م)</p>)}</div>
                                       )}
 
-                                      {/* خدمات المناسبة الإضافية */}
                                       {(detailModalBooking.snapshotPackages2?.length > 0 || detailModalBooking.snapshotVideoServices2?.length > 0) && (
                                           <div className="mt-3 pt-3 border-t border-[#333]">
                                               {detailModalBooking.snapshotPackages2?.length > 0 && <div><p className="text-sm text-blue-400">فوتوغرافيا إضافية:</p> {detailModalBooking.snapshotPackages2.map((p, i) => <p key={i} className="text-sm font-bold text-white pr-4">- {p.name} ({p.price} ج.م)</p>)}</div>}
@@ -2870,7 +2854,6 @@
                                           </div>
                                       )}
                                       
-                                      {/* الملاحظات */}
                                       {detailModalBooking.notes && (
                                           <div className="mt-3 pt-3 border-t border-[#333]">
                                               <p className="text-sm text-gray-400">ملاحظات إضافية:</p>
@@ -2879,18 +2862,20 @@
                                       )}
                                   </div>
 
-                                  {/* الملخص المالي */}
                                   <div className="flex justify-between items-center bg-[#D4AF37]/10 p-4 rounded-xl border border-[#D4AF37]/30">
                                       <div className="text-center"><p className="text-xs text-gray-400 uppercase">الإجمالي</p><p className="text-xl font-bold text-white">{detailModalBooking.totalPrice} ج.م</p></div>
                                       <div className="text-center border-r border-[#D4AF37]/20 pr-4"><p className="text-xs text-gray-400 uppercase">المدفوع</p><p className="text-xl font-bold text-green-500">{detailModalBooking.paid || 0} ج.م</p></div>
                                       <div className="text-center border-r border-[#D4AF37]/20 pr-4"><p className="text-xs text-gray-400 uppercase">المتبقي</p><p className={`text-xl font-bold ${detailModalBooking.remaining > 0 ? 'text-red-500' : 'text-green-500'}`}>{detailModalBooking.remaining} ج.م</p></div>
                                   </div>
+                                  
+                                  <button onClick={() => sendInvoice(detailModalBooking)} className="w-full bg-teal-600 hover:bg-teal-500 text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2 mt-4">
+                                      <Icons.FileText size={20} /> إرسال الفاتورة ورابط التتبع عبر واتساب
+                                  </button>
                               </div>
                           </div>
                       </div>
                     )}
                     
-                    {/* Thank You Modal */}
                     {thankYouClient && (
                       <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[100] p-4 animate-fadeIn">
                           <div className="bg-[#111] border border-green-500/30 p-6 rounded-3xl w-full max-w-md shadow-2xl">
@@ -3046,7 +3031,7 @@
                                     {b.remaining > 0 ? (
                                         <p className="text-xs text-red-500 mt-1 font-bold">باقي {b.remaining}</p>
                                     ) : (
-                                        <span className="text-[11px] bg-green-500/20 text-green-400 border border-green-500/30 px-2 py-1 rounded-lg mt-1 inline-block font-bold">تم سداد كامل المبلغ</span>
+                                        <span className="text-[11px] bg-green-500/20 text-green-400 border border-green-500/30 px-2 py-1 rounded-lg mt-1 inline-block font-bold">مكتمل</span>
                                     )}
                                 </td>
                                 <td className="p-4">
@@ -3058,8 +3043,9 @@
                                         {BOOKING_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                                     </select>
                                 </td>
-                                <td className="p-4 flex justify-center gap-2">
-                                    <button onClick={() => setDetailModalBooking(b)} className="p-2.5 bg-gray-500/10 text-gray-400 hover:bg-gray-500 hover:text-white rounded-xl transition-colors" title="عرض التفاصيل الكاملة"><Icons.Eye size={20}/></button>
+                                <td className="p-4 flex justify-center gap-2 flex-wrap max-w-[200px]">
+                                    <button onClick={() => setDetailModalBooking(b)} className="p-2.5 bg-gray-500/10 text-gray-400 hover:bg-gray-500 hover:text-white rounded-xl transition-colors" title="عرض التفاصيل الشاملة"><Icons.Eye size={20}/></button>
+                                    <button onClick={() => sendInvoice(b)} className="p-2.5 bg-teal-500/10 text-teal-500 hover:bg-teal-500 hover:text-white rounded-xl transition-colors" title="إرسال الفاتورة والتتبع عبر واتساب"><Icons.FileText size={20}/></button>
                                     <button onClick={() => setMsgModalBooking(b)} className="p-2.5 bg-green-500/10 text-green-500 hover:bg-green-500 hover:text-white rounded-xl transition-colors" title="إرسال رسالة سريعة للعميل"><Icons.MessageSquare size={20}/></button>
                                     <button onClick={() => window.open(generateGoogleCalendarLink(b, settings.studioName), '_blank')} className="p-2.5 bg-blue-500/10 text-blue-500 hover:bg-blue-500 hover:text-white rounded-xl transition-colors" title="إضافة للتقويم"><Icons.CalendarPlus size={20}/></button>
                                     <button onClick={() => onEdit(b)} className="p-2.5 bg-blue-500/10 text-blue-500 hover:bg-blue-500 hover:text-white rounded-xl transition-colors" title="تعديل الحجز"><Icons.Edit size={20}/></button>
