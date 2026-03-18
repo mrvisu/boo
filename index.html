@@ -1476,6 +1476,12 @@
           const [paymentModalOpen, setPaymentModalOpen] = useState(false);
           const [paymentSearch, setPaymentSearch] = useState('');
 
+          // Upcoming Clients Filter State
+          const [upcomingFilter, setUpcomingFilter] = useState('all');
+
+          // Month Details State
+          const [selectedMonthStats, setSelectedMonthStats] = useState(null);
+
           // الخصوصية
           const [localHideFinancials, setLocalHideFinancials] = useState(settings.hideFinancials || false);
           
@@ -1558,8 +1564,10 @@
               const d = new Date(b.date);
               if (!isNaN(d)) {
                   const mKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-                  if (!monthly[mKey]) monthly[mKey] = { label: `${monthNames[d.getMonth()]} ${d.getFullYear()}`, rev: 0, count: 0 };
-                  monthly[mKey].rev += bRev; monthly[mKey].count += 1;
+                  if (!monthly[mKey]) monthly[mKey] = { label: `${monthNames[d.getMonth()]} ${d.getFullYear()}`, rev: 0, count: 0, bookings: [] };
+                  monthly[mKey].rev += bRev; 
+                  monthly[mKey].count += 1;
+                  monthly[mKey].bookings.push(b); // إضافة بيانات الحجز لهذا الشهر
                   
                   if (d.getMonth() === currentMonthIndex && d.getFullYear() === today.getFullYear()) {
                       currentMonthTotalBookings++;
@@ -1635,6 +1643,14 @@
           const selectedAlertExpenses = selectedAlertBooking ? expenses.filter(e => e.bookingId === selectedAlertBooking.data.id) : [];
           const alertTotalCost = selectedAlertExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
           const alertNetProfit = selectedAlertBooking ? selectedAlertBooking.data.totalPrice - alertTotalCost : 0;
+
+          // فلترة العملاء القادمين
+          const filteredUpcoming = upcoming.filter(b => {
+              const mainType = b.bookingMainType || 'فوتوغرافي وفيديو';
+              if (upcomingFilter === 'photo') return ['تصوير فوتوغرافي', 'فوتوغرافي وفيديو'].includes(mainType);
+              if (upcomingFilter === 'video') return ['تصوير فيديو', 'فوتوغرافي وفيديو'].includes(mainType);
+              return true;
+          });
 
           return (
             <div className="space-y-8 animate-fadeIn relative">
@@ -1741,6 +1757,38 @@
                 </div>
               )}
 
+              {/* Month Details Modal */}
+              {selectedMonthStats && (
+                <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[90] p-4 animate-fadeIn">
+                    <div className="bg-[#111] border border-[#D4AF37]/30 p-6 rounded-3xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl">
+                        <div className="flex justify-between items-start mb-4 border-b border-[#222] pb-4 shrink-0">
+                            <div>
+                                <h3 className="text-xl font-bold text-[#D4AF37] flex items-center gap-2">
+                                    <Icons.CalendarIcon size={20}/> تفاصيل شهر {selectedMonthStats.label}
+                                </h3>
+                                <p className="text-sm text-gray-400 mt-2">إجمالي العملاء: <span className="text-white font-bold">{selectedMonthStats.count}</span> | الإيرادات الكلية: <span className="text-green-500 font-bold">{localHideFinancials ? '••••••' : formatMoney(selectedMonthStats.rev)}</span></p>
+                            </div>
+                            <button onClick={() => setSelectedMonthStats(null)} className="text-gray-400 hover:text-white"><Icons.X size={24} /></button>
+                        </div>
+                        
+                        <div className="flex-1 overflow-y-auto pr-2 no-scrollbar space-y-3">
+                            {selectedMonthStats.bookings.map((b, idx) => (
+                                <div key={idx} className="bg-[#1a1a1a] p-4 rounded-xl border border-[#333] hover:border-[#D4AF37]/50 transition-colors flex justify-between items-center">
+                                    <div>
+                                        <p className="font-bold text-white text-sm md:text-base">{b.groomName} & {b.brideName}</p>
+                                        <p className="text-xs text-gray-400 mt-1">{b.date} | {b.sessionType === 'آخر' ? b.otherSessionType : b.sessionType}</p>
+                                    </div>
+                                    <div className="text-left bg-black p-2 rounded-lg border border-[#222]">
+                                        <p className="text-[10px] text-gray-500 mb-0.5">الإجمالي</p>
+                                        <p className="text-[#D4AF37] font-bold text-xs md:text-sm">{localHideFinancials ? '••••••' : formatMoney(b.totalPrice)}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+              )}
+
               {/* Detail Modal for General Alerts */}
               {selectedAlertBooking && selectedAlertBooking.type === 'general' && (
                 <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[80] p-4 animate-fadeIn">
@@ -1824,6 +1872,19 @@
                 </button>
               </header>
 
+              {/* شريط الإيرادات الشهرية الأفقي */}
+              <div className="flex gap-3 overflow-x-auto no-scrollbar mb-6 pb-2">
+                  {stats.sortedMonths.length > 0 ? stats.sortedMonths.map((m, i) => (
+                      <div key={i} onClick={() => setSelectedMonthStats(m)} className="cursor-pointer bg-gradient-to-b from-[#111] to-black border border-[#333] px-5 py-3 rounded-2xl flex-shrink-0 flex flex-col items-center justify-center min-w-[140px] shadow-lg hover:border-[#D4AF37]/50 transition-colors group">
+                          <span className="text-gray-400 text-xs font-bold mb-1 group-hover:text-white transition-colors">{m.label}</span>
+                          <span className="text-[#D4AF37] font-black text-sm">{localHideFinancials ? '••••••' : formatMoney(m.rev)}</span>
+                          <span className="text-[10px] text-gray-500 mt-1.5 bg-[#222] px-2 py-0.5 rounded-full border border-[#333]">{m.count} عملاء</span>
+                      </div>
+                  )) : (
+                      <div className="text-gray-500 text-sm">لا توجد إيرادات مسجلة بعد.</div>
+                  )}
+              </div>
+
               {/* Animated Alert Queue Section */}
               <div className="space-y-4">
                   <AnimatedAlertBox 
@@ -1845,7 +1906,7 @@
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
                 {/* Upcoming Queue */}
                 <div className="lg:col-span-2 bg-[#111] p-6 rounded-3xl border border-[#222] shadow-xl flex flex-col h-[550px]">
-                  <div className="flex items-center justify-between gap-3 mb-6 shrink-0">
+                  <div className="flex items-center justify-between gap-3 mb-4 shrink-0">
                       <h3 className="text-[#D4AF37] font-bold text-xl flex items-center gap-2">
                           <Icons.ClockIcon className="text-[#D4AF37]" size={20} />
                           العملاء القادمون (شهر {stats.currentMonthNumber})
@@ -1854,8 +1915,16 @@
                           أقرب 7 حجوزات
                       </span>
                   </div>
+
+                  {/* أزرار الفلترة */}
+                  <div className="flex gap-2 mb-4 shrink-0 bg-black p-1.5 rounded-xl border border-[#333] w-fit">
+                      <button onClick={() => setUpcomingFilter('all')} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${upcomingFilter === 'all' ? 'bg-[#D4AF37] text-black' : 'text-gray-400 hover:text-white hover:bg-[#222]'}`}>الكل</button>
+                      <button onClick={() => setUpcomingFilter('photo')} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${upcomingFilter === 'photo' ? 'bg-[#D4AF37] text-black' : 'text-gray-400 hover:text-white hover:bg-[#222]'}`}>فوتوغرافيا</button>
+                      <button onClick={() => setUpcomingFilter('video')} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${upcomingFilter === 'video' ? 'bg-[#D4AF37] text-black' : 'text-gray-400 hover:text-white hover:bg-[#222]'}`}>فيديو</button>
+                  </div>
+
                   <div className="space-y-3 overflow-y-auto pr-2 no-scrollbar flex-1">
-                      {upcoming.length > 0 ? upcoming.slice(0, 7).map(b => (
+                      {filteredUpcoming.length > 0 ? filteredUpcoming.slice(0, 7).map(b => (
                           <div key={b.id} onClick={() => setSelectedAlertBooking({ data: b, type: 'general' })} className="flex flex-col md:flex-row md:items-center justify-between bg-black/40 p-4 rounded-xl border border-white/5 hover:border-[#D4AF37]/50 transition-colors gap-4 cursor-pointer shrink-0">
                               <div className="flex items-center gap-4">
                                   <div className="bg-[#D4AF37]/10 text-[#D4AF37] font-bold text-center p-3 rounded-xl min-w-[70px] border border-[#D4AF37]/20">
